@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,19 +41,18 @@ public class AuthController
         this.jwtUtils = jwtUtils;
     }
 
-    // @PostMapping(value = "/task", produces = "application/json", consumes = "application/json")
-    // public ResponseEntity<Object> taskAdd(@RequestBody Task task)
-
     @GetMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
     {
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
+        return ResponseEntity.ok(new JwtResponse(jwt));
+
+        /*
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
@@ -62,11 +62,14 @@ public class AuthController
                 userDetails.getUsername(),
                 userDetails.getEmail(),
                 roles));
+         */
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User ObjUser)
+    public ResponseEntity<?> registerUser(@RequestBody User ObjUser)
     {
+        /*
+        //TODO VALIDATE
         if (userRepository.existsByUsername(ObjUser.getUsername()))
         {
             return ResponseEntity
@@ -80,13 +83,18 @@ public class AuthController
                     .badRequest()
                     .body(new ApiResponse(false, "Error: Email is already taken!"));
         }
+         */
 
-        // Create new user's account
-        //User user = new User(ObjUser.getUsername(),
-        //        ObjUser.getEmail(),
-        //        encoder.encode(ObjUser.getPassword()));
+        User user = new User(ObjUser.getUsername(), encoder.encode(ObjUser.getPassword()),
+                ObjUser.getFirstName(),ObjUser.getLastName(),ObjUser.getFirmName(),
+                ObjUser.getActivity(),ObjUser.getInn(),ObjUser.getEmail());
 
-        User user = ObjUser;
+        if(ObjUser.getPatronymic() != null) user.setPatronymic(ObjUser.getPatronymic());
+        if(ObjUser.getDescription() != null) user.setDescription(ObjUser.getDescription());
+        if(ObjUser.getAddress() != null) user.setAddress(ObjUser.getAddress());
+        if(ObjUser.getTechnology() != null) user.setTechnology(ObjUser.getTechnology());
+        if(ObjUser.getAccount() != null) user.setAccount(ObjUser.getAccount());
+
         user.setPassword(encoder.encode(ObjUser.getPassword()));
         userRepository.save(user);
 

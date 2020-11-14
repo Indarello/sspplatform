@@ -24,14 +24,15 @@ public class UserDetailsServiceImpl implements UserDetailsService
     }
 
     @Transactional
-    public UserDetails loadUserByToken(String token) throws UsernameNotFoundException
+    public User loadUserByToken(String token) throws UsernameNotFoundException
     {
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
-        return UserDetailsImpl.build(user);
+        user.setPassword("[PROTECTED]");
+        return user;
     }
 
     @Override

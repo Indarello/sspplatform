@@ -19,7 +19,8 @@ import javax.validation.constraints.Size;
                 @UniqueConstraint(columnNames = "username"),
                 @UniqueConstraint(columnNames = "email"),
                 @UniqueConstraint(columnNames = "account"),
-                @UniqueConstraint(columnNames = "telephone")
+                @UniqueConstraint(columnNames = "telephone"),
+                @UniqueConstraint(columnNames = "inn")
         })
 public class User
 {
@@ -28,14 +29,59 @@ public class User
     private String username;
 
     @NotBlank
-    @Email
-    private String email;
-
-    @NotBlank
     private String password;
 
+    /**
+     * Имя контактного лица
+     */
     @NotBlank
-    private String role;
+    private String firstName;
+
+    /**
+     * Фамилия контактного лица
+     */
+    @NotBlank
+    private String lastName;
+
+    /**
+     * Отчество контактного лица
+     */
+    @NotNull
+    private String patronymic;
+
+    /**
+     * название компании
+     */
+    @NotNull
+    private String firmName;
+
+    /**
+     * описание компании
+     */
+    @NotNull
+    private String description;
+
+    /**
+     * Адрес компании
+     */
+    @NotNull
+    private String address;
+
+    /**
+     * Вид деятельности компании
+     * Например: Делаем лучшие веб сервисы
+     */
+    @NotNull
+    private String activity;
+
+    /**
+     * Стек технологии
+     */
+    @NotNull
+    private String technology;
+
+    @NotNull
+    private BigInteger inn;
 
     /**
      * номер счета
@@ -46,41 +92,69 @@ public class User
     @NotNull
     private BigInteger telephone;
 
-    /**
-     * название компании
-     */
-    @NotNull
-    private String company;
+    @NotBlank
+    @Email
+    private String email;
 
     /**
-     * описание компании
+     * роль в системе (сторонняя компания|сотрудник ssp) firm|employee
      */
-    @NotNull
-    private String description;
+    @NotBlank
+    private String role;
 
     /**
-     * адресс компании
+     * Статус в системе (Не подтвержден|Подтвержден|Данные изучаются|Заблокирвоан) (NotApproved|Approved|Review|Banned)
      */
-    @NotNull
-    private String address;
-
-    @NotNull
-    private BigInteger inn;
-
-    /**
-     * Контактное лицо - ФИО
-     */
-    @NotNull
-    private String contact;
+    @NotBlank
+    private String status;
 
     public User()
     {
     }
 
-    public User(String username, String email, String password)
+    /**
+     * конструктор для создания поставщинка
+     */
+    public User(String username, String password, String firstName, String lastName, String firmName, String activity, BigInteger inn, String email)
     {
         this.username = username;
-        this.email = email;
         this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.patronymic = "";
+        this.firmName = firmName;
+        this.description = "";
+        this.address = "";
+        this.activity = activity;
+        this.technology = "";
+        this.inn = inn;
+        this.account = "";
+        this.telephone = BigInteger.valueOf(0);
+        this.email = email;
+        this.role = "firm";
+        this.status = "NotApproved";
+    }
+
+    /**
+     * конструктор для создания сотрудника компании
+     */
+    public User(String username, String password, String firstName, String lastName)
+    {
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.patronymic = "";
+        this.firmName = "";
+        this.description = "";
+        this.address = "";
+        this.activity = "";
+        this.technology = "";
+        this.inn = BigInteger.valueOf(0);
+        this.account = "";
+        this.telephone = BigInteger.valueOf(0);
+        this.email = "";
+        this.role = "employee";
+        this.status = "Approved";
     }
 }
