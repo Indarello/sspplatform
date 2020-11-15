@@ -36,13 +36,13 @@
 			<column name="technology" type="text">
 				<constraints nullable="false"/>
 			</column>
-			<column name="inn" type="NUMERIC(19, 2)">
+			<column name="inn" type="varchar(20)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="account" type="varchar(50)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="telephone" type="NUMERIC(19, 2)">
+			<column name="telephone" type="varchar(30)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="email" type="text">

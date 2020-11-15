@@ -16,11 +16,11 @@ import javax.validation.constraints.Size;
 @Data
 @Table(name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = "username"),
-                @UniqueConstraint(columnNames = "email"),
-                @UniqueConstraint(columnNames = "account"),
-                @UniqueConstraint(columnNames = "telephone"),
-                @UniqueConstraint(columnNames = "inn")
+                //@UniqueConstraint(columnNames = "email"),     могут быть пустыми
+                //@UniqueConstraint(columnNames = "account"),
+                //@UniqueConstraint(columnNames = "telephone"),
+                //@UniqueConstraint(columnNames = "inn")
+                @UniqueConstraint(columnNames = "username")
         })
 public class User
 {
@@ -81,7 +81,7 @@ public class User
     private String technology;
 
     @NotNull
-    private BigInteger inn;
+    private String inn;
 
     /**
      * номер счета
@@ -90,9 +90,9 @@ public class User
     private String account;
 
     @NotNull
-    private BigInteger telephone;
+    private String telephone;
 
-    @NotBlank
+    @NotNull
     @Email
     private String email;
 
@@ -115,7 +115,7 @@ public class User
     /**
      * конструктор для создания поставщинка
      */
-    public User(String username, String password, String firstName, String lastName, String firmName, String activity, BigInteger inn, String email)
+    public User(String username, String password, String firstName, String lastName, String firmName, String activity, String inn, String email)
     {
         this.username = username;
         this.password = password;
@@ -129,7 +129,7 @@ public class User
         this.technology = "";
         this.inn = inn;
         this.account = "";
-        this.telephone = BigInteger.valueOf(0);
+        this.telephone = "";
         this.email = email;
         this.role = "firm";
         this.status = "NotApproved";
@@ -150,9 +150,9 @@ public class User
         this.address = "";
         this.activity = "";
         this.technology = "";
-        this.inn = BigInteger.valueOf(0);
+        this.inn = "";
         this.account = "";
-        this.telephone = BigInteger.valueOf(0);
+        this.telephone = "";
         this.email = "";
         this.role = "employee";
         this.status = "Approved";

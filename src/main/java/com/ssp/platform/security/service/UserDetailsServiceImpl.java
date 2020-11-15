@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
         this.jwtUtils = jwtUtils;
     }
 
-    @Transactional
+    //@Transactional
     public User loadUserByToken(String token) throws UsernameNotFoundException
     {
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
@@ -31,12 +31,11 @@ public class UserDetailsServiceImpl implements UserDetailsService
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
-        user.setPassword("[PROTECTED]");
         return user;
     }
 
     @Override
-    @Transactional
+    //@Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
         User user = userRepository.findByUsername(username)
