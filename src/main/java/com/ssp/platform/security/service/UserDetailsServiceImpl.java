@@ -23,7 +23,6 @@ public class UserDetailsServiceImpl implements UserDetailsService
         this.jwtUtils = jwtUtils;
     }
 
-    //@Transactional
     public User loadUserByToken(String token) throws UsernameNotFoundException
     {
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
@@ -35,7 +34,6 @@ public class UserDetailsServiceImpl implements UserDetailsService
     }
 
     @Override
-    //@Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
         User user = userRepository.findByUsername(username)
