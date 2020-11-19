@@ -50,7 +50,7 @@ public class UserController
         this.jwtUtils = jwtUtils;
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
     {
         Authentication authentication = authenticationManager.authenticate(

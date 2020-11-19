@@ -89,12 +89,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/purchase").permitAll()
                 .antMatchers("/testall").permitAll()
                 .antMatchers("/regfirstadmin").permitAll()
+                .antMatchers("/login").permitAll()
                 .anyRequest().authenticated();
 
         http.httpBasic().disable().cors().configurationSource(corsConfigurationSource());
 
         // авторизцаия доступна анонимным посетителям
-        http.formLogin().loginPage("/login").permitAll();
+        //http.formLogin().loginPage("/login").permitAll();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
