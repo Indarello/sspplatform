@@ -50,11 +50,12 @@ public class UserController
         this.jwtUtils = jwtUtils;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
+    @GetMapping("/login")
+    public ResponseEntity<?> authenticateUser(@RequestParam("username") String username,
+                                              @RequestParam("password") String password)
     {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(username, password));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
