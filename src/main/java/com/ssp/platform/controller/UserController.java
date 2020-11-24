@@ -58,6 +58,7 @@ public class UserController
     }
 
     @GetMapping("/login")
+    @CrossOrigin("https://ssp-platform.herokuapp.com/")
     public ResponseEntity<?> authenticateUser(@RequestHeader("username") String username, @RequestHeader("password") String password)
     {
         ValidatorResponse validatorResponse;
