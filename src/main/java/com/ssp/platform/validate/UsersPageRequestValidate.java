@@ -2,6 +2,7 @@ package com.ssp.platform.validate;
 
 import com.ssp.platform.entity.User;
 import com.ssp.platform.request.UsersPageRequest;
+import com.ssp.platform.response.ValidateResponse;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -16,27 +17,39 @@ public class UsersPageRequestValidate
         this.usersPageRequest = usersPageRequest;
     }
 
-    public String ValidateUsersPage()
+    public ValidateResponse validateUsersPage()
     {
-        if (usersPageRequest.getRequestPage() < 0 || usersPageRequest.getRequestPage() > 100000)
+        Integer checkInt = usersPageRequest.getRequestPage();
+        if (checkInt == null)
         {
-            return "Параметр requestPage может быть только 0-100000";
+            usersPageRequest.setRequestPage(0);
         }
-        if (usersPageRequest.getNumberOfElements() < 1 || usersPageRequest.getNumberOfElements() > 100)
+        else if (checkInt < 0 || checkInt > 100000)
+        {
+            return new ValidateResponse(false, "requestPage", "Параметр requestPage может быть только 0-100000");
+        }
+
+
+        checkInt = usersPageRequest.getNumberOfElements();
+        if (checkInt == null)
+        {
+            usersPageRequest.setNumberOfElements(10);
+        }
+        else if (checkInt < 1 || checkInt > 100)
         {
             usersPageRequest.setNumberOfElements(10);
         }
 
-        if (usersPageRequest.getType() == null)
+        String checkString = usersPageRequest.getType();
+        if (checkString == null)
         {
-            return "Параметр type не предоставлен";
+            return new ValidateResponse(false, "type", "Параметр type не предоставлен");
+        }
+        if(!checkString.equals("firm") && !checkString.equals("employee"))
+        {
+            return new ValidateResponse(false, "type", "Параметр type может быть только firm|employee");
         }
 
-        if(!usersPageRequest.getType().equals("firm") && !usersPageRequest.getType().equals("employee"))
-        {
-            return "Параметр type может быть только firm|employee";
-        }
-
-        return "ok";
+        return new ValidateResponse(true, "", "ok");
     }
 }

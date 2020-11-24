@@ -34,19 +34,19 @@ import java.util.Optional;
 @RestController
 public class UserController
 {
-    final AuthenticationManager authenticationManager;
-    final UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
     private final UserDetailsServiceImpl userDetailsService;
-    final PasswordEncoder encoder;
-    final JwtUtils jwtUtils;
-    boolean existsFirstUser = false;
+    private final PasswordEncoder encoder;
+    private final JwtUtils jwtUtils;
+    private boolean existsFirstUser = false;
 
     final UserValidator userValidator;
 
     @Autowired
     public UserController(
-            AuthenticationManager authenticationManager, UserService userService, UserDetailsServiceImpl userDetailsService, PasswordEncoder encoder,
-            JwtUtils jwtUtils, UserValidator userValidator
+            AuthenticationManager authenticationManager, UserService userService, UserDetailsServiceImpl userDetailsService,
+            PasswordEncoder encoder, JwtUtils jwtUtils, UserValidator userValidator
     )
     {
         this.authenticationManager = authenticationManager;
@@ -197,22 +197,24 @@ public class UserController
 
     @GetMapping(value = "/users/{type}")
     @PreAuthorize("hasAuthority('employee')")
-    public ResponseEntity<Object> getUsers(@PathVariable(name = "type") String type, @RequestBody UsersPageRequest userPageRequest)
+    public ResponseEntity<Object> getUsers(@PathVariable(name = "type") String type,
+           @RequestParam(value = "requestPage", required = false) Integer requestPage,
+           @RequestParam(value = "numberOfElements", required = false) Integer numberOfElements)
     {
-        userPageRequest.setType(type);
-        UsersPageRequestValidate usersPageValidate = new UsersPageRequestValidate(userPageRequest);
+        UsersPageRequest usersPageRequest = new UsersPageRequest(requestPage, numberOfElements, type);
+        UsersPageRequestValidate usersPageValidate = new UsersPageRequestValidate(usersPageRequest);
+        ValidateResponse validateResponse = usersPageValidate.validateUsersPage();
 
-        String checkResult = usersPageValidate.ValidateUsersPage();
-        if (!checkResult.equals("ok"))
+        if(!validateResponse.isSuccess())
         {
-            return new ResponseEntity<>(new ApiResponse(false, checkResult), HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
-        UsersPageRequest validPageRequest = usersPageValidate.getUsersPageRequest();
+        UsersPageRequest validUsersPageRequest = usersPageValidate.getUsersPageRequest();
 
-        Pageable pageable = PageRequest.of(validPageRequest.getRequestPage(), validPageRequest.getNumberOfElements());
+        Pageable pageable = PageRequest.of(validUsersPageRequest.getRequestPage(), validUsersPageRequest.getNumberOfElements());
 
-        Page<User> searchResult = userService.findAllByRole(pageable, validPageRequest.getType());
+        Page<User> searchResult = userService.findAllByRole(pageable, validUsersPageRequest.getType());
 
 
         return new ResponseEntity<>(searchResult, HttpStatus.OK);

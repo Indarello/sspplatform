@@ -3,6 +3,7 @@ package com.ssp.platform.controller;
 import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.response.FileResponse;
 import com.ssp.platform.service.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ public class FileController
 
     private final FileService fileService;
 
+    @Autowired
     public FileController(FileService fileService)
     {
         this.fileService = fileService;
@@ -74,21 +76,4 @@ public class FileController
                     .body(resource);
         }
     }
-
-    /*
-    @GetMapping("/file/{fileId}")
-    public ResponseEntity<Resource> getFile(@PathVariable("fileId") UUID fileId, HttpServletRequest request) throws IOException
-    {
-        Resource resource = fileService.getFile(fileId);
-        String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-
-        System.out.println(contentType);
-        System.out.println(resource.getFile().getAbsolutePath());
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-    }
-     */
 }

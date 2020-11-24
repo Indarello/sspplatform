@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@ControllerAdvice
 public class PurchaseController
 {
     private final PurchaseService purchaseService;
@@ -42,19 +41,6 @@ public class PurchaseController
         this.fileService = fileService;
     }
 
-
-    /**
-     * Я не знаю как это по другому решить
-     * но без этого если размер файла превышает допустимый (10МБ) - всегда вылетает SizeLimitExceededException
-     * при этом на стороне сервера
-     * Использую его родительский класс (MultipartException), может быть там еще какие то ошибки бывают
-     */
-    @ExceptionHandler(MultipartException.class)
-    @ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE)
-    public ResponseEntity<Object> handleMultipartException(MultipartException ex)
-    {
-        return new ResponseEntity<>(new ApiResponse(false, ex.getMessage()), HttpStatus.NOT_ACCEPTABLE);
-    }
 
     /**
      * Добавление сущности закупки
