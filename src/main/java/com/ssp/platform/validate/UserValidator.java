@@ -498,7 +498,7 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
             return false;
         }
 
-        if (!isMatch(companyAddress, "[A-Za-zа-яA-Я0-9 .,!@#№$;%:^?&*()_\\-+={}]+", Pattern.CASE_INSENSITIVE)){
+        if (!isMatch(companyAddress, "[A-Za-zа-яA-Я0-9 .,!@#№$;%:^?&*()_/\\-+={}]+", Pattern.CASE_INSENSITIVE)){
             validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
             return false;
         }
