@@ -9,15 +9,13 @@ import org.springframework.stereotype.Repository;
 import com.ssp.platform.entity.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>
+public interface UserRepository extends JpaRepository<User, String>
 {
     Optional<User> findByUsername(String username);
 
     boolean existsByUsername(String username);
 
-    boolean existsByRole(String role);
-
-    boolean existsByEmail(String email);
+    boolean deleteByUsername(String username);
 
     Page<User> findAllByRole(Pageable pageable, String role);
 }

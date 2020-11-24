@@ -6,8 +6,10 @@ import com.ssp.platform.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для выполнения операций с данными пользователя.
@@ -30,13 +32,10 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
-    public boolean existsByUsername(String username)
+    public Optional<User> findByUsername(String username)
     {
-        return userRepository.existsByUsername(username);
+        return userRepository.findByUsername(username);
     }
-
-    @Override
-    public boolean existsByRole(String role) { return userRepository.existsByRole(role); }
 
     @Override
     public Page<User> findAllByRole(Pageable pageable, String role)
@@ -45,8 +44,15 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
-    public Optional<User> findByUsername(String username)
-    {
-        return userRepository.findByUsername(username);
+    @Transactional
+    public boolean deleteUser(String username) {
+        Optional<User> searchResult = userRepository.findByUsername(username);
+        if (searchResult.isPresent()) {
+
+            userRepository.deleteByUsername(username);
+            return true;
+        }
+
+        return false;
     }
 }
