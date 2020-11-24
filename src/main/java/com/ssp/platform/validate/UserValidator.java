@@ -47,88 +47,85 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
 
     private final int MIN_PHONE_NUMBER_SIZE = 11;
 
-    private final int MAX_PHONE_NUMBER_SIZE = 20;
+    private final int MAX_PHONE_NUMBER_SIZE = 17;
 
-    private final int MIN_EMAIL_SIZE = 5;
+    private final int MIN_EMAIL_SIZE = 3;
 
-    private final int MAX_EMAIL_SIZE = 40;
+    private final int MAX_EMAIL_SIZE = 50;
 
     private final UserServiceImpl userService;
+
+    private ValidatorResponse validatorResponse;
 
     public UserValidator(UserServiceImpl userService) {
         this.userService = userService;
     }
 
-    public ValidatorResponse validateLoginForm(User userEntity)
-    {
-        ValidatorResponse validatorResponse;
-
-        if ((validatorResponse = validateLoginNoUnique(userEntity.getUsername())).getValidatorStatus() == ERROR)
-        {
+    public ValidatorResponse validateLoginForm(User userEntity) {
+        if (!validateLoginNoUnique(userEntity.getUsername())) {
             return validatorResponse;
         }
 
-        validatorResponse = validatePassword(userEntity.getPassword());
+        validatePassword(userEntity.getPassword());
 
         return validatorResponse;
     }
 
     public ValidatorResponse validateFirmUser(User userEntity) {
-        ValidatorResponse validatorResponse;
 
-        if ((validatorResponse = validateLogin(userEntity.getUsername())).getValidatorStatus() == ERROR) {
+        if (!validateLogin(userEntity.getUsername())){
             return validatorResponse;
         }
 
-        if ((validatorResponse = validatePassword(userEntity.getPassword())).getValidatorStatus() == ERROR) {
+        if (!validatePassword(userEntity.getPassword())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateFirstName(userEntity.getFirstName())).getValidatorStatus() == ERROR) {
+        if (!validateFirstName(userEntity.getFirstName())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateLastName(userEntity.getLastName())).getValidatorStatus() == ERROR) {
+        if (!validateLastName(userEntity.getLastName())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validatePatronymic(userEntity.getPatronymic())).getValidatorStatus() == ERROR) {
+        if (!validatePatronymic(userEntity.getPatronymic())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateCompanyName(userEntity.getFirmName())).getValidatorStatus() == ERROR) {
+        if (!validateCompanyName(userEntity.getFirmName())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateCompanyDescription(userEntity.getDescription())).getValidatorStatus() == ERROR) {
+        if (!validateCompanyDescription(userEntity.getDescription())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateCompanyAddress(userEntity.getAddress())).getValidatorStatus() == ERROR) {
+        if (!validateCompanyAddress(userEntity.getAddress())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateCompanyKindOfActivity(userEntity.getActivity())).getValidatorStatus() == ERROR) {
+        if (!validateCompanyKindOfActivity(userEntity.getActivity())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateCompanyTechnologyStack(userEntity.getTechnology())).getValidatorStatus() == ERROR) {
+        if (!validateCompanyTechnologyStack(userEntity.getTechnology())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateTIN(userEntity.getInn())).getValidatorStatus() == ERROR) {
+        if (!validateTIN(userEntity.getInn())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateAccountNumber(userEntity.getAccount())).getValidatorStatus() == ERROR) {
+        if (!validateAccountNumber(userEntity.getAccount())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validatePhoneNumber(userEntity.getTelephone())).getValidatorStatus() == ERROR) {
+        if (!validatePhoneNumber(userEntity.getTelephone())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateEmail(userEntity.getEmail())).getValidatorStatus() == ERROR) {
+        if (!validateEmail(userEntity.getEmail())) {
             return validatorResponse;
         }
 
@@ -136,72 +133,71 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
     }
 
     public ValidatorResponse validateEditFirmUser(User userEntity, User oldUser) {
-        ValidatorResponse validatorResponse;
 
         if (userEntity.getPassword() == null) userEntity.setPassword(oldUser.getPassword());
         else {
-            if ((validatorResponse = validatePassword(userEntity.getPassword())).getValidatorStatus() == ERROR) {
+            if (!validatePassword(userEntity.getPassword())) {
                 return validatorResponse;
             }
         }
 
         if (userEntity.getFirmName() == null) userEntity.setFirstName(oldUser.getFirstName());
-        else if ((validatorResponse = validateFirstName(userEntity.getFirstName())).getValidatorStatus() == ERROR) {
+        else if (!validateFirstName(userEntity.getFirstName())) {
             return validatorResponse;
         }
 
         if (userEntity.getLastName() == null) userEntity.setLastName(oldUser.getLastName());
-        else if ((validatorResponse = validateLastName(userEntity.getLastName())).getValidatorStatus() == ERROR) {
+        else if (!validateLastName(userEntity.getLastName())) {
             return validatorResponse;
         }
 
         if (userEntity.getPatronymic() == null) userEntity.setPatronymic(oldUser.getPatronymic());
-        else if ((validatorResponse = validatePatronymic(userEntity.getPatronymic())).getValidatorStatus() == ERROR) {
+        else if (!validatePatronymic(userEntity.getPatronymic())) {
             return validatorResponse;
         }
 
         if (userEntity.getFirmName() == null) userEntity.setFirstName(oldUser.getFirmName());
-        else if ((validatorResponse = validateCompanyName(userEntity.getFirmName())).getValidatorStatus() == ERROR) {
+        else if (!validateCompanyName(userEntity.getFirmName())) {
             return validatorResponse;
         }
 
         if (userEntity.getDescription() == null) userEntity.setDescription(oldUser.getDescription());
-        else if ((validatorResponse = validateCompanyDescription(userEntity.getDescription())).getValidatorStatus() == ERROR) {
+        else if (!validateCompanyDescription(userEntity.getDescription())) {
             return validatorResponse;
         }
 
         if (userEntity.getAddress() == null) userEntity.setAddress(oldUser.getAddress());
-        else if ((validatorResponse = validateCompanyAddress(userEntity.getAddress())).getValidatorStatus() == ERROR) {
+        else if (!validateCompanyAddress(userEntity.getAddress())) {
             return validatorResponse;
         }
 
         if (userEntity.getActivity() == null) userEntity.setActivity(oldUser.getActivity());
-        else if ((validatorResponse = validateCompanyKindOfActivity(userEntity.getActivity())).getValidatorStatus() == ERROR) {
+        else if (!validateCompanyKindOfActivity(userEntity.getActivity())) {
             return validatorResponse;
         }
 
         if (userEntity.getTechnology() == null) userEntity.setTechnology(oldUser.getTechnology());
-        else if ((validatorResponse = validateCompanyTechnologyStack(userEntity.getTechnology())).getValidatorStatus() == ERROR) {
+        else if (!validateCompanyTechnologyStack(userEntity.getTechnology())) {
             return validatorResponse;
         }
 
         if (userEntity.getInn() == null) userEntity.setInn(oldUser.getInn());
-        else if ((validatorResponse = validateTIN(userEntity.getInn())).getValidatorStatus() == ERROR) {
+        else if (!validateTIN(userEntity.getInn())) {
             return validatorResponse;
         }
 
         if (userEntity.getAccount() == null) userEntity.setAccount(oldUser.getAccount());
-        else if ((validatorResponse = validateAccountNumber(userEntity.getAccount())).getValidatorStatus() == ERROR) {
+        else if (!validateAccountNumber(userEntity.getAccount())) {
             return validatorResponse;
         }
 
         if (userEntity.getTelephone() == null) userEntity.setTelephone(oldUser.getTelephone());
-        else if ((validatorResponse = validatePhoneNumber(userEntity.getTelephone())).getValidatorStatus() == ERROR) {
+        else if (!validatePhoneNumber(userEntity.getTelephone())) {
             return validatorResponse;
         }
 
         if (userEntity.getEmail() == null) userEntity.setEmail(oldUser.getEmail());
-        if ((validatorResponse = validateEmail(userEntity.getEmail())).getValidatorStatus() == ERROR) {
+        if (!validateEmail(userEntity.getEmail())) {
             return validatorResponse;
         }
 
@@ -209,25 +205,24 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
     }
 
     public ValidatorResponse validateEmployeeUser(User userEntity) {
-        ValidatorResponse validatorResponse;
 
-        if ((validatorResponse = validateLogin(userEntity.getUsername())).getValidatorStatus() == ERROR) {
+        if (!validateLogin(userEntity.getUsername())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validatePassword(userEntity.getPassword())).getValidatorStatus() == ERROR) {
+        if (!validatePassword(userEntity.getPassword())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateFirstName(userEntity.getFirstName())).getValidatorStatus() == ERROR) {
+        if (!validateFirstName(userEntity.getFirstName())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validateLastName(userEntity.getLastName())).getValidatorStatus() == ERROR) {
+        if (!validateLastName(userEntity.getLastName())) {
             return validatorResponse;
         }
 
-        if ((validatorResponse = validatePatronymic(userEntity.getPatronymic())).getValidatorStatus() == ERROR) {
+        if (!validatePatronymic(userEntity.getPatronymic())) {
             return validatorResponse;
         }
 
@@ -239,435 +234,513 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
 
         if (userEntity.getPassword() == null) userEntity.setPassword(oldUser.getPassword());
         else {
-            if ((validatorResponse = validatePassword(userEntity.getPassword())).getValidatorStatus() == ERROR) {
+            if (!validatePassword(userEntity.getPassword())) {
                 return validatorResponse;
             }
         }
 
         if (userEntity.getFirmName() == null) userEntity.setFirstName(oldUser.getFirstName());
-        else if ((validatorResponse = validateFirstName(userEntity.getFirstName())).getValidatorStatus() == ERROR) {
+        else if (!validateFirstName(userEntity.getFirstName())) {
             return validatorResponse;
         }
 
         if (userEntity.getLastName() == null) userEntity.setLastName(oldUser.getLastName());
-        else if ((validatorResponse = validateLastName(userEntity.getLastName())).getValidatorStatus() == ERROR) {
+        else if (!validateLastName(userEntity.getLastName())) {
             return validatorResponse;
         }
 
         if (userEntity.getPatronymic() == null) userEntity.setPatronymic(oldUser.getPatronymic());
-        else if ((validatorResponse = validatePatronymic(userEntity.getPatronymic())).getValidatorStatus() == ERROR) {
+        else if (!validatePatronymic(userEntity.getPatronymic())) {
             return validatorResponse;
         }
 
         return validatorResponse;
     }
 
-    private ValidatorResponse validateLogin(String login){
+    private boolean validateLogin(String login){
         final String FIELD_NAME = "login";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(login)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(login)) {
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
-        }
-
-        if (!inBounds(login, MIN_LOGIN_SIZE, MAX_LOGIN_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
-        }
-
-        if (!isMatch(login, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            return false;
         }
 
         if (onlySpaces(login)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return false;
+        }
+
+        if (!inBounds(login, MIN_LOGIN_SIZE, MAX_LOGIN_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
+            return false;
+        }
+
+        if (!isMatch(login, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return false;
         }
 
         if (userService.existsByUsername(login)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.LOGIN_ALREADY_EXIST_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.LOGIN_ALREADY_EXIST_ERROR);
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        return true;
     }
 
-    private ValidatorResponse validatePassword(String password){
+    private boolean validatePassword(String password){
         final String FIELD_NAME = "password";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(password)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_PASSWORD_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_PASSWORD_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(password)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_PASSWORD_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_PASSWORD_FIELD_ERROR);
+            return false;
         }
 
         if (onlySpaces(password)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.ONLY_SPACES_ERROR);
-        }
-
-        //FIXME
-        char currentCharacter;
-        boolean numberPresent = false;
-        boolean upperCasePresent = false;
-        boolean lowerCasePresent = false;
-        boolean specialCharacterPresent = false;
-
-        String specialCharactersString = "!@#$%&*()'+,-./:;<=>?[]^_`{|}";
-
-        for (int i = 0; i < password.length(); i++) {
-            currentCharacter = password.charAt(i);
-            if (Character.isDigit(currentCharacter)) {
-                numberPresent = true;
-            } else if (Character.isUpperCase(currentCharacter)) {
-                upperCasePresent = true;
-            } else if (Character.isLowerCase(currentCharacter)) {
-                lowerCasePresent = true;
-            } else if (specialCharactersString.contains(Character.toString(currentCharacter))) {
-                specialCharacterPresent = true;
-            }
-        }
-
-        if (!(numberPresent || upperCasePresent || lowerCasePresent || specialCharacterPresent)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PASSWORD_SYMBOLS_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
         if (!inBounds(password, MIN_PASSWORD_SIZE, MAX_PASSWORD_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PASSWORD_SIZE_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PASSWORD_SIZE_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        if (!isMatch(password, "([A-Za-z0-9!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}])+")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PASSWORD_SYMBOLS_ERROR);
+            return false;
+        }
+
+        return true;
     }
 
-    private ValidatorResponse validateFirstName(String firstName){
+    private boolean validateFirstName(String firstName){
         final String FIELD_NAME = "firstName";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(firstName)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_FIRST_NAME_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_FIRST_NAME_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(firstName)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_FIRST_NAME_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_FIRST_NAME_FIELD_ERROR);
+            return false;
+        }
+
+        if (onlySpaces(firstName)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
         if (!inBounds(firstName, MAX_FIRST_NAME_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_FIRST_NAME_SIZE_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_FIRST_NAME_SIZE_ERROR);
+            return false;
         }
 
-        if (!isMatch(firstName, "^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*")){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
+        if (!isMatch(firstName, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}]$)|([А-Яа-яA-Za-z]*)")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        return true;
     }
 
-    private ValidatorResponse validateLastName(String lastName){
+    private boolean validateLastName(String lastName){
         final String FIELD_NAME = "lastName";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(lastName)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_LAST_NAME_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_LAST_NAME_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(lastName)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_LAST_NAME_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_LAST_NAME_FIELD_ERROR);
+            return false;
+        }
+
+        if (onlySpaces(lastName)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
         if (!inBounds(lastName, MAX_LAST_NAME_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_LAST_NAME_SIZE_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_LAST_NAME_SIZE_ERROR);
+            return false;
         }
 
-        if (!isMatch(lastName, "^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*")){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_LAST_NAME_SYMBOLS_ERROR);
+        if (!isMatch(lastName, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}]$)|([А-Яа-яA-Za-z]*)")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_LAST_NAME_SYMBOLS_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        return true;
     }
 
-    private ValidatorResponse validatePatronymic(String patronymic){
+    private boolean validatePatronymic(String patronymic){
         final String FIELD_NAME = "patronymic";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(patronymic)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+            return true;
         }
 
         if (isEmpty(patronymic)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+            return true;
+        }
+
+        if (onlySpaces(patronymic)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
         if (!inBounds(patronymic, MAX_PATRONYMIC_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PATRONYMIC_SIZE_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PATRONYMIC_SIZE_ERROR);
+            return false;
         }
 
-        if (!isMatch(patronymic, "^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*")){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PATRONYMIC_SYMBOLS_ERROR);
+        if (!isMatch(patronymic, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}]$)|([А-Яа-яA-Za-z]*)")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PATRONYMIC_SYMBOLS_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        return true;
     }
 
-    private ValidatorResponse validateCompanyName(String companyName){
+    private boolean validateCompanyName(String companyName){
         final String FIELD_NAME = "companyName";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(companyName)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_COMPANY_NAME_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_COMPANY_NAME_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(companyName)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_COMPANY_NAME_FIELD_ERROR);
-        }
-
-        if (!inBounds(companyName, MAX_COMPANY_NAME_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_NAME_SIZE_ERROR);
-        }
-
-        if (companyName.length() != 0 && companyName.charAt(0) == companyName.charAt(companyName.length() - 1) && companyName.charAt(0) == ' '){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_NAME_SYMBOLS_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_COMPANY_NAME_FIELD_ERROR);
+            return false;
         }
 
         if (onlySpaces(companyName)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        if (!inBounds(companyName, MAX_COMPANY_NAME_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_NAME_SIZE_ERROR);
+            return false;
+        }
+
+        if (companyName.length() != 0 && companyName.charAt(0) == companyName.charAt(companyName.length() - 1) && companyName.charAt(0) == ' '){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_NAME_SYMBOLS_ERROR);
+            return false;
+        }
+
+        return true;
     }
 
-    private ValidatorResponse validateCompanyDescription(String companyDescription){
+    private boolean validateCompanyDescription(String companyDescription){
         final String FIELD_NAME = "companyDescription";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(companyDescription)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+            return true;
         }
 
         if (isEmpty(companyDescription)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
-        }
-
-        if (!inBounds(companyDescription, MAX_COMPANY_DESCRIPTION_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_DESCRIPTION_SIZE_ERROR);
+            return true;
         }
 
         if (onlySpaces(companyDescription)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        if (!inBounds(companyDescription, MAX_COMPANY_DESCRIPTION_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_DESCRIPTION_SIZE_ERROR);
+            return false;
+        }
+
+        return true;
     }
 
-    private ValidatorResponse validateCompanyAddress(String companyAddress){
+    private boolean validateCompanyAddress(String companyAddress){
         final String FIELD_NAME = "companyAddress";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(companyAddress)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+            return true;
         }
 
         if (isEmpty(companyAddress)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
-        }
-
-        if (!inBounds(companyAddress, MAX_COMPANY_ADDRESS_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_ADDRESS_SIZE_ERROR);
-        }
-
-        if (!isMatch(companyAddress, "[а-яA-Я0-9 .,!@#№$;%:^?&*()_\\-+={}]+", Pattern.CASE_INSENSITIVE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
-        }
-
-        if (companyAddress.length() != 0 && companyAddress.charAt(0) == companyAddress.charAt(companyAddress.length() - 1) && companyAddress.charAt(0) == ' '){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
+            return true;
         }
 
         if (onlySpaces(companyAddress)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        if (!inBounds(companyAddress, MAX_COMPANY_ADDRESS_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_ADDRESS_SIZE_ERROR);
+            return false;
+        }
+
+        if (!isMatch(companyAddress, "[A-Za-zа-яA-Я0-9 .,!@#№$;%:^?&*()_\\-+={}]+", Pattern.CASE_INSENSITIVE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
+            return false;
+        }
+
+        if (companyAddress.length() != 0 && companyAddress.charAt(0) == companyAddress.charAt(companyAddress.length() - 1) && companyAddress.charAt(0) == ' '){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
+            return false;
+        }
+        return true;
     }
 
-    private ValidatorResponse validateCompanyKindOfActivity(String kindOfActivity){
+    private boolean validateCompanyKindOfActivity(String kindOfActivity){
         final String FIELD_NAME = "companyKindOfActivity";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(kindOfActivity)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_COMPANY_KIND_OF_ACTIVITY_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_COMPANY_KIND_OF_ACTIVITY_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(kindOfActivity)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_COMPANY_KIND_OF_ACTIVITY_FIELD_ERROR);
-        }
-
-        if (!inBounds(kindOfActivity, MAX_COMPANY_KIND_OF_ACTIVITY_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_KIND_OF_ACTIVITY_SIZE_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_COMPANY_KIND_OF_ACTIVITY_FIELD_ERROR);
+            return false;
         }
 
         if (onlySpaces(kindOfActivity)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        if (!inBounds(kindOfActivity, MAX_COMPANY_KIND_OF_ACTIVITY_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_KIND_OF_ACTIVITY_SIZE_ERROR);
+            return false;
+        }
+
+        return true;
     }
 
-    private ValidatorResponse validateCompanyTechnologyStack(String technologyStack){
+    private boolean validateCompanyTechnologyStack(String technologyStack){
         final String FIELD_NAME = "companyTechnologyStack";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(technologyStack)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+            return true;
         }
 
         if (isEmpty(technologyStack)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
-        }
-
-        if (!inBounds(technologyStack, MAX_COMPANY_TECHNOLOGY_STACK_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_TECHNOLOGY_STACK_SIZE_ERROR);
+            return true;
         }
 
         if (onlySpaces(technologyStack)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        if (!inBounds(technologyStack, MAX_COMPANY_TECHNOLOGY_STACK_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_COMPANY_TECHNOLOGY_STACK_SIZE_ERROR);
+            return false;
+        }
+
+        return true;
     }
 
-    private ValidatorResponse validateTIN(String tIN){
+    private boolean validateTIN(String tIN){
         final String FIELD_NAME = "TIN";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(tIN)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_TIN_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_TIN_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(tIN)) {
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_TIN_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_TIN_FIELD_ERROR);
+            return false;
+        }
+
+        if (onlySpaces(tIN)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
         if (!inBounds(tIN, MIN_TIN_SIZE, MAX_TIN_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_TIN_SIZE_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_TIN_SIZE_ERROR);
+            return false;
         }
 
-        if (!isMatch(tIN, "[0-9]+[A-Z]*")){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
+        if (isMatch(tIN, "[A-Z]")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_LETTERS_TIN_FIELD_ERROR);
+            return false;
+        }
+
+        if (!isMatch(tIN, "[A-Z0-9]*")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
+            return false;
         }
 
         if (userService.existsByInn(tIN)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.TIN_ALREADY_EXIST_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.TIN_ALREADY_EXIST_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        return true;
     }
 
-    private ValidatorResponse validateAccountNumber(String accountNumber){
+    private boolean validateAccountNumber(String accountNumber){
         final String FIELD_NAME = "accountNumber";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(accountNumber)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+            return true;
         }
 
         if (isEmpty(accountNumber)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
-        }
-
-        if (!inBounds(accountNumber, MIN_ACCOUNT_NUMBER_SIZE, MAX_ACCOUNT_NUMBER_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_ACCOUNT_NUMBER_SIZE_ERROR);
-        }
-
-        if (!isMatch(accountNumber, "[A-Z0-9]+")){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_ACCOUNT_NUMBER_ERROR);
-        }
-
-        if (isExist(accountNumber)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ACCOUNT_NUMBER_ALREADY_EXIST_ERROR);
+            return true;
         }
 
         if (onlySpaces(accountNumber)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        if (!inBounds(accountNumber, MIN_ACCOUNT_NUMBER_SIZE, MAX_ACCOUNT_NUMBER_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_ACCOUNT_NUMBER_SIZE_ERROR);
+            return false;
+        }
+
+        if (!isMatch(accountNumber, "[A-Z0-9]+")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_ACCOUNT_NUMBER_ERROR);
+            return false;
+        }
+
+        return true;
     }
 
-    private ValidatorResponse validatePhoneNumber(String phoneNumber){
+    private boolean validatePhoneNumber(String phoneNumber){
         final String FIELD_NAME = "phoneNumber";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(phoneNumber)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+            return true;
         }
 
         if (isEmpty(phoneNumber)){
-            return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
-        }
-
-        if (!inBounds(phoneNumber, MIN_PHONE_NUMBER_SIZE, MAX_PHONE_NUMBER_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PHONE_NUMBER_SIZE_ERROR);
-        }
-
-        if (!isMatch(phoneNumber, "([+]{0,1}[0-9]{1,3}\\([0-9]{2,3}\\)[0-9]+\\-[0-9]+\\-[0-9]+)|([+]{0,1}[0-9]{1,12})")){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR);
+            return true;
         }
 
         if (onlySpaces(phoneNumber)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
+        }
+
+        if (!inBounds(phoneNumber, MIN_PHONE_NUMBER_SIZE, MAX_PHONE_NUMBER_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PHONE_NUMBER_SIZE_ERROR);
+            return false;
+        }
+
+        if (!isMatch(phoneNumber, "[+]{0,1}[0-9]{1,12}")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR);
+            return false;
         }
 
         if (userService.existsByPhoneNumber(phoneNumber)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.PHONE_NUMBER_ALREADY_EXIST_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.PHONE_NUMBER_ALREADY_EXIST_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        return true;
     }
 
-    private ValidatorResponse validateEmail(String email){
+    private boolean validateEmail(String email){
         final String FIELD_NAME = "email";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(email)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_EMAIL_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_EMAIL_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(email)) {
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_EMAIL_FIELD_ERROR);
-        }
-
-        if (!inBounds(email, MIN_EMAIL_SIZE, MAX_EMAIL_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_EMAIL_SIZE_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMPTY_EMAIL_FIELD_ERROR);
+            return false;
         }
 
         if (onlySpaces(email)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_SPACES_ERROR);
+            return false;
         }
 
-        if (!isMatch(email, "[a-z0-9._\\-]{1,25}\\@[a-z0-9._\\-]{2,25}\\.[a-z0-9._\\-]{1,7}", Pattern.CASE_INSENSITIVE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_EMAIL_ERROR);
+        if (!inBounds(email, MIN_EMAIL_SIZE, MAX_EMAIL_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_EMAIL_SIZE_ERROR);
+            return false;
+        }
+
+        if (!isMatch(email, ".{1,25}\\@.{2,15}\\..{2,7}")){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR);
+            return false;
+        }
+
+        if (!isMatch(email, "[a-z0-9._\\-]{1,25}\\@[a-z0-9._\\-]{2,15}\\.[a-z0-9._\\-]{2,7}", Pattern.CASE_INSENSITIVE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_EMAIL_ERROR);
+            return false;
         }
 
         if (userService.existsByEmail(email)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMAIL_ALREADY_EXIST_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.EMAIL_ALREADY_EXIST_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        return true;
     }
 
-    private ValidatorResponse validateLoginNoUnique(String login){
+    private boolean validateLoginNoUnique(String login){
         final String FIELD_NAME = "login";
+        validatorResponse = new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
 
         if (isNull(login)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            return false;
         }
 
         if (isEmpty(login)) {
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
-        }
-
-        if (!inBounds(login, MIN_LOGIN_SIZE, MAX_LOGIN_SIZE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
-        }
-
-        if (!isMatch(login, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            return false;
         }
 
         if (onlySpaces(login)){
-            return new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return false;
         }
 
-        return new ValidatorResponse(OK, HttpStatus.OK, ValidatorMessages.OK);
+        if (!inBounds(login, MIN_LOGIN_SIZE, MAX_LOGIN_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
+            return false;
+        }
+
+        if (!isMatch(login, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return false;
+        }
+
+        return true;
     }
 }
 
