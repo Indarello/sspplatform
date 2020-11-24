@@ -7,7 +7,8 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "purchases")
@@ -98,9 +99,6 @@ public class Purchase
     //@JsonIgnore
     @OneToOne(mappedBy = "purchase")
     private FileEntity file;
-
-    @OneToMany(mappedBy = "purchaseId")
-    private List<SupplyEntity> supplies;
 
     public Purchase()
     {
