@@ -1,15 +1,18 @@
 package com.ssp.platform.validate;
 
+import com.ssp.platform.entity.User;
 import com.ssp.platform.request.UsersPageRequest;
 import com.ssp.platform.response.ValidateResponse;
 import lombok.Data;
 
+import java.math.BigInteger;
+
 @Data
-public class UsersPageValidate
+public class UsersPageRequestValidate
 {
     private UsersPageRequest usersPageRequest;
 
-    public UsersPageValidate(UsersPageRequest usersPageRequest)
+    public UsersPageRequestValidate(UsersPageRequest usersPageRequest)
     {
         this.usersPageRequest = usersPageRequest;
     }
