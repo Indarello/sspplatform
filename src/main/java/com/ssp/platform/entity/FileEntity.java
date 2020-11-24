@@ -28,6 +28,11 @@ public class FileEntity
     @JsonIgnore
     private Purchase purchase;
 
+    //@OneToOne
+    //@JoinColumn(name = "supply_id")
+    //@JsonIgnore
+    //private SupplyEntity supply;
+
     @NotNull
     private String name;
 

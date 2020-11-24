@@ -45,20 +45,4 @@ public abstract class Validator {
 
         return matcher.matches();
     }
-
-    public boolean isExist(String field){
-        /**
-         * TODO: Проверка на существование такого же поля в БД
-         */
-
-        return false;
-    }
-
-    public boolean isExist(UUID uuid){
-        /**
-         * TODO: Проверка на существование такого же поля в БД
-         */
-
-        return false;
-    }
 }
