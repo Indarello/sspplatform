@@ -13,7 +13,7 @@ public enum PurchaseStatus
 
     public String message;
 
-    Status(String status)
+    PurchaseStatus(String status)
     {
         this.message = status;
     }

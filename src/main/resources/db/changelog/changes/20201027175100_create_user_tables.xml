@@ -12,7 +12,46 @@
 			<column name="password" type="varchar(200)">
 				<constraints nullable="false"/>
 			</column>
+			<column name="first_name" type="varchar(30)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="last_name" type="varchar(30)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="patronymic" type="varchar(30)">
+                <constraints nullable="true"/>
+			</column>
+			<column name="firm_name" type="varchar(50)">
+				<constraints nullable="true"/>
+			</column>
+			<column name="description" type="text">
+                <constraints nullable="true"/>
+			</column>
+			<column name="address" type="varchar(50)">
+                <constraints nullable="true"/>
+			</column>
+			<column name="activity" type="text">
+                <constraints nullable="true"/>
+			</column>
+			<column name="technology" type="text">
+                <constraints nullable="true"/>
+			</column>
+			<column name="inn" type="varchar(20)">
+                <constraints nullable="true"/>
+			</column>
+			<column name="account" type="varchar(50)">
+                <constraints nullable="true"/>
+			</column>
+			<column name="telephone" type="varchar(30)">
+                <constraints nullable="true"/>
+			</column>
+			<column name="email" type="text">
+                <constraints nullable="true"/>
+			</column>
 			<column name="role" type="varchar(50)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="status" type="varchar(50)">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>

@@ -33,7 +33,7 @@ public class UserDetailsImpl implements UserDetails
 
         return new UserDetailsImpl(
                 user.getUsername(),
-                "abc@mail.ru",
+                user.getEmail(),
                 user.getPassword(),
                 authorities);
     }

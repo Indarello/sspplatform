@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class JwtResponse {
+	private boolean success = true;
 	private String token;
 	private String type = "Bearer";
 	/*

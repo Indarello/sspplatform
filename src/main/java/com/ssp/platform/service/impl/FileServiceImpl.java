@@ -22,7 +22,7 @@ public class FileServiceImpl implements FileService
 {
 
     @Autowired
-    private FileRepository fileRepository;
+    private final FileRepository fileRepository;
 
     private final Path fileStorageLocation;
 
