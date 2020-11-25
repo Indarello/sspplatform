@@ -317,7 +317,33 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
             return false;
         }
 
-        if (!isMatch(password, "([A-Za-z0-9!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}])+")){
+        if (!inBounds(password, MIN_PASSWORD_SIZE, MAX_PASSWORD_SIZE)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PASSWORD_SIZE_ERROR);
+            return false;
+        }
+
+        char currentCharacter;
+        boolean numberPresent = false;
+        boolean upperCasePresent = false;
+        boolean lowerCasePresent = false;
+        boolean specialCharacterPresent = false;
+
+        String specialCharactersString = "!@#$%&*()'+,-.\\/:;<=>?[]^_`{|}";
+
+        for (int i = 0; i < password.length(); i++) {
+            currentCharacter = password.charAt(i);
+            if (Character.isDigit(currentCharacter)) {
+                numberPresent = true;
+            } else if (Character.isUpperCase(currentCharacter)) {
+                upperCasePresent = true;
+            } else if (Character.isLowerCase(currentCharacter)) {
+                lowerCasePresent = true;
+            } else if (specialCharactersString.contains(Character.toString(currentCharacter))) {
+                specialCharacterPresent = true;
+            }
+        }
+
+        if (!((numberPresent || specialCharacterPresent) && upperCasePresent && lowerCasePresent)){
             validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PASSWORD_SYMBOLS_ERROR);
             return false;
         }

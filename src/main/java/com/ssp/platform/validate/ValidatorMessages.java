@@ -22,7 +22,7 @@ public class ValidatorMessages {
 
     public static final String WRONG_PASSWORD_SIZE_ERROR = "Пароль должен содержать от 8 до 20 символов!";
 
-    public static final String WRONG_PASSWORD_SYMBOLS_ERROR = "Пароль должен содержать латиницу (верхний или нижний регистр), цифры, специальные символы и пробелы";
+    public static final String WRONG_PASSWORD_SYMBOLS_ERROR = "Пароль должен содержать хотя бы одну латнскую букву в верхнем и нижнем регистре, хотя бы одну цифру или специальный знак";
 
     public static final String EMPTY_FIRST_NAME_FIELD_ERROR = "Поле имени должно быть заполнено!";
 
