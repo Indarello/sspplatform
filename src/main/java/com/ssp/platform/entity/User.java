@@ -3,24 +3,16 @@ package com.ssp.platform.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
-import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Data
 @Table(name = "users",
         uniqueConstraints = {
                 //@UniqueConstraint(columnNames = "email"),     могут быть пустыми
-                //@UniqueConstraint(columnNames = "account"),
                 //@UniqueConstraint(columnNames = "telephone"),
                 //@UniqueConstraint(columnNames = "inn")
                 @UniqueConstraint(columnNames = "username")

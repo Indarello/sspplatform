@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
- * Обработчик исключений
+ * Выводит сообщение в случае если пара логин/пароль неверные при авторизации
  */
 @ControllerAdvice
 public class WrongLoginPasswordHandler extends ResponseEntityExceptionHandler {
@@ -18,5 +18,4 @@ public class WrongLoginPasswordHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleBadCredentialsException(){
         return new ResponseEntity(new ValidateResponse(false, "", "Неверный логин или пароль"), HttpStatus.UNAUTHORIZED);
     }
-
 }

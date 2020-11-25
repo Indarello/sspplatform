@@ -3,12 +3,15 @@ package com.ssp.platform.controller;
 import com.ssp.platform.entity.FileEntity;
 import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.User;
+import com.ssp.platform.request.PurchasesPageRequest;
 import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
 import com.ssp.platform.validate.FileValidate;
+import com.ssp.platform.validate.PurchaseValidate;
+import com.ssp.platform.validate.PurchasesPageValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -54,8 +56,8 @@ public class PurchaseController
         @RequestHeader("Authorization") String token,
         @RequestParam(value = "name") String name,
         @RequestParam(value = "description") String description,
-        @RequestParam(value = "proposalDeadLine") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH") Date proposalDeadLine,
-        @RequestParam(value = "finishDeadLine", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH") Date finishDeadLine,
+        @RequestParam(value = "proposalDeadLine") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date proposalDeadLine,
+        @RequestParam(value = "finishDeadLine", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date finishDeadLine,
         @RequestParam(value = "budget", required = false) BigInteger budget,
         @RequestParam(value = "demands", required = false) String demands,
         @RequestParam(value = "team", required = false) String team,
@@ -64,12 +66,21 @@ public class PurchaseController
     )   throws IOException, NoSuchAlgorithmException
     {
         User author = userDetailsService.loadUserByToken(token);
-        Purchase validatedPurchase = new Purchase(author, name, description, proposalDeadLine,
+        Purchase objPurchase = new Purchase(author, name, description, proposalDeadLine,
                 finishDeadLine, budget, demands, team, workCondition);
 
-        //System.out.println("123");
 
-        //TODO validate
+        PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
+
+        ValidateResponse validateResponse = purchaseValidate.validatePurchaseCreate();
+        if(!validateResponse.isSuccess())
+        {
+            return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        Purchase validatedPurchase = purchaseValidate.getPurchase();
+
+
         FileEntity savedFiles = null;
 
         if (files != null)
@@ -99,6 +110,7 @@ public class PurchaseController
 
         try
         {
+            //TODO: отправить приглашение на email
             return new ResponseEntity<>(purchaseService.save(savedPurchase), HttpStatus.CREATED);
         }
         catch (Exception e)
@@ -116,22 +128,21 @@ public class PurchaseController
      */
     @GetMapping(value = "/purchases", produces = "application/json")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getPurchases(@RequestParam("requestPage") int requestPage,
-                                               @RequestParam("numberOfElements") int numberOfElements)
+    public ResponseEntity<Object> getPurchases(@RequestParam(value = "requestPage", required = false) Integer requestPage,
+                                               @RequestParam(value = "numberOfElements", required = false) Integer numberOfElements)
     {
-        //TODO validate когда будет еще фильтрация и сортировка
-        if (requestPage < 0 || requestPage > 100_000)
+        PurchasesPageRequest purchasesPageRequest = new PurchasesPageRequest(requestPage, numberOfElements);
+        PurchasesPageValidate purchasesPageValidate = new PurchasesPageValidate(purchasesPageRequest);
+        ValidateResponse validateResponse = purchasesPageValidate.validatePurchasePage();
+
+        if(!validateResponse.isSuccess())
         {
-            return new ResponseEntity<>(new ApiResponse(false,
-                    "Parameter requestPage can be only 0-100000"), HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
-        if (numberOfElements < 1 || numberOfElements > 100)
-        {
-            numberOfElements = 10;
-        }
+        PurchasesPageRequest validPageRequest = purchasesPageValidate.getPurchasePageRequest();
 
-        Pageable pageable = PageRequest.of(requestPage, numberOfElements);
+        Pageable pageable = PageRequest.of(validPageRequest.getRequestPage(), validPageRequest.getNumberOfElements());
 
         try
         {

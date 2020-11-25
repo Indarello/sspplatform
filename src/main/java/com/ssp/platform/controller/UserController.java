@@ -11,7 +11,7 @@ import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.UserService;
 import com.ssp.platform.validate.UserValidate;
 import com.ssp.platform.validate.UserValidator;
-import com.ssp.platform.validate.UsersPageRequestValidate;
+import com.ssp.platform.validate.UsersPageValidate;
 import com.ssp.platform.validate.ValidatorStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -202,7 +202,7 @@ public class UserController
            @RequestParam(value = "numberOfElements", required = false) Integer numberOfElements)
     {
         UsersPageRequest usersPageRequest = new UsersPageRequest(requestPage, numberOfElements, type);
-        UsersPageRequestValidate usersPageValidate = new UsersPageRequestValidate(usersPageRequest);
+        UsersPageValidate usersPageValidate = new UsersPageValidate(usersPageRequest);
         ValidateResponse validateResponse = usersPageValidate.validateUsersPage();
 
         if(!validateResponse.isSuccess())
