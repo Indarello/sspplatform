@@ -7,7 +7,6 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -31,7 +30,6 @@ public class Purchase
     @JsonIgnore         //нам пока что не надо выводить информацию по автору закупки
     private User author;
 
-
     /**
      * Наименование закупки
      */
@@ -44,22 +42,25 @@ public class Purchase
     @NotNull
     private String description;
 
+    /**
+     * Дата и время создания закупки
+     * Все даты храним в Long, так удобнее для фронтендера
+     * это timestamp в секундах
+     */
     @NotNull
-    @Column(name = "create_date")
-    private final Date createDate;
+    private Long createDate;
 
     /**
      * Дата и время окончания срока подачи предложений
-     * Маска для даты и времени: mask("ДД.ММ.ГГГГ:ЧЧ.ММ")
      */
     @NotNull
-    private Date proposalDeadLine;
+    private Long proposalDeadLine;
 
     /**
      * Дата окончания выполнения работ по закупке
      */
     @NotNull
-    private Date finishDeadLine;
+    private Long finishDeadLine;
 
     /**
      * Бюджет закупки
@@ -102,16 +103,16 @@ public class Purchase
 
     public Purchase()
     {
-        this.createDate = new Date();
+        this.createDate = System.currentTimeMillis()/1000;
     }
 
-    public Purchase(User author, String name, String description, Date proposalDeadLine, Date finishDeadLine,
+    public Purchase(User author, String name, String description, Long proposalDeadLine, Long finishDeadLine,
                     BigInteger budget, String demands, String team, String workCondition)
     {
         this.author = author;
         this.name = name;
         this.description = description;
-        this.createDate = new Date();
+        this.createDate = System.currentTimeMillis()/1000;
         this.proposalDeadLine = proposalDeadLine;
         this.finishDeadLine = finishDeadLine;
         this.budget = budget;

@@ -15,7 +15,6 @@ import com.ssp.platform.validate.PurchasesPageValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,8 +54,8 @@ public class PurchaseController
         @RequestHeader("Authorization") String token,
         @RequestParam(value = "name") String name,
         @RequestParam(value = "description") String description,
-        @RequestParam(value = "proposalDeadLine") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date proposalDeadLine,
-        @RequestParam(value = "finishDeadLine", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date finishDeadLine,
+        @RequestParam(value = "proposalDeadLine") Long proposalDeadLine,
+        @RequestParam(value = "finishDeadLine", required = false) Long finishDeadLine,
         @RequestParam(value = "budget", required = false) BigInteger budget,
         @RequestParam(value = "demands", required = false) String demands,
         @RequestParam(value = "team", required = false) String team,
@@ -66,6 +64,7 @@ public class PurchaseController
     )   throws IOException, NoSuchAlgorithmException
     {
         User author = userDetailsService.loadUserByToken(token);
+
         Purchase objPurchase = new Purchase(author, name, description, proposalDeadLine,
                 finishDeadLine, budget, demands, team, workCondition);
 

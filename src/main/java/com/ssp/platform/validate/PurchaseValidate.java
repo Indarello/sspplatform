@@ -3,19 +3,14 @@ package com.ssp.platform.validate;
 import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.response.ValidateResponse;
 import lombok.Data;
-
 import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Data
 public class PurchaseValidate
 {
-    public static final long ONE_HUNDRED_YEARS = 3155760000000L;
-    public static final long ONE_HOUR = 3600000L;
+    public static final long ONE_HUNDRED_YEARS = 3155760000L;
+    public static final long ONE_HOUR = 3600L;
+    public static final long THREE_THOUSAND_YEARS = 32503741200L;
     private Purchase purchase;
     private String checkResult = "ok";
     private boolean foundInvalid = false;
@@ -94,25 +89,22 @@ public class PurchaseValidate
 
     private void validateProposalDeadLine()
     {
-        Date date = purchase.getProposalDeadLine();
-        if (date == null)
+        Long proposalSec = purchase.getProposalDeadLine();
+        if (proposalSec == null)
         {
             setCheckResult("Дата окончания срока подачи предложений должна быть заполнена!");
             return;
         }
 
-        Date CheckDate = new Date();
-        long nowMSec = CheckDate.getTime();
-        CheckDate.setTime(nowMSec + ONE_HUNDRED_YEARS);
-        if (date.after(CheckDate))
+        long nowSec = System.currentTimeMillis()/1000;
+        if (proposalSec > nowSec + ONE_HUNDRED_YEARS)
         {
             setCheckResult("Дата окончания срока подачи предложений " +
                     "должна быть не позже чем через 100 лет от текущей даты.");
             return;
         }
 
-        CheckDate.setTime(nowMSec + ONE_HOUR);
-        if (date.before(purchase.getCreateDate()))
+        if (proposalSec < nowSec + ONE_HOUR)
         {
             setCheckResult("Время окончания срока подачи предложений " +
                     "не может быть раньше чем через час после создания предложения");
@@ -122,20 +114,19 @@ public class PurchaseValidate
 
     private void validateFinishDeadLine()
     {
-        Date date = purchase.getFinishDeadLine();
-        if (date == null)
+        Long finishSec = purchase.getFinishDeadLine();
+
+        if (finishSec == null)
         {
-            Date defaultDate = new GregorianCalendar(3000, Calendar.JANUARY, 2).getTime();
-            purchase.setFinishDeadLine(defaultDate);
+            purchase.setFinishDeadLine(THREE_THOUSAND_YEARS);
             return;
         }
-        if (date.before(purchase.getProposalDeadLine()))
+        if (finishSec < purchase.getProposalDeadLine())
         {
-            setCheckResult("Время окончания выполнения работ " +
+            setCheckResult("Дата окончания выполнения работ " +
                     "не может быть перед датой окончания срока подачи предложений");
             return;
         }
-
     }
 
     private void validateBudget()

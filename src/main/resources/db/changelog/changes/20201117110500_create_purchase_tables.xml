@@ -18,13 +18,13 @@
             <column name="description" type="text">
                 <constraints nullable="false"/>
             </column>
-            <column name="create_date" type="timestamp without time zone">
+            <column name="create_date" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="proposal_dead_line" type="timestamp without time zone">
+            <column name="proposal_dead_line" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="finish_dead_line" type="timestamp without time zone">
+            <column name="finish_dead_line" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="budget" type="numeric(30, 2)">
