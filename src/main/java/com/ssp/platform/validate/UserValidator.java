@@ -47,7 +47,7 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
 
     private final int MIN_PHONE_NUMBER_SIZE = 11;
 
-    private final int MAX_PHONE_NUMBER_SIZE = 17;
+    private final int MAX_PHONE_NUMBER_SIZE = 12;
 
     private final int MIN_EMAIL_SIZE = 3;
 
