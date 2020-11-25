@@ -69,7 +69,6 @@ public class PurchaseController
         Purchase objPurchase = new Purchase(author, name, description, proposalDeadLine,
                 finishDeadLine, budget, demands, team, workCondition);
 
-
         PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
 
         ValidateResponse validateResponse = purchaseValidate.validatePurchaseCreate();
@@ -92,7 +91,6 @@ public class PurchaseController
 
                 else return new ResponseEntity<>(validateResult, HttpStatus.NOT_ACCEPTABLE);
             }
-
             else
             {
                 savedFiles = fileService.addFiles(files);
@@ -181,31 +179,12 @@ public class PurchaseController
 
     /**
      * Изменения параметров сущности закупки
-     *
-     * @return ResponseEntity со статусом
      */
     @PutMapping(value = "/purchase", produces = "application/json", consumes = "application/json")
     @PreAuthorize("hasAuthority('employee')")
     public ResponseEntity<Object> changePurchase(@RequestBody Purchase purchase)
     {
 
-        if (purchase.getId().toString().isEmpty())
-        {
-            return new ResponseEntity<>(new ApiResponse(false, "Empty id"),
-                    HttpStatus.NOT_ACCEPTABLE);
-        }
-
-        if (purchase.getName().isEmpty())
-        {
-            return new ResponseEntity<>(new ApiResponse(false, "Empty name"),
-                    HttpStatus.NOT_ACCEPTABLE);
-        }
-
-        if (purchase.getAuthor().getUsername().isEmpty())
-        {
-            return new ResponseEntity<>(new ApiResponse(false, "Empty author field"),
-                    HttpStatus.NOT_ACCEPTABLE);
-        }
 
         try
         {

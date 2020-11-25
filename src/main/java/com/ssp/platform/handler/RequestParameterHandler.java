@@ -14,7 +14,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
  * Без этих обработок будет возвращать просто пустоту и 400 ошибку
  */
 @ControllerAdvice
-public class MissingParameterHandler
+public class RequestParameterHandler
 {
     /**
      * Когда параметр не предоставлен в RequestBody form-data

@@ -125,7 +125,7 @@ public class PurchaseValidate
         Date date = purchase.getFinishDeadLine();
         if (date == null)
         {
-            Date defaultDate = new GregorianCalendar(3000, Calendar.JANUARY, 0).getTime();
+            Date defaultDate = new GregorianCalendar(3000, Calendar.JANUARY, 2).getTime();
             purchase.setFinishDeadLine(defaultDate);
             return;
         }
