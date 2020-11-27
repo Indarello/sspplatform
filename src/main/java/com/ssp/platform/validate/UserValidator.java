@@ -612,8 +612,21 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
             return false;
         }
 
-        if (isMatch(tIN, "[A-Z]")){
-            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.ONLY_LETTERS_TIN_FIELD_ERROR);
+        char currentCharacter;
+        boolean numberPresent = false;
+        boolean upperCasePresent = false;
+
+        for (int i = 0; i < tIN.length(); i++) {
+            currentCharacter = tIN.charAt(i);
+            if (Character.isDigit(currentCharacter)) {
+                numberPresent = true;
+            } else if (Character.isUpperCase(currentCharacter)) {
+                upperCasePresent = true;
+            }
+        }
+
+        if ((!numberPresent && upperCasePresent)){
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
             return false;
         }
 
@@ -682,7 +695,7 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
             return false;
         }
 
-        if (!isMatch(phoneNumber, "[+]{0,1}[0-9]{1,12}")){
+        if (!isMatch(phoneNumber, "[0-9]*")){
             validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR);
             return false;
         }

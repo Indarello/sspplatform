@@ -22,7 +22,7 @@ public class ValidatorMessages {
 
     public static final String WRONG_PASSWORD_SIZE_ERROR = "Пароль должен содержать от 8 до 20 символов!";
 
-    public static final String WRONG_PASSWORD_SYMBOLS_ERROR = "Пароль должен содержать хотя бы одну латнскую букву в верхнем и нижнем регистре, хотя бы одну цифру или специальный знак";
+    public static final String WRONG_PASSWORD_SYMBOLS_ERROR = "Пароль должен содержать хотя бы одну заглавную и строчную латинские буквы, хотя бы одну цифру или символ";
 
     public static final String EMPTY_FIRST_NAME_FIELD_ERROR = "Поле имени должно быть заполнено!";
 
@@ -38,7 +38,7 @@ public class ValidatorMessages {
 
     public static final String WRONG_PATRONYMIC_SIZE_ERROR = "В отчестве не может быть больше 20 символов!";
 
-    public static final String WRONG_PATRONYMIC_SYMBOLS_ERROR = "Фамилия может содержать верхний и нижний регистр латиницы или кириллицы, один пробел или дефис в середине.";
+    public static final String WRONG_PATRONYMIC_SYMBOLS_ERROR = "Отчество может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
     public static final String EMPTY_COMPANY_NAME_FIELD_ERROR = "Поле имени компании должно быть заполнено!";
 
@@ -60,9 +60,9 @@ public class ValidatorMessages {
 
     public static final String ONLY_LETTERS_TIN_FIELD_ERROR = "Поле ИНН не может содержать только буквы!";
 
-    public static final String WRONG_TIN_SIZE_ERROR = "Поле ИНН должно содержать от 9 до 12 символов!";
+    public static final String WRONG_TIN_SIZE_ERROR = "Поле ИНН/УНН должно содержать не менее 9 символов!";
 
-    public static final String WRONG_SYMBOLS_IN_TIN_ERROR = "ИНН должен содержать только цифры и может содержать латиницу";
+    public static final String WRONG_SYMBOLS_IN_TIN_ERROR = "ИНН/УНН может содержать цифры и латинские заглавные буквы";
 
     public static final String TIN_ALREADY_EXIST_ERROR = "Пользователь с данным ИНН уже существует";
 
@@ -74,7 +74,7 @@ public class ValidatorMessages {
 
     public static final String WRONG_PHONE_NUMBER_SIZE_ERROR = "Номер телефона должен содержать от 11 до 17 символов!";
 
-    public static final String WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR = "Номер телефона может содержать только цифры и \"+\".";
+    public static final String WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR = "Номер телефона может содержать только цифры.";
 
     public static final String PHONE_NUMBER_ALREADY_EXIST_ERROR = "Пользователь с данным номером телефона уже существует";
 
