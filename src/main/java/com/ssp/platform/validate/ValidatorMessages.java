@@ -72,7 +72,7 @@ public class ValidatorMessages {
 
     public static final String ACCOUNT_NUMBER_ALREADY_EXIST_ERROR = "Пользователь с данным номером счёта уже существует";
 
-    public static final String WRONG_PHONE_NUMBER_SIZE_ERROR = "Номер телефона должен содержать от 11 до 17 символов!";
+    public static final String WRONG_PHONE_NUMBER_SIZE_ERROR = "Номер телефона должен содержать не менее 11 символов!";
 
     public static final String WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR = "Номер телефона должен содержать только цифры.";
 
