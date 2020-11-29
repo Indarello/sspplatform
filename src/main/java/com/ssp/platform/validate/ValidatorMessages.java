@@ -14,7 +14,7 @@ public class ValidatorMessages {
 
     public static final String WRONG_LOGIN_SIZE_ERROR = "Логин должен содержать от 2 до 30 символов!";
 
-    public static final String WRONG_SYMBOLS_IN_LOGIN_ERROR = "Логин может содержать только латиницу (верхний и нижний регистр) или цифры. Цифра не может быть первым символом";
+    public static final String WRONG_SYMBOLS_IN_LOGIN_ERROR = "Логин может содержать только заглавные и строчные латинские буквы и цифры. Цифра не может быть первым символом";
 
     public static final String LOGIN_ALREADY_EXIST_ERROR = "Данный логин уже занят!";
 
@@ -26,17 +26,17 @@ public class ValidatorMessages {
 
     public static final String EMPTY_FIRST_NAME_FIELD_ERROR = "Поле имени должно быть заполнено!";
 
-    public static final String WRONG_FIRST_NAME_SIZE_ERROR = "В имени не может быть больше 20 символов!";
+    public static final String WRONG_FIRST_NAME_SIZE_ERROR = "В поле имени не может быть больше 20 символов!";
 
-    public static final String WRONG_FIRST_NAME_SYMBOLS_ERROR = "Имя может содержать верхний и нижний регистр латиницы или кириллицы, один пробел или дефис в середине.";
+    public static final String WRONG_FIRST_NAME_SYMBOLS_ERROR = "Имя может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
     public static final String EMPTY_LAST_NAME_FIELD_ERROR = "Поле фамилии должно быть заполнено!";
 
-    public static final String WRONG_LAST_NAME_SIZE_ERROR = "В фамилии не может быть больше 20 символов!";
+    public static final String WRONG_LAST_NAME_SIZE_ERROR = "В поле фамилии не может быть больше 20 символов!";
 
-    public static final String WRONG_LAST_NAME_SYMBOLS_ERROR = "Фамилия может содержать верхний и нижний регистр латиницы или кириллицы, один пробел или дефис в середине.";
+    public static final String WRONG_LAST_NAME_SYMBOLS_ERROR = "Фамилия может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
-    public static final String WRONG_PATRONYMIC_SIZE_ERROR = "В отчестве не может быть больше 20 символов!";
+    public static final String WRONG_PATRONYMIC_SIZE_ERROR = "В поле отчестве не может быть больше 20 символов!";
 
     public static final String WRONG_PATRONYMIC_SYMBOLS_ERROR = "Отчество может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
@@ -74,7 +74,7 @@ public class ValidatorMessages {
 
     public static final String WRONG_PHONE_NUMBER_SIZE_ERROR = "Номер телефона должен содержать от 11 до 17 символов!";
 
-    public static final String WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR = "Номер телефона может содержать только цифры.";
+    public static final String WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR = "Номер телефона должен содержать только цифры.";
 
     public static final String PHONE_NUMBER_ALREADY_EXIST_ERROR = "Пользователь с данным номером телефона уже существует";
 

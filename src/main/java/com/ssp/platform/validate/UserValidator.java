@@ -6,6 +6,7 @@ import com.ssp.platform.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static com.ssp.platform.validate.ValidatorStatus.*;
@@ -288,6 +289,7 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
 
         if (userService.existsByUsername(login)){
             validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.LOGIN_ALREADY_EXIST_ERROR);
+            return false;
         }
 
         return true;
@@ -375,7 +377,7 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
             return false;
         }
 
-        if (!isMatch(firstName, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}]$)|([А-Яа-яA-Za-z]*)")){
+        if (!isMatch(firstName, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)")){
             validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
             return false;
         }
@@ -407,7 +409,7 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
             return false;
         }
 
-        if (!isMatch(lastName, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}]$)|([А-Яа-яA-Za-z]*)")){
+        if (!isMatch(lastName, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)")){
             validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_LAST_NAME_SYMBOLS_ERROR);
             return false;
         }
@@ -437,7 +439,7 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
             return false;
         }
 
-        if (!isMatch(patronymic, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}]$)|([А-Яа-яA-Za-z]*)")){
+        if (!isMatch(patronymic, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)")){
             validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME,  ValidatorMessages.WRONG_PATRONYMIC_SYMBOLS_ERROR);
             return false;
         }
