@@ -330,7 +330,7 @@ public class UserValidator extends com.ssp.platform.validate.Validator {
         boolean lowerCasePresent = false;
         boolean specialCharacterPresent = false;
 
-        String specialCharactersString = "!@#$%&*()'+,-.\\/:;<=>?[]^_`{|}";
+        String specialCharactersString = "!@#$%&*()'+,-.\\/:;<=>?[]^_`{ |}";
 
         for (int i = 0; i < password.length(); i++) {
             currentCharacter = password.charAt(i);
