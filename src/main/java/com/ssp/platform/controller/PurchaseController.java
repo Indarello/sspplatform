@@ -15,6 +15,7 @@ import com.ssp.platform.validate.PurchasesPageValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -139,7 +140,8 @@ public class PurchaseController
 
         PurchasesPageRequest validPageRequest = purchasesPageValidate.getPurchasePageRequest();
 
-        Pageable pageable = PageRequest.of(validPageRequest.getRequestPage(), validPageRequest.getNumberOfElements());
+        Pageable pageable = PageRequest.of(validPageRequest.getRequestPage(), validPageRequest.getNumberOfElements(),
+                Sort.by("createDate").descending());
 
         try
         {
