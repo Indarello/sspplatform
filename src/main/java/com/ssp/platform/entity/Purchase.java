@@ -84,6 +84,7 @@ public class Purchase
     /**
      * Причина отмены
      */
+    @NotNull
     private String cancelReason;
 
     /**
@@ -95,6 +96,7 @@ public class Purchase
     /**
      * Условия работы
      */
+    @NotNull
     private String workCondition;
 
     //@JsonIgnore

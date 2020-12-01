@@ -24,9 +24,9 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
-    public void save(User user)
+    public User save(User user)
     {
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
@@ -49,11 +49,6 @@ public class UserServiceImpl implements UserService
     @Override
     public boolean existsByInn(String tIN) {
         return userRepository.existsByInn(tIN);
-    }
-
-    @Override
-    public boolean existsByPassword(String password) {
-        return userRepository.existsByPassword(password);
     }
 
     @Override

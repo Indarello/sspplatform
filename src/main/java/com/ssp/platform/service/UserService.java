@@ -10,7 +10,7 @@ import java.util.Optional;
  */
 public interface UserService
 {
-    void save(User user);
+    User save(User user);
 
     boolean existsByRole(String role);
 
@@ -21,8 +21,6 @@ public interface UserService
     boolean existsByPhoneNumber(String phoneNumber);
 
     boolean existsByInn(String tIN);
-
-    boolean existsByPassword(String password);
 
     Page<User> findAllByRole(Pageable pageable, String role);
 

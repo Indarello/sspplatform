@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,6 @@ import java.util.List;
         })
 public class User
 {
-    //TODO: вернуть все NotNull, номер счета убрать
     @Id
     @NotBlank
     private String username;
@@ -43,53 +43,48 @@ public class User
     /**
      * Отчество контактного лица
      */
-    //@NotNull
+    @NotNull
     private String patronymic;
 
     /**
      * название компании
      */
-    //@NotNull
+    @NotNull
     private String firmName;
 
     /**
      * описание компании
      */
-    //@NotNull
+    @NotNull
     private String description;
 
     /**
      * Адрес компании
      */
-    //@NotNull
+    @NotNull
     private String address;
 
     /**
      * Вид деятельности компании
      * Например: Делаем лучшие веб сервисы
      */
-    //@NotNull
+    @NotNull
     private String activity;
 
     /**
      * Стек технологии
      */
-    //@NotNull
+    @NotNull
     private String technology;
 
-    //@NotNull
+    @NotNull
     private String inn;
 
-    /**
-     * номер счета
-     */
-    //@NotNull
-    private String account;
 
-    //@NotNull
+    @NotNull
     private String telephone;
 
-    //@NotNull
+    @NotNull
     @Email
     private String email;
 
@@ -99,13 +94,13 @@ public class User
     @NotBlank
     private String role;
 
+    //TODO поменять в будущем чтобы начинались с маленькой буквы
     /**
      * Статус в системе (Не подтвержден|Подтвержден|Данные изучаются|Заблокирвоан) (NotApproved|Approved|Review|Banned)
      */
     @NotBlank
     private String status;
 
-    //TODO удаление пользователя должно удалить закупки, пока что выдает ошибку на удалении
     @OneToMany(mappedBy="author", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Purchase> purchases;
@@ -118,51 +113,5 @@ public class User
     {
         this.username = username;
         this.password = password;
-    }
-
-    /**
-     * конструктор для создания поставщинка
-     */
-    public User(String username, String password, String firstName, String lastName, String firmName, String activity, String inn, String email)
-    {
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.patronymic = "";
-        this.firmName = firmName;
-        this.description = "";
-        this.address = "";
-        this.activity = activity;
-        this.technology = "";
-        this.inn = inn;
-        this.account = "";
-        this.telephone = "";
-        this.email = email;
-        this.role = "firm";
-        this.status = "NotApproved";
-    }
-
-    /**
-     * конструктор для создания сотрудника компании
-     */
-    public User(String username, String password, String firstName, String lastName)
-    {
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.patronymic = "";
-        this.firmName = "";
-        this.description = "";
-        this.address = "";
-        this.activity = "";
-        this.technology = "";
-        this.inn = "";
-        this.account = "";
-        this.telephone = "";
-        this.email = "";
-        this.role = "employee";
-        this.status = "Approved";
     }
 }

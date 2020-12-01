@@ -23,7 +23,5 @@ public interface UserRepository extends JpaRepository<User, Long>
 
     boolean existsByInn(String tIN);
 
-    boolean existsByPassword(String password);
-
     Page<User> findAllByRole(Pageable pageable, String role);
 }

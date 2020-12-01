@@ -2,35 +2,71 @@ package com.ssp.platform.validate;
 
 import com.ssp.platform.entity.User;
 import com.ssp.platform.response.ValidateResponse;
+import com.ssp.platform.service.UserService;
 import lombok.Data;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import java.util.regex.Pattern;
 
-@Data
-public class UserValidate
+//TODO:В будущем если будет время сделать так что бы название полей ValidateResponse совпадало с названием поля user
+@Getter
+@Component
+public class UserValidate extends com.ssp.platform.validate.Validator
 {
     private User user;
     private String checkResult = "ok";
     private boolean foundInvalid = false;
 
-    public UserValidate(User user)
+    private final UserService userService;
+
+    private final int MIN_LOGIN_SIZE = 2;
+    private final int MAX_LOGIN_SIZE = 30;
+
+
+    public void UserValidateReset(User user)
     {
         this.checkResult = "ok";
         this.foundInvalid = false;
         this.user = user;
     }
 
+    @Autowired
+    public UserValidate(UserService userService)
+    {
+        this.userService = userService;
+    }
+
     /**
-     * Валидация при регистрации пользователя сотрудника
+     * Валидация при создании пользователя сотрудника
      */
     public ValidateResponse validateEmployeeUser()
     {
-        checkUsername();                        //проверка параметра username
-        if(foundInvalid) return new ValidateResponse(false, "name", checkResult);
+        checkUsername();
+        if(foundInvalid) return new ValidateResponse(false, "login", checkResult);
 
-        checkPatronymic();                      //проверка параметра Отчества
+        checkPassword();
+        if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
+
+        checkFirstName();
+        if(foundInvalid) return new ValidateResponse(false, "firstName", checkResult);
+
+        checkLastName();
+        if(foundInvalid) return new ValidateResponse(false, "lastName", checkResult);
+
+        checkPatronymic();
         if(foundInvalid) return new ValidateResponse(false, "patronymic", checkResult);
 
-        user.setInn("");                        //у сотрудника нет ИНН, по паттерну хранить null в бд не стоит
-        //TODO:все остальные проверки
+        user.setFirmName("");
+        user.setDescription("");
+        user.setAddress("");
+        user.setActivity("");
+        user.setTechnology("");
+        user.setInn("");
+        user.setTelephone("");
+        user.setEmail("");
+        user.setRole("employee");
+        user.setStatus("Approved");
 
         return new ValidateResponse(true, "", checkResult);
     }
@@ -40,15 +76,61 @@ public class UserValidate
      */
     public ValidateResponse validateFirmUser()
     {
-        checkUsername();                //проверка параметра username
-        if(foundInvalid) return new ValidateResponse(false, "name", checkResult);
+        checkUsername();
+        if(foundInvalid) return new ValidateResponse(false, "login", checkResult);
 
-        checkPatronymic();              //проверка параметра Отчества
+        checkPassword();
+        if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
+
+        checkFirstName();
+        if(foundInvalid) return new ValidateResponse(false, "firstName", checkResult);
+
+        checkLastName();
+        if(foundInvalid) return new ValidateResponse(false, "lastName", checkResult);
+
+        checkPatronymic();
         if(foundInvalid) return new ValidateResponse(false, "patronymic", checkResult);
 
-        checkInn();                     //проверка параметра INN, в отличии от сотрудника - у поставщика есть ИНН
-        if(foundInvalid) return new ValidateResponse(false, "inn", checkResult);
-        //TODO:все остальные проверки
+        checkFirmName();
+        if(foundInvalid) return new ValidateResponse(false, "companyName", checkResult);
+
+        checkDescription();
+        if(foundInvalid) return new ValidateResponse(false, "companyDescription", checkResult);
+
+        checkAddress();
+        if(foundInvalid) return new ValidateResponse(false, "companyAddress", checkResult);
+
+        checkActivity();
+        if(foundInvalid) return new ValidateResponse(false, "companyKindOfActivity", checkResult);
+
+        checkTechnology();
+        if(foundInvalid) return new ValidateResponse(false, "companyTechnologyStack", checkResult);
+
+        checkInn();
+        if(foundInvalid) return new ValidateResponse(false, "TIN", checkResult);
+
+        checkTelephone();
+        if(foundInvalid) return new ValidateResponse(false, "phoneNumber", checkResult);
+
+        checkEmail();
+        if(foundInvalid) return new ValidateResponse(false, "email", checkResult);
+
+        user.setRole("firm");
+        user.setStatus("NotApproved");
+
+        return new ValidateResponse(true, "", checkResult);
+    }
+
+    /**
+     * Валидация при авторизации
+     */
+    public ValidateResponse validateLogin()
+    {
+        validateUsernameNoUnique();
+        if(foundInvalid) return new ValidateResponse(false, "login", checkResult);
+
+        checkPassword();
+        if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
 
         return new ValidateResponse(true, "", checkResult);
     }
@@ -56,165 +138,178 @@ public class UserValidate
     /**
      * Валидация при изменении пользователя поставщика
      */
-    //TODO: public ValidateResponse validateEditFirmUser(User oldUser)
-    public String validateEditFirmUser(User oldUser)
+    public ValidateResponse validateEditFirmUser(User oldUser)
     {
-        //логин проверили в контроллере, его нельзя изменить
-        //TODO везде добавить проверки на отличие от старого как в пароле (!user.getPassword().equals(oldUser.getPassword()))
-        if(user.getPassword() == null) user.setPassword(oldUser.getPassword());         //Параметр пароль не предоставлен, выставляем старое
-        else if(!user.getPassword().equals(oldUser.getPassword()))                      //проверка параметра пароль, если он отличается от старого
+        /*
+          Валидация параметров только если они предоставлены и отличны от прошлых
+         */
+        String checkParameter = user.getPassword();
+        String oldParameter = oldUser.getPassword();
+        if(checkParameter == null) user.setPassword(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
             checkPassword();
-            if(foundInvalid) return checkResult;
+            if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
         }
 
-        if(user.getFirstName() == null) user.setFirstName(oldUser.getFirstName());
-        else
+        checkParameter = user.getFirstName();
+        oldParameter = oldUser.getFirstName();
+        if(checkParameter == null) user.setFirstName(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //else checkFirstName();
-            if(foundInvalid) return checkResult;
+            checkFirstName();
+            if(foundInvalid) return new ValidateResponse(false, "firstName", checkResult);
         }
 
-        if(user.getLastName() == null) user.setLastName(oldUser.getLastName());
-        else
+        checkParameter = user.getLastName();
+        oldParameter = oldUser.getLastName();
+        if(checkParameter == null) user.setLastName(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //else checkLastName();
-            if(foundInvalid) return checkResult;
+            checkLastName();
+            if(foundInvalid) return new ValidateResponse(false, "lastName", checkResult);
         }
 
-        if(user.getPatronymic() == null) user.setPatronymic(oldUser.getPatronymic());
-        else
+        checkParameter = user.getPatronymic();
+        oldParameter = oldUser.getPatronymic();
+        if(checkParameter == null) user.setPatronymic(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
             checkPatronymic();
-            if(foundInvalid) return checkResult;
+            if(foundInvalid) return new ValidateResponse(false, "patronymic", checkResult);
         }
 
-        if(user.getFirmName() == null) user.setFirmName(oldUser.getFirmName());
-        else
+        checkParameter = user.getFirmName();
+        oldParameter = oldUser.getFirmName();
+        if(checkParameter == null) user.setFirmName(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //check
-            if(foundInvalid) return checkResult;
+            checkFirmName();
+            if(foundInvalid) return new ValidateResponse(false, "companyName", checkResult);
         }
 
-        if(user.getDescription() == null) user.setDescription(oldUser.getDescription());
-        else
+        checkParameter = user.getDescription();
+        oldParameter = oldUser.getDescription();
+        if(checkParameter == null) user.setDescription(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //check
-            if(foundInvalid) return checkResult;
+            checkDescription();
+            if(foundInvalid) return new ValidateResponse(false, "companyDescription", checkResult);
         }
 
-        if(user.getAddress() == null) user.setAddress(oldUser.getAddress());
-        else
+        checkParameter = user.getAddress();
+        oldParameter = oldUser.getAddress();
+        if(checkParameter == null) user.setAddress(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //check
-            if(foundInvalid) return checkResult;
+            checkAddress();
+            if(foundInvalid) return new ValidateResponse(false, "companyAddress", checkResult);
         }
 
-        if(user.getActivity() == null) user.setActivity(oldUser.getActivity());
-        else
+        checkParameter = user.getActivity();
+        oldParameter = oldUser.getActivity();
+        if(checkParameter == null) user.setActivity(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //check
-            if(foundInvalid) return checkResult;
+            checkActivity();
+            if(foundInvalid) return new ValidateResponse(false, "companyKindOfActivity", checkResult);
         }
 
-        if(user.getTechnology() == null) user.setTechnology(oldUser.getTechnology());
-        else
+        checkParameter = user.getTechnology();
+        oldParameter = oldUser.getTechnology();
+        if(checkParameter == null) user.setTechnology(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //check
-            if(foundInvalid) return checkResult;
+            checkTechnology();
+            if(foundInvalid) return new ValidateResponse(false, "companyTechnologyStack", checkResult);
         }
 
-        if(user.getInn() == null) user.setInn(oldUser.getInn());
-        else
+        checkParameter = user.getTelephone();
+        oldParameter = oldUser.getTelephone();
+        if(checkParameter == null) user.setTelephone(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //check
-            if(foundInvalid) return checkResult;
+            checkTelephone();
+            if(foundInvalid) return new ValidateResponse(false, "phoneNumber", checkResult);
         }
 
-        if(user.getAccount() == null) user.setAccount(oldUser.getAccount());
-        else
+        checkParameter = user.getEmail();
+        oldParameter = oldUser.getEmail();
+        if(checkParameter == null) user.setEmail(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //check
-            if(foundInvalid) return checkResult;
+            checkEmail();
+            if(foundInvalid) return new ValidateResponse(false, "email", checkResult);
         }
 
-        if(user.getTelephone() == null) user.setTelephone(oldUser.getTelephone());
-        else
+        checkParameter = user.getStatus();
+        oldParameter = oldUser.getStatus();
+        if(checkParameter == null) user.setStatus(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //check
-            if(foundInvalid) return checkResult;
-        }
-
-        if(user.getEmail() == null) user.setEmail(oldUser.getEmail());
-        else
-        {
-            //check
-            if(foundInvalid) return checkResult;
-        }
-
-        if(user.getStatus() == null) user.setStatus(oldUser.getStatus());
-        else
-        {
-            //check
-            if(foundInvalid) return checkResult;
+            checkStatus();
+            if(foundInvalid) return new ValidateResponse(false, "status", checkResult);
         }
 
 
+        user.setRole("firm");
 
-        user.setRole("firm");                                                           //роль поменять нельзя
-
-        return checkResult;
+        return new ValidateResponse(true, "", checkResult);
     }
 
     /**
      * Валидация при изменении пользователя сотрудника
      */
-    public String validateEditEmployeeUser(User oldUser)
+    public ValidateResponse validateEditEmployeeUser(User oldUser)
     {
-        //логин проверили в контроллере, его нельзя изменить
-        if(user.getPassword() == null) user.setPassword(oldUser.getPassword());         //Параметр пароль не предоставлен, выставляем старое
-        else                                                                            //проверка параметра пароль
+        String checkParameter = user.getPassword();
+        String oldParameter = oldUser.getPassword();
+        if(checkParameter == null) user.setPassword(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
             checkPassword();
-            if(foundInvalid) return checkResult;
+            if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
         }
 
-        if(user.getFirstName() == null) user.setFirstName(oldUser.getFirstName());
-        else
+        checkParameter = user.getFirstName();
+        oldParameter = oldUser.getFirstName();
+        if(checkParameter == null) user.setFirstName(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //else checkFirstName();
-            if(foundInvalid) return checkResult;
+            checkFirstName();
+            if(foundInvalid) return new ValidateResponse(false, "firstName", checkResult);
         }
 
-        if(user.getLastName() == null) user.setLastName(oldUser.getLastName());
-        else
+        checkParameter = user.getLastName();
+        oldParameter = oldUser.getLastName();
+        if(checkParameter == null) user.setLastName(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
-            //else checkLastName();
-            if(foundInvalid) return checkResult;
+            checkLastName();
+            if(foundInvalid) return new ValidateResponse(false, "lastName", checkResult);
         }
 
-        if(user.getPatronymic() == null) user.setPatronymic(oldUser.getPatronymic());
-        else
+        checkParameter = user.getPatronymic();
+        oldParameter = oldUser.getPatronymic();
+        if(checkParameter == null) user.setPatronymic(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
         {
             checkPatronymic();
-            if(foundInvalid) return checkResult;
+            if(foundInvalid) return new ValidateResponse(false, "patronymic", checkResult);
         }
 
-        user.setFirmName("");                                                           //у сотрудника нет всех этих параметров
+        user.setFirmName("");
         user.setDescription("");
         user.setAddress("");
         user.setActivity("");
         user.setTechnology("");
         user.setInn("");
-        user.setAccount("");
         user.setTelephone("");
         user.setEmail("");
         user.setRole("employee");
         user.setStatus("Approved");
 
-
-
-        return checkResult;
+        return new ValidateResponse(true, "", checkResult);
     }
 
     /**
@@ -225,20 +320,36 @@ public class UserValidate
     private void checkUsername()
     {
         String checkString = user.getUsername();
-        if (checkString == null)                                       //Параметр username обязателен
+        if (checkString == null)
         {
-            setCheckResult("Параметр username не предоставлен");
+            setCheckResult(ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
-        if (checkLength < 2 || checkLength > 30)
+        if (checkLength < MIN_LOGIN_SIZE || checkLength > MAX_LOGIN_SIZE)
         {
-            setCheckResult("Параметр username должен быть от 2 до 30 символов");
+            setCheckResult(ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
             return;
         }
 
-        //TODO сюда проверку на уникальность в бд
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return;
+        }
+
+        if (userService.existsByUsername(checkString))
+        {
+            setCheckResult(ValidatorMessages.LOGIN_ALREADY_EXIST_ERROR);
+            return;
+        }
     }
 
     /**
@@ -248,74 +359,520 @@ public class UserValidate
     {
         String checkString = user.getPassword();
 
-        //TODO сделать
-    }
-
-    /**
-     * Приватный метод проверки Отчетства
-     * Необходимо вынести так как будет использоваться при validateFirmUser() и при validateEmployeeUser()
-     * Те при проверки регистрации нового поставщика и при создании сотрудника
-     */
-    private void checkPatronymic()
-    {
-        String checkString = user.getPatronymic();
-        if (checkString == null)                                       //если отчество все таки предоставили - его надо проверить
+        if (checkString == null)
         {
-            user.setPatronymic("");                     //параметр отчество не обязателен, по паттерну хранить null в бд не стоит
-        }
-
-        else if (!checkString.equals(""))                //если отчество все таки предоставили - его надо проверить
-        {
-            int checkLength = checkString.length();
-            if (checkLength < 1 || checkLength > 20)
-            {
-                setCheckResult("Параметр Отчество должен быть от 1 до 20 символов");
-                return;
-            }
-        }
-    }
-
-    /**
-     * Приватный метод проверки Инн
-     */
-    private void checkInn()
-    {
-        /*
-        BigInteger checkBigInteger = user.getInn();
-        if (checkBigInteger == null)                                       //Параметр ИНН для поставщика обязателен
-        {
-            setCheckResult("Параметр ИНН не предоставлен";
+            setCheckResult(ValidatorMessages.EMPTY_PASSWORD_FIELD_ERROR);
             return;
         }
 
-        if (checkBigInteger.compareTo(BigInteger.valueOf(9)) < 0 || checkBigInteger.compareTo(BigInteger.valueOf(13)) > 0)
+        int checkLength = checkString.length();
+        if (checkLength < 8 || checkLength > 20)
         {
-            setCheckResult("Параметр ИНН должен быть от 9 до 13 символов";   //Уточню у аналитика
+            setCheckResult(ValidatorMessages.WRONG_PASSWORD_SIZE_ERROR);
+            return;
+        }
+
+        //TODO: проверить нужна ли эта функция
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+        char currentCharacter;
+        boolean numberPresent = false;
+        boolean upperCasePresent = false;
+        boolean lowerCasePresent = false;
+        boolean specialCharacterPresent = false;
+        boolean spacePresent = false;
+
+        String specialCharactersString = "!@#$%&*()'+,-.\\/:;<=>?[]^_`{|}";
+
+        for (int i = 0; i < checkLength; i++)
+        {
+            currentCharacter = checkString.charAt(i);
+            if (Character.isDigit(currentCharacter))
+            {
+                numberPresent = true;
+            }
+            else if (Character.isUpperCase(currentCharacter))
+            {
+                upperCasePresent = true;
+            }
+            else if (Character.isLowerCase(currentCharacter))
+            {
+                lowerCasePresent = true;
+            }
+            else if (specialCharactersString.contains(Character.toString(currentCharacter)))
+            {
+                specialCharacterPresent = true;
+            }
+            else if (Character.isSpaceChar(currentCharacter))
+            {
+                spacePresent = true;
+            }
+        }
+
+        if (!((numberPresent || specialCharacterPresent) && upperCasePresent && lowerCasePresent && !spacePresent))
+        {
+            setCheckResult(ValidatorMessages.WRONG_PASSWORD_SYMBOLS_ERROR);
+            return;
+        }
+    }
+
+    private void checkFirstName()
+    {
+        String checkString = user.getFirstName();
+        if (checkString == null)
+        {
+            setCheckResult(ValidatorMessages.EMPTY_FIRST_NAME_FIELD_ERROR);
+            return;
+        }
+
+        int checkLength = checkString.length();
+        if (checkLength < 1 || checkLength > 20)
+        {
+            setCheckResult(ValidatorMessages.WRONG_FIRST_NAME_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
+        {
+            setCheckResult(ValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
+            return;
+        }
+    }
+
+    private void checkLastName()
+    {
+        String checkString = user.getLastName();
+        if (checkString == null)
+        {
+            setCheckResult(ValidatorMessages.EMPTY_LAST_NAME_FIELD_ERROR);
+            return;
+        }
+
+        int checkLength = checkString.length();
+        if (checkLength < 1 || checkLength > 20)
+        {
+            setCheckResult(ValidatorMessages.WRONG_LAST_NAME_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
+        {
+            setCheckResult(ValidatorMessages.WRONG_LAST_NAME_SYMBOLS_ERROR);
+            return;
+        }
+    }
+
+    private void checkPatronymic()
+    {
+        String checkString = user.getPatronymic();
+        if (checkString == null)
+        {
+            user.setPatronymic("");
+            return;
+        }
+
+        int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
+        if (checkLength > 20)
+        {
+            setCheckResult(ValidatorMessages.WRONG_PATRONYMIC_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
+        {
+            setCheckResult(ValidatorMessages.WRONG_PATRONYMIC_SYMBOLS_ERROR);
+            return;
+        }
+    }
+
+    private void checkFirmName()
+    {
+        String checkString = user.getFirmName();
+        if (checkString == null)
+        {
+            setCheckResult(ValidatorMessages.EMPTY_COMPANY_NAME_FIELD_ERROR);
+            return;
+        }
+
+        int checkLength = checkString.length();
+        if (checkLength < 1 || checkLength > 30)
+        {
+            setCheckResult(ValidatorMessages.WRONG_COMPANY_NAME_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+        //TODO: Разобраться с этим
+        /*
+        if (checkString.charAt(0) == companyName.charAt(companyName.length() - 1) && companyName.charAt(0) == ' ')
+        {
+            setCheckResult(ValidatorMessages.WRONG_COMPANY_NAME_SYMBOLS_ERROR);
             return;
         }
         */
 
-        //TODO сюда проверку на уникальность в бд
+    }
+
+    private void checkDescription()
+    {
+        String checkString = user.getDescription();
+        if (checkString == null)
+        {
+            user.setDescription("");
+            return;
+        }
+
+        int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
+        if (checkLength > 1000)
+        {
+            setCheckResult(ValidatorMessages.WRONG_COMPANY_DESCRIPTION_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+    }
+
+    private void checkAddress()
+    {
+        String checkString = user.getAddress();
+        if (checkString == null)
+        {
+            user.setAddress("");
+            return;
+        }
+
+        int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
+        if (checkLength > 50)
+        {
+            setCheckResult(ValidatorMessages.WRONG_COMPANY_ADDRESS_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "[A-Za-zа-яA-Я0-9 .,!@#№$;%:^?&*()_/\\-+={}]+", Pattern.CASE_INSENSITIVE))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
+            return;
+        }
+
+        //TODO: Разобраться с этим
+        /*
+        if (companyAddress.length() != 0 && companyAddress.charAt(0) == companyAddress.charAt(companyAddress.length() - 1) && companyAddress.charAt(0) == ' ')
+        {
+            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
+            return false;
+        }
+        */
+    }
+
+    private void checkActivity()
+    {
+        String checkString = user.getActivity();
+        if (checkString == null)
+        {
+            setCheckResult(ValidatorMessages.EMPTY_COMPANY_KIND_OF_ACTIVITY_FIELD_ERROR);
+            return;
+        }
+
+        int checkLength = checkString.length();
+        if (checkLength < 1 || checkLength > 100)
+        {
+            setCheckResult(ValidatorMessages.WRONG_COMPANY_KIND_OF_ACTIVITY_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+    }
+
+    private void checkTechnology()
+    {
+        String checkString = user.getTechnology();
+        if (checkString == null)
+        {
+            user.setTechnology("");
+            return;
+        }
+
+        int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
+        if (checkLength > 100)
+        {
+            setCheckResult(ValidatorMessages.WRONG_COMPANY_TECHNOLOGY_STACK_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+    }
+
+    private void checkInn()
+    {
+        String checkString = user.getInn();
+        if (checkString == null)
+        {
+            setCheckResult(ValidatorMessages.EMPTY_TIN_FIELD_ERROR);
+            return;
+        }
+
+        int checkLength = checkString.length();
+        if (checkLength < 9 || checkLength > 12)
+        {
+            setCheckResult(ValidatorMessages.WRONG_TIN_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+        char currentCharacter;
+        boolean numberPresent = false;
+        boolean upperCasePresent = false;
+
+        for (int i = 0; i < checkLength; i++)
+        {
+            currentCharacter = checkString.charAt(i);
+            if (Character.isDigit(currentCharacter))
+            {
+                numberPresent = true;
+            }
+            else if (Character.isUpperCase(currentCharacter))
+            {
+                upperCasePresent = true;
+            }
+        }
+
+        if ((!numberPresent && upperCasePresent))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "[A-Z0-9]*"))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
+            return;
+        }
+
+        if (userService.existsByInn(checkString))
+        {
+            setCheckResult(ValidatorMessages.TIN_ALREADY_EXIST_ERROR);
+            return;
+        }
+    }
+
+    private void checkTelephone()
+    {
+        String checkString = user.getTelephone();
+        if (checkString == null)
+        {
+            user.setTelephone("");
+            return;
+        }
+
+        int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
+        if (checkLength < 11 || checkLength > 12)
+        {
+            setCheckResult(ValidatorMessages.WRONG_PHONE_NUMBER_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "[0-9]*"))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR);
+            return;
+        }
+
+        if (userService.existsByPhoneNumber(checkString))
+        {
+            setCheckResult(ValidatorMessages.PHONE_NUMBER_ALREADY_EXIST_ERROR);
+            return;
+        }
+
+    }
+
+    private void checkEmail()
+    {
+        String checkString = user.getEmail();
+        if (checkString == null)
+        {
+            setCheckResult(ValidatorMessages.EMPTY_EMAIL_FIELD_ERROR);
+            return;
+        }
+
+        int checkLength = checkString.length();
+        if (checkLength < 3 || checkLength > 50)
+        {
+            setCheckResult(ValidatorMessages.WRONG_EMAIL_SIZE_ERROR);
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            return;
+        }
+
+
+        if (!isMatch(checkString, ".{1,25}\\@.{2,15}\\..{2,7}"))
+        {
+            setCheckResult(ValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "[a-z0-9._\\-]{1,25}\\@[a-z0-9._\\-]{2,15}\\.[a-z0-9._\\-]{2,7}", Pattern.CASE_INSENSITIVE))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_EMAIL_ERROR);
+            return;
+        }
+
+        if (userService.existsByEmail(checkString))
+        {
+            setCheckResult(ValidatorMessages.EMAIL_ALREADY_EXIST_ERROR);
+            return;
+        }
+
+    }
+
+    private void checkStatus()
+    {
+        String checkString = user.getStatus();
+        if (!checkString.equals("NotApproved") && !checkString.equals("Approved"))
+        {
+            setCheckResult(ValidatorMessages.WRONG_USER_STATUS_ERROR);
+            return;
+        }
+
     }
 
     /**
-     * Статичный метод проверки username
-     * Необходим для метода получения информации по 1 пользователю
+     * Необходим для валидцаии при авторизации, убрана проверка на уникальность
      */
-    public static String validateUsername(String username)
+    private void validateUsernameNoUnique()
     {
-        if (username == null)
+        String checkString = user.getUsername();
+        if (checkString == null)
         {
-            return "Параметр username не предоставлен";
+            setCheckResult(ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            return;
         }
 
-        int checkLength = username.length();
-        if (checkLength < 2 || checkLength > 30)
+        int checkLength = checkString.length();
+        if (checkLength < MIN_LOGIN_SIZE || checkLength > MAX_LOGIN_SIZE)
         {
-            return "Параметр username должен быть от 2 до 30 символов";
+            setCheckResult(ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
+            return;
         }
 
-        return "ok";
+        if (onlySpaces(checkString))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
+        {
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return;
+        }
+
+        return;
+    }
+
+    /**
+     * Необходим для валидцаии при авторизации, убрана проверка на уникальность
+     */
+    public ValidateResponse validateUsernameLogin(String checkString)
+    {
+        if (checkString == null)
+        {
+            return new ValidateResponse(false, "login", ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+        }
+
+        int checkLength = checkString.length();
+        if (checkLength < MIN_LOGIN_SIZE || checkLength > MAX_LOGIN_SIZE)
+        {
+            return new ValidateResponse(false, "login", ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
+        }
+
+        if (onlySpaces(checkString))
+        {
+            return new ValidateResponse(false, "login", ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+        }
+
+        if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
+        {
+            return new ValidateResponse(false, "login", ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+        }
+
+        return new ValidateResponse(true, "", checkResult);
     }
 
     private void setCheckResult(String result)
@@ -324,22 +881,3 @@ public class UserValidate
         checkResult = result;
     }
 }
-
-
-
-        /*
-        //TODO VALIDATE
-        if (userRepository.existsByUsername(ObjUser.getUsername()))
-        {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new ApiResponse(false, "Error: Username is already taken!"));
-        }
-
-        if (userRepository.existsByEmail(ObjUser.getEmail()))
-        {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new ApiResponse(false, "Error: Email is already taken!"));
-        }
-         */

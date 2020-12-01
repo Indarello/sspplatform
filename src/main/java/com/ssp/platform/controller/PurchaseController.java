@@ -183,10 +183,10 @@ public class PurchaseController
      */
     @PutMapping(value = "/purchase", produces = "application/json", consumes = "application/json")
     @PreAuthorize("hasAuthority('employee')")
-    public ResponseEntity<Object> changePurchase(@RequestBody Purchase purchase)
+    public ResponseEntity<Object> changePurchase(@RequestHeader("Authorization") String token, @RequestBody Purchase purchase)
     {
-
-
+        User author = userDetailsService.loadUserByToken(token);
+        purchase.setAuthor(author);
         try
         {
             Optional<Purchase> editResult = purchaseService.changePurchase(purchase);
