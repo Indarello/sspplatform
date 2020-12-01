@@ -175,9 +175,9 @@ public class PurchaseValidate
         }
 
         int checkLength = checkString.length();
-        if (checkLength > 100)
+        if (checkLength > 1000)
         {
-            setCheckResult("Состав команды должен содержать не более 100 символов!");
+            setCheckResult("Состав команды должен содержать не более 1000 символов!");
             return;
         }
     }
@@ -192,9 +192,9 @@ public class PurchaseValidate
         }
 
         int checkLength = checkString.length();
-        if (checkLength > 100)
+        if (checkLength > 1000)
         {
-            setCheckResult("Условия работы должны содержать не более 100 символов!");
+            setCheckResult("Условия работы должны содержать не более 1000 символов!");
             return;
         }
 

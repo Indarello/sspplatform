@@ -20,17 +20,17 @@ public class ValidatorMessages {
 
     public static final String EMPTY_FIRST_NAME_FIELD_ERROR = "Поле имени должно быть заполнено!";
 
-    public static final String WRONG_FIRST_NAME_SIZE_ERROR = "Поле имени должно содержать от 1 до 20 символов!";
+    public static final String WRONG_FIRST_NAME_SIZE_ERROR = "Поле имени должно содержать от 1 до 30 символов!";
 
     public static final String WRONG_FIRST_NAME_SYMBOLS_ERROR = "Имя может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
     public static final String EMPTY_LAST_NAME_FIELD_ERROR = "Поле фамилии должно быть заполнено!";
 
-    public static final String WRONG_LAST_NAME_SIZE_ERROR = "Поле фамилии должно содержать от 1 до 20 символов!";
+    public static final String WRONG_LAST_NAME_SIZE_ERROR = "Поле фамилии должно содержать от 1 до 30 символов!";
 
     public static final String WRONG_LAST_NAME_SYMBOLS_ERROR = "Фамилия может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
-    public static final String WRONG_PATRONYMIC_SIZE_ERROR = "Поле отчество должно содержать от 1 до 20 символов!";
+    public static final String WRONG_PATRONYMIC_SIZE_ERROR = "Поле отчество должно содержать не более 30 символов!";
 
     public static final String WRONG_PATRONYMIC_SYMBOLS_ERROR = "Отчество может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 

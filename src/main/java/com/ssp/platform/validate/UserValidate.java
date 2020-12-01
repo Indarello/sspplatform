@@ -429,7 +429,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         }
 
         int checkLength = checkString.length();
-        if (checkLength < 1 || checkLength > 20)
+        if (checkLength < 1 || checkLength > 30)
         {
             setCheckResult(ValidatorMessages.WRONG_FIRST_NAME_SIZE_ERROR);
             return;
@@ -441,6 +441,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
+        //TODO: Упростить regex
         if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
         {
             setCheckResult(ValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
@@ -458,7 +459,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         }
 
         int checkLength = checkString.length();
-        if (checkLength < 1 || checkLength > 20)
+        if (checkLength < 1 || checkLength > 30)
         {
             setCheckResult(ValidatorMessages.WRONG_LAST_NAME_SIZE_ERROR);
             return;
@@ -490,7 +491,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (checkLength == 0) return;
 
-        if (checkLength > 20)
+        if (checkLength > 30)
         {
             setCheckResult(ValidatorMessages.WRONG_PATRONYMIC_SIZE_ERROR);
             return;
