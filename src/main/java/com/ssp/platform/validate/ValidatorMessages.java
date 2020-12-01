@@ -20,23 +20,23 @@ public class ValidatorMessages {
 
     public static final String EMPTY_FIRST_NAME_FIELD_ERROR = "Поле имени должно быть заполнено!";
 
-    public static final String WRONG_FIRST_NAME_SIZE_ERROR = "В поле имени не может быть больше 20 символов!";
+    public static final String WRONG_FIRST_NAME_SIZE_ERROR = "Поле имени должно содержать от 1 до 20 символов!";
 
     public static final String WRONG_FIRST_NAME_SYMBOLS_ERROR = "Имя может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
     public static final String EMPTY_LAST_NAME_FIELD_ERROR = "Поле фамилии должно быть заполнено!";
 
-    public static final String WRONG_LAST_NAME_SIZE_ERROR = "В поле фамилии не может быть больше 20 символов!";
+    public static final String WRONG_LAST_NAME_SIZE_ERROR = "Поле фамилии должно содержать от 1 до 20 символов!";
 
     public static final String WRONG_LAST_NAME_SYMBOLS_ERROR = "Фамилия может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
-    public static final String WRONG_PATRONYMIC_SIZE_ERROR = "В поле отчестве не может быть больше 20 символов!";
+    public static final String WRONG_PATRONYMIC_SIZE_ERROR = "Поле отчество должно содержать от 1 до 20 символов!";
 
     public static final String WRONG_PATRONYMIC_SYMBOLS_ERROR = "Отчество может содержать заглавные и строчные буквы кириллицы или латинского алфавита.";
 
     public static final String EMPTY_COMPANY_NAME_FIELD_ERROR = "Поле имени компании должно быть заполнено!";
 
-    public static final String WRONG_COMPANY_NAME_SIZE_ERROR = "Имя компании должно содержать не более 30 символов";
+    public static final String WRONG_COMPANY_NAME_SIZE_ERROR = "Поле имя компании должно содержать от 1 до 30 символов!";
 
     public static final String WRONG_COMPANY_NAME_SYMBOLS_ERROR = "Имя компании может содержать верхний и нижний регистр латиницы или кириллицы, цифры и специальные знаки";
 
@@ -46,13 +46,11 @@ public class ValidatorMessages {
 
     public static final String EMPTY_COMPANY_KIND_OF_ACTIVITY_FIELD_ERROR = "Поле деятельности компании должно быть заполнено!";
 
-    public static final String WRONG_COMPANY_KIND_OF_ACTIVITY_SIZE_ERROR = "Поле деятельности компании должно содержать не более 100 символов";
+    public static final String WRONG_COMPANY_KIND_OF_ACTIVITY_SIZE_ERROR = "Поле деятельности компании должно содержать от 1 до 100 символов!";
 
     public static final String WRONG_COMPANY_TECHNOLOGY_STACK_SIZE_ERROR = "Поле технологического стека должно содержать не более 100 символов";
 
     public static final String EMPTY_TIN_FIELD_ERROR = "Поле ИНН должно быть заполнено!";
-
-    public static final String ONLY_LETTERS_TIN_FIELD_ERROR = "Поле ИНН не может содержать только буквы!";
 
     public static final String WRONG_TIN_SIZE_ERROR = "Поле ИНН/УНН должно содержать от 9 до 12 символов!";
 
@@ -60,7 +58,7 @@ public class ValidatorMessages {
 
     public static final String TIN_ALREADY_EXIST_ERROR = "Пользователь с данным ИНН уже существует";
 
-    public static final String WRONG_PHONE_NUMBER_SIZE_ERROR = "Номер телефона должен содержать не менее 11 символов!";
+    public static final String WRONG_PHONE_NUMBER_SIZE_ERROR = "Номер телефона должен содержать от 11 до 12 символов!";
 
     public static final String WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR = "Номер телефона должен содержать только цифры.";
 

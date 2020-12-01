@@ -39,7 +39,6 @@ public class UserController
     private boolean existsFirstUser = false;
 
 
-
     @Autowired
     public UserController(
             AuthenticationManager authenticationManager, UserService userService, UserDetailsServiceImpl userDetailsService,

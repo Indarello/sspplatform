@@ -3,7 +3,6 @@ package com.ssp.platform.validate;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.service.UserService;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -531,14 +530,12 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
-        //TODO: Разобраться с этим
-        /*
-        if (checkString.charAt(0) == companyName.charAt(companyName.length() - 1) && companyName.charAt(0) == ' ')
+
+        if (checkString.charAt(checkLength - 1) == ' ' && checkString.charAt(0) == ' ')
         {
             setCheckResult(ValidatorMessages.WRONG_COMPANY_NAME_SYMBOLS_ERROR);
             return;
         }
-        */
 
     }
 
@@ -600,14 +597,11 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        //TODO: Разобраться с этим
-        /*
-        if (companyAddress.length() != 0 && companyAddress.charAt(0) == companyAddress.charAt(companyAddress.length() - 1) && companyAddress.charAt(0) == ' ')
+        if (checkString.charAt(checkLength - 1) == ' ' && checkString.charAt(0) == ' ')
         {
-            validatorResponse = new ValidatorResponse(ERROR, HttpStatus.BAD_REQUEST, FIELD_NAME, ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
-            return false;
+            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
+            return;
         }
-        */
     }
 
     private void checkActivity()

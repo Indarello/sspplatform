@@ -1,6 +1,5 @@
 package com.ssp.platform.validate;
 
-import java.util.UUID;
 import java.util.regex.*;
 
 public abstract class Validator {
