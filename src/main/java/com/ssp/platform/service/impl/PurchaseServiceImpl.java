@@ -63,4 +63,9 @@ public class PurchaseServiceImpl implements PurchaseService
     {
         return purchaseRepository.findById(id);
     }
+
+    @Override
+    public boolean existById(UUID id) {
+        return purchaseRepository.existsById(id);
+    }
 }

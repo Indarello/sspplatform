@@ -45,6 +45,9 @@
             <column name="work_condition" type="text">
                 <constraints nullable="false"/>
             </column>
+            <column name="file_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 </databaseChangeLog>

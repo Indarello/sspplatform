@@ -7,4 +7,5 @@
 	<include  file="db/changelog/changes/20201027175100_create_user_tables.xml"/>
 	<include  file="db/changelog/changes/20201117110500_create_purchase_tables.xml"/>
 	<include  file="db/changelog/changes/20201027175100_create_file_tables.xml"/>
+	<include file="db/changelog/changes/20201121140821_create_supply_table.xml"/>
 </databaseChangeLog> 

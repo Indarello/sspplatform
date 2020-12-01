@@ -4,9 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -99,9 +103,16 @@ public class Purchase
     @NotNull
     private String workCondition;
 
-    //@JsonIgnore
-    @OneToOne(mappedBy = "purchase")
+    @ManyToOne(fetch = FetchType.EAGER, targetEntity = FileEntity.class)
+    @JoinColumn(name = "file_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private FileEntity file;
+
+    /**
+     * Массив сущностей предложений
+     */
+    @OneToMany(mappedBy = "purchaseId")
+    private List<SupplyEntity> supplies;
 
     public Purchase()
     {

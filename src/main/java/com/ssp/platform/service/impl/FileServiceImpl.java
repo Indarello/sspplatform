@@ -18,8 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class FileServiceImpl implements FileService
-{
+public class FileServiceImpl implements FileService {
 
     @Autowired
     private final FileRepository fileRepository;
@@ -27,12 +26,10 @@ public class FileServiceImpl implements FileService
     private final Path fileStorageLocation;
 
     @Autowired
-    public FileServiceImpl(FileProperty fileProperty, FileRepository fileRepository) throws IOException
-    {
-        this.fileStorageLocation = Paths.get(fileProperty.getUploadDirectory()).toAbsolutePath().normalize();
+    public FileServiceImpl(FileProperty fileProperty, FileRepository fileRepository) throws IOException {
+        fileStorageLocation = Paths.get(fileProperty.getUploadDirectory()).toAbsolutePath().normalize();
         this.fileRepository = fileRepository;
-        if (!Files.exists(fileStorageLocation))
-        {
+        if (!Files.exists(fileStorageLocation)) {
             Files.createDirectory(fileStorageLocation);
         }
     }
@@ -44,30 +41,18 @@ public class FileServiceImpl implements FileService
     }
 
     @Override
-    public FileEntity addFiles(MultipartFile[] multipartFiles) throws NoSuchAlgorithmException, IOException
-    {
-        int index = 0;
-        FileEntity[] savedFiles = new FileEntity[multipartFiles.length];
-
-        for (MultipartFile file : multipartFiles)
-        {
-            savedFiles[index] = createFile(file);
-            index++;
-        }
-        return savedFiles[0];
-        //return savedFiles;     пока что только 1 файл можно сохранить
+    public FileEntity addFile(MultipartFile file) throws NoSuchAlgorithmException, IOException {
+        return createFile(file);
     }
 
     @Override
-    public FileResponse getFile(UUID id) throws MalformedURLException
-    {
+    public FileResponse getFile(UUID id) throws MalformedURLException {
         Optional<FileEntity> searchResult = fileRepository.findById(id);
 
-        if (searchResult.isPresent())
-        {
+        if (searchResult.isPresent()) {
             FileEntity fileEntity = searchResult.get();
             String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
-            Path filePath = this.fileStorageLocation.resolve(fileEntity.getHash() + extension).normalize();
+            Path filePath = fileStorageLocation.resolve(fileEntity.getHash() + extension).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             return new FileResponse(true, resource, fileEntity);
@@ -75,24 +60,44 @@ public class FileServiceImpl implements FileService
         return new FileResponse(false, null, null);
     }
 
-    private FileEntity createFile(MultipartFile file) throws NoSuchAlgorithmException, IOException
-    {
+    @Override
+    public void delete(UUID id) throws IOException {
+        FileEntity fileEntity = fileRepository.getOne(id);
+
+        if (fileEntity.getSupplies().isEmpty()){
+            String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
+
+            deleteFile(fileEntity.getHash(), extension);
+            fileRepository.delete(fileEntity);
+        }
+    }
+
+    private FileEntity createFile(MultipartFile file) throws NoSuchAlgorithmException, IOException {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setName(file.getOriginalFilename());
         fileEntity.setMimeType(file.getContentType());
         fileEntity.setSize(file.getSize());
         fileEntity.setHash();
 
-        String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
-        storeFile(file, fileEntity.getHash(), extension);
+        if (fileRepository.existsByHash(fileEntity.getHash())){
+            fileEntity = fileRepository.getOneByHash(fileEntity.getHash());
+            return fileEntity;
+        } else {
+            String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
+            storeFile(file, fileEntity.getHash(), extension);
 
-        return fileRepository.save(fileEntity);
+            return fileRepository.save(fileEntity);
+        }
     }
 
-    private void storeFile(MultipartFile file, String hash, String fileExtension) throws IOException
-    {
-        Path targetLocation = this.fileStorageLocation.resolve(hash + fileExtension);
+    private void storeFile(MultipartFile file, String hash, String fileExtension) throws IOException {
+        Path targetLocation = fileStorageLocation.resolve(hash + fileExtension);
         Files.copy(file.getInputStream(), targetLocation);
+    }
+
+    private void deleteFile(String hash, String fileExtension) throws IOException {
+        Path targetLocation = fileStorageLocation.resolve(hash + fileExtension);
+        Files.delete(targetLocation);
     }
 
 }

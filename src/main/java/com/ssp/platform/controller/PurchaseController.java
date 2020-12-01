@@ -93,7 +93,8 @@ public class PurchaseController
             }
             else
             {
-                savedFiles = fileService.addFiles(files);
+                //TODO доделать несколько файлов
+                savedFiles = fileService.addFile(files[0]);
                 validatedPurchase.setFile(savedFiles);
             }
         }

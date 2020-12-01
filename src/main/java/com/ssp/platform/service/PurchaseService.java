@@ -17,4 +17,6 @@ public interface PurchaseService {
 	boolean deletePurchase(UUID id);
 
 	Optional<Purchase> findById(UUID id);
+
+	boolean existById(UUID id);
 }

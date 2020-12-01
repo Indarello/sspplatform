@@ -15,8 +15,8 @@ import java.util.*;
 @Table(name = "files")
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileEntity
-{
+public class FileEntity {
+
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")
@@ -40,12 +40,19 @@ public class FileEntity
     @NotNull
     private String hash;
 
-    public void setHash() throws NoSuchAlgorithmException
-    {
-        String modifiedName = this.name + this.mimeType + this.size + new Date().getTime();
-        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "file")
+    private List<Purchase> purchases;
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "file")
+    private List<SupplyEntity> supplies;
+
+    public void setHash() throws NoSuchAlgorithmException {
+        String modifiedName = name + mimeType + size;
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(modifiedName.getBytes(StandardCharsets.UTF_8));
-        this.hash = new BigInteger(1, messageDigest.digest()).toString(16);
+        hash = new BigInteger(1, messageDigest.digest()).toString(16);
     }
 
 }
