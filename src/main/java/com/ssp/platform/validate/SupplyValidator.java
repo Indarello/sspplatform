@@ -4,6 +4,7 @@ import com.ssp.platform.entity.SupplyEntity;
 import com.ssp.platform.entity.enums.SupplyStatus;
 import com.ssp.platform.response.ValidatorResponse;
 import com.ssp.platform.service.impl.PurchaseServiceImpl;
+import com.ssp.platform.validate.ValidatorMessages.SupplyValidatorMessages;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -21,6 +22,8 @@ public class SupplyValidator extends Validator {
 
     private final int MAX_SUPPLY_COMMENT_SYMBOLS = 1000;
 
+    private final int MAX_SUPPLY_RESULT_SYMBOLS = 1000;
+
     private final PurchaseServiceImpl purchaseService;
 
     private ValidatorResponse response;
@@ -30,9 +33,9 @@ public class SupplyValidator extends Validator {
     }
 
     public ValidatorResponse validateSupplyCreating(SupplyEntity supplyEntity){
-        response = new ValidatorResponse(true, ValidatorMessages.OK);
+        response = new ValidatorResponse(true, SupplyValidatorMessages.OK);
 
-        if (!validatePurchaseId(supplyEntity.getPurchaseId())){
+        if (!validatePurchaseId(supplyEntity.getPurchase().getId())){
             return response;
         }
 
@@ -50,7 +53,7 @@ public class SupplyValidator extends Validator {
     }
 
     public ValidatorResponse validateSupplyUpdating(SupplyEntity updatedEntity, int role) {
-        response = new ValidatorResponse(true, ValidatorMessages.OK);
+        response = new ValidatorResponse(true, SupplyValidatorMessages.OK);
 
         switch (role){
             case ROLE_FIRM:
@@ -85,7 +88,7 @@ public class SupplyValidator extends Validator {
         final String FIELD_NAME = "purchaseId";
 
         if (!purchaseService.existById(id)){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.WRONG_PURCHASE_ID_ERROR);
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_PURCHASE_ID_ERROR);
             return false;
         }
 
@@ -95,23 +98,23 @@ public class SupplyValidator extends Validator {
     private boolean validateDescription(String description) {
         final String FIELD_NAME = "description";
 
-        if (isNull(description)) {
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.EMPTY_SUPPLY_DESCRIPTION_ERROR);
+        if (description == null) {
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_DESCRIPTION_ERROR);
             return false;
         }
 
-        if (isEmpty(description)) {
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.EMPTY_SUPPLY_DESCRIPTION_ERROR);
+        if (description.isEmpty()) {
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_DESCRIPTION_ERROR);
             return false;
         }
 
         if (onlySpaces(description)) {
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.ONLY_SPACES_ERROR);
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.ONLY_SPACES_ERROR);
             return false;
         }
 
-        if (!inBounds(description, MAX_SUPPLY_DESCRIPTION_SYMBOLS)) {
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.WRONG_SUPPLY_DESCRIPTION_BOUNDS_ERROR);
+        if (description.length() > MAX_SUPPLY_DESCRIPTION_SYMBOLS) {
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_SUPPLY_DESCRIPTION_BOUNDS_ERROR);
             return false;
         }
 
@@ -121,12 +124,17 @@ public class SupplyValidator extends Validator {
     private boolean validateBudget(Long budget) {
         final String FIELD_NAME = "budget";
 
-        if (isNull(budget)){
+        if (budget == null){
             return true;
         }
 
         if (budget > MAX_SUPPLY_BUDGET){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.WRONG_SUPPLY_BUDGET_BOUNDS_ERROR);
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_SUPPLY_BUDGET_BOUNDS_ERROR);
+            return false;
+        }
+
+        if (budget < 0L){
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.NEGATIVE_SUPPLY_BUDGET_ERROR);
             return false;
         }
 
@@ -136,21 +144,21 @@ public class SupplyValidator extends Validator {
     private boolean validateComment(String comment){
         final String FIELD_NAME = "comment";
 
-        if (isNull(comment)){
+        if (comment == null){
             return true;
         }
 
-        if (isEmpty(comment)){
+        if (comment.isEmpty()){
             return true;
         }
 
         if (onlySpaces(comment)){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.ONLY_SPACES_ERROR);
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.ONLY_SPACES_ERROR);
             return false;
         }
 
-        if (!inBounds(comment, MAX_SUPPLY_COMMENT_SYMBOLS)){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.WRONG_SUPPLY_COMMENT_BOUNDS_ERROR);
+        if (comment.length() > MAX_SUPPLY_COMMENT_SYMBOLS){
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_SUPPLY_COMMENT_BOUNDS_ERROR);
             return false;
         }
 
@@ -160,8 +168,8 @@ public class SupplyValidator extends Validator {
     private boolean validateStatus(SupplyStatus status){
         final String FIELD_NAME = "status";
 
-        if (isNull(status)){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.EMPTY_SUPPLY_STATUS_ERROR);
+        if (status == null){
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_STATUS_ERROR);
             return false;
         }
 
@@ -171,23 +179,23 @@ public class SupplyValidator extends Validator {
     private boolean validateResult(String result){
         final String FIELD_NAME = "resultOfConsideration";
         
-        if (isNull(result)){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.EMPTY_SUPPLY_RESULT_ERROR);
+        if (result == null){
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_RESULT_ERROR);
             return false;
         }
         
-        if (isEmpty(result)){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.EMPTY_SUPPLY_RESULT_ERROR);
+        if (result.isEmpty()){
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_RESULT_ERROR);
             return false;
         }
         
         if (onlySpaces(result)){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.ONLY_SPACES_ERROR);
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.ONLY_SPACES_ERROR);
             return false;
         }
         
-        if (!inBounds(result, MAX_SUPPLY_COMMENT_SYMBOLS)){
-            response = new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.WRONG_SUPPLY_RESULT_BOUNDS_ERROR);
+        if (result.length() > MAX_SUPPLY_RESULT_SYMBOLS){
+            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_SUPPLY_RESULT_BOUNDS_ERROR);
             return false;
         }
 

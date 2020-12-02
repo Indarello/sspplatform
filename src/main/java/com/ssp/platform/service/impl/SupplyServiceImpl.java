@@ -4,10 +4,12 @@ import com.ssp.platform.entity.*;
 import com.ssp.platform.entity.enums.SupplyStatus;
 import com.ssp.platform.exceptions.PageExceptions.*;
 import com.ssp.platform.exceptions.SupplyException;
-import com.ssp.platform.repository.SupplyRepository;
+import com.ssp.platform.repository.*;
 import com.ssp.platform.response.*;
 import com.ssp.platform.service.*;
 import com.ssp.platform.validate.*;
+import com.ssp.platform.validate.ValidatorMessages.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,17 +25,23 @@ public class SupplyServiceImpl implements SupplyService {
 
     private final SupplyRepository supplyRepository;
 
+    private final PurchaseRepository purchaseRepository;
+
     private final FileServiceImpl fileService;
 
     private final SupplyValidator supplyValidator;
 
     private final FileValidator fileValidator;
 
-    public SupplyServiceImpl(SupplyRepository supplyRepository, FileServiceImpl fileService, SupplyValidator supplyValidator, FileValidator fileValidator) {
+    public SupplyServiceImpl(
+            SupplyRepository supplyRepository, FileServiceImpl fileService, SupplyValidator supplyValidator, FileValidator fileValidator,
+            PurchaseRepository purchaseRepository
+    ) {
         this.supplyRepository = supplyRepository;
         this.fileService = fileService;
         this.supplyValidator = supplyValidator;
         this.fileValidator = fileValidator;
+        this.purchaseRepository = purchaseRepository;
     }
 
     @Override
@@ -41,7 +49,7 @@ public class SupplyServiceImpl implements SupplyService {
             throws SupplyException, IOException, NoSuchAlgorithmException {
 
         if (supplyRepository.existsByAuthorAndPurchaseId(author, purchaseId)) {
-            throw new SupplyException(new ValidatorResponse(false, ValidatorMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
+            throw new SupplyException(new ValidatorResponse(false, SupplyValidatorMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
         }
 
         ValidatorResponse response = fileValidator.validateFile(file);
@@ -51,7 +59,7 @@ public class SupplyServiceImpl implements SupplyService {
         if (file == null){
             fileEntity = fileService.addFile(file);
         }
-        SupplyEntity supplyEntity = new SupplyEntity(purchaseId, description, author, budget, comment, fileEntity);
+        SupplyEntity supplyEntity = new SupplyEntity(purchaseRepository.getOne(purchaseId), description, author, budget, comment, fileEntity);
 
         response = supplyValidator.validateSupplyCreating(supplyEntity);
         if (!response.isSuccess()) throw new SupplyException(response);
@@ -132,7 +140,7 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     @Override
-    public List<SupplyResponse> getPage(int pageIndex, int pageSize) throws PageIndexException, PageSizeException {
+    public List<SupplyResponse> getPage(UUID purchaseId, int pageIndex, int pageSize) throws PageIndexException, PageSizeException {
         if (pageIndex < 0) {
             throw new PageIndexException();
         }
@@ -144,7 +152,7 @@ public class SupplyServiceImpl implements SupplyService {
         }
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
-        Page<SupplyEntity> page = supplyRepository.findAll(pageable);
+        Page<SupplyEntity> page = supplyRepository.findAllByPurchase(purchaseRepository.getOne(purchaseId), pageable);
 
         List<SupplyResponse> out = new ArrayList<>();
         for (SupplyEntity supplyEntity : page){
@@ -152,20 +160,22 @@ public class SupplyServiceImpl implements SupplyService {
 
             supplyResponse.setDescription(supplyEntity.getDescription());
             supplyResponse.setCreateDate(supplyEntity.getCreateDate());
-            supplyResponse.setAuthor(supplyEntity.getAuthor().getLastName() + " " + supplyEntity.getAuthor().getFirstName());
+            supplyResponse.setAuthor(supplyEntity.getAuthor().getUsername());
             supplyResponse.setBudget(supplyEntity.getBudget());
             supplyResponse.setComment(supplyEntity.getComment());
             supplyResponse.setStatus(supplyEntity.getStatus());
             supplyResponse.setResultOfConsideration(supplyEntity.getResultOfConsideration());
             supplyResponse.setResultDate(supplyEntity.getResultDate());
 
-            FileDTO fileDTO = new FileDTO(
-                    supplyEntity.getFile().getName(),
-                    supplyEntity.getFile().getMimeType(),
-                    supplyEntity.getFile().getSize(),
-                    supplyEntity.getFile().getHash()
-            );
-            supplyResponse.setFile(fileDTO);
+            if (supplyEntity.getFile() != null){
+                FileDTO fileDTO = new FileDTO(
+                        supplyEntity.getFile().getName(),
+                        supplyEntity.getFile().getMimeType(),
+                        supplyEntity.getFile().getSize(),
+                        supplyEntity.getFile().getHash()
+                );
+                supplyResponse.setFile(fileDTO);
+            }
 
             out.add(supplyResponse);
         }

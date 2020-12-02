@@ -1,5 +1,6 @@
 package com.ssp.platform.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssp.platform.entity.enums.SupplyStatus;
 import lombok.Data;
 import org.hibernate.annotations.*;
@@ -22,8 +23,11 @@ public class SupplyEntity {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "purchase_id")
-    private UUID purchaseId;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER, targetEntity = Purchase.class)
+    @JoinColumn(name = "purchase_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Purchase purchase;
 
     @Column(name = "description")
     private String description;
@@ -62,10 +66,10 @@ public class SupplyEntity {
     }
 
     public SupplyEntity(
-            UUID purchaseId, String description, User author,
+            Purchase purchase, String description, User author,
             Long budget, String comment, FileEntity file
     ) {
-        this.purchaseId = purchaseId;
+        this.purchase = purchase;
         this.description = description;
         this.author = author;
         this.budget = budget;

@@ -3,6 +3,7 @@ package com.ssp.platform.validate;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.service.UserService;
+import com.ssp.platform.validate.ValidatorMessages.UserValidatorMessages;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -336,14 +337,14 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getUsername();
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < MIN_LOGIN_SIZE || checkLength > MAX_LOGIN_SIZE)
         {
-            setCheckResult(ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
             return;
         }
 
@@ -356,13 +357,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
             return;
         }
 
         if (userService.existsByUsername(checkString))
         {
-            setCheckResult(ValidatorMessages.LOGIN_ALREADY_EXIST_ERROR);
+            setCheckResult(UserValidatorMessages.LOGIN_ALREADY_EXIST_ERROR);
             return;
         }
     }
@@ -376,14 +377,14 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_PASSWORD_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_PASSWORD_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 8 || checkLength > 20)
         {
-            setCheckResult(ValidatorMessages.WRONG_PASSWORD_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_PASSWORD_SIZE_ERROR);
             return;
         }
 
@@ -432,13 +433,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (!((numberPresent || specialCharacterPresent) && upperCasePresent && lowerCasePresent && !spacePresent))
         {
-            setCheckResult(ValidatorMessages.WRONG_PASSWORD_SYMBOLS_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_PASSWORD_SYMBOLS_ERROR);
             return;
         }
 
         if (!isMatch(checkString, "[A-Za-z0-9^!@#$%&\\*()'\\+,\\-\\./:;<=\\>\\?\\[\\]^_`{\\|}\\\\]*"))
         {
-            setCheckResult(ValidatorMessages.WRONG_PASSWORD_SYMBOLS_REGEX);
+            setCheckResult(UserValidatorMessages.WRONG_PASSWORD_SYMBOLS_REGEX);
             return;
         }
     }
@@ -448,14 +449,14 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getFirstName();
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_FIRST_NAME_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_FIRST_NAME_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 30)
         {
-            setCheckResult(ValidatorMessages.WRONG_FIRST_NAME_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_FIRST_NAME_SIZE_ERROR);
             return;
         }
 
@@ -469,7 +470,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         //TODO: Упростить regex
         if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
         {
-            setCheckResult(ValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
             return;
         }
     }
@@ -479,14 +480,14 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getLastName();
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_LAST_NAME_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_LAST_NAME_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 30)
         {
-            setCheckResult(ValidatorMessages.WRONG_LAST_NAME_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_LAST_NAME_SIZE_ERROR);
             return;
         }
 
@@ -500,7 +501,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
         {
-            setCheckResult(ValidatorMessages.WRONG_LAST_NAME_SYMBOLS_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_LAST_NAME_SYMBOLS_ERROR);
             return;
         }
     }
@@ -520,7 +521,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (checkLength > 30)
         {
-            setCheckResult(ValidatorMessages.WRONG_PATRONYMIC_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_PATRONYMIC_SIZE_ERROR);
             return;
         }
 
@@ -534,7 +535,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
         {
-            setCheckResult(ValidatorMessages.WRONG_PATRONYMIC_SYMBOLS_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_PATRONYMIC_SYMBOLS_ERROR);
             return;
         }
     }
@@ -544,26 +545,26 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getFirmName();
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_COMPANY_NAME_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_COMPANY_NAME_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 30)
         {
-            setCheckResult(ValidatorMessages.WRONG_COMPANY_NAME_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_COMPANY_NAME_SIZE_ERROR);
             return;
         }
 
         if (onlySpaces(checkString))
         {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            setCheckResult(UserValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
 
         if (checkString.charAt(checkLength - 1) == ' ' && checkString.charAt(0) == ' ')
         {
-            setCheckResult(ValidatorMessages.WRONG_COMPANY_NAME_SYMBOLS_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_COMPANY_NAME_SYMBOLS_ERROR);
             return;
         }
 
@@ -584,13 +585,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (checkLength > 1000)
         {
-            setCheckResult(ValidatorMessages.WRONG_COMPANY_DESCRIPTION_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_COMPANY_DESCRIPTION_SIZE_ERROR);
             return;
         }
 
         if (onlySpaces(checkString))
         {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            setCheckResult(UserValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
 
@@ -611,25 +612,25 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (checkLength > 50)
         {
-            setCheckResult(ValidatorMessages.WRONG_COMPANY_ADDRESS_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_COMPANY_ADDRESS_SIZE_ERROR);
             return;
         }
 
         if (onlySpaces(checkString))
         {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            setCheckResult(UserValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
 
         if (!isMatch(checkString, "[A-Za-zа-яA-Я0-9 .,!@#№$;%:^?&*()_/\\-+={}]+", Pattern.CASE_INSENSITIVE))
         {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
             return;
         }
 
         if (checkString.charAt(checkLength - 1) == ' ' && checkString.charAt(0) == ' ')
         {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
             return;
         }
     }
@@ -639,20 +640,20 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getActivity();
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_COMPANY_KIND_OF_ACTIVITY_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_COMPANY_KIND_OF_ACTIVITY_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 100)
         {
-            setCheckResult(ValidatorMessages.WRONG_COMPANY_KIND_OF_ACTIVITY_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_COMPANY_KIND_OF_ACTIVITY_SIZE_ERROR);
             return;
         }
 
         if (onlySpaces(checkString))
         {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            setCheckResult(UserValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
 
@@ -673,13 +674,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (checkLength > 100)
         {
-            setCheckResult(ValidatorMessages.WRONG_COMPANY_TECHNOLOGY_STACK_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_COMPANY_TECHNOLOGY_STACK_SIZE_ERROR);
             return;
         }
 
         if (onlySpaces(checkString))
         {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            setCheckResult(UserValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
 
@@ -690,20 +691,20 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getInn();
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_TIN_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_TIN_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 9 || checkLength > 12)
         {
-            setCheckResult(ValidatorMessages.WRONG_TIN_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_TIN_SIZE_ERROR);
             return;
         }
 
         if (onlySpaces(checkString))
         {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            setCheckResult(UserValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
 
@@ -726,19 +727,19 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if ((!numberPresent && upperCasePresent))
         {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
             return;
         }
 
         if (!isMatch(checkString, "[A-Z0-9]*"))
         {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
             return;
         }
 
         if (userService.existsByInn(checkString))
         {
-            setCheckResult(ValidatorMessages.TIN_ALREADY_EXIST_ERROR);
+            setCheckResult(UserValidatorMessages.TIN_ALREADY_EXIST_ERROR);
             return;
         }
     }
@@ -758,7 +759,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (checkLength < 11 || checkLength > 17)
         {
-            setCheckResult(ValidatorMessages.WRONG_PHONE_NUMBER_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_PHONE_NUMBER_SIZE_ERROR);
             return;
         }
 
@@ -771,13 +772,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 */
         if (!isMatch(checkString, "[0-9]*"))
         {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR);
             return;
         }
 
         if (userService.existsByPhoneNumber(checkString))
         {
-            setCheckResult(ValidatorMessages.PHONE_NUMBER_ALREADY_EXIST_ERROR);
+            setCheckResult(UserValidatorMessages.PHONE_NUMBER_ALREADY_EXIST_ERROR);
             return;
         }
 
@@ -788,38 +789,38 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getEmail();
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_EMAIL_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_EMAIL_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 3 || checkLength > 50)
         {
-            setCheckResult(ValidatorMessages.WRONG_EMAIL_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_EMAIL_SIZE_ERROR);
             return;
         }
 
         if (onlySpaces(checkString))
         {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
+            setCheckResult(UserValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
 
         if (!isMatch(checkString, ".{1,25}\\@.{2,15}\\..{2,7}"))
         {
-            setCheckResult(ValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR);
             return;
         }
 
         if (!isMatch(checkString, "[a-z0-9._\\-]{1,25}\\@[a-z0-9._\\-]{2,15}\\.[a-z0-9._\\-]{2,7}", Pattern.CASE_INSENSITIVE))
         {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_EMAIL_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_EMAIL_ERROR);
             return;
         }
 
         if (userService.existsByEmail(checkString))
         {
-            setCheckResult(ValidatorMessages.EMAIL_ALREADY_EXIST_ERROR);
+            setCheckResult(UserValidatorMessages.EMAIL_ALREADY_EXIST_ERROR);
             return;
         }
 
@@ -830,7 +831,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getStatus();
         if (!checkString.equals("NotApproved") && !checkString.equals("Approved"))
         {
-            setCheckResult(ValidatorMessages.WRONG_USER_STATUS_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_USER_STATUS_ERROR);
             return;
         }
 
@@ -844,14 +845,14 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         String checkString = user.getUsername();
         if (checkString == null)
         {
-            setCheckResult(ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            setCheckResult(UserValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < MIN_LOGIN_SIZE || checkLength > MAX_LOGIN_SIZE)
         {
-            setCheckResult(ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
             return;
         }
 /*
@@ -863,7 +864,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
             return;
         }
 
@@ -877,13 +878,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
     {
         if (checkString == null)
         {
-            return new ValidateResponse(false, "login", ValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
+            return new ValidateResponse(false, "login", UserValidatorMessages.EMPTY_LOGIN_FIELD_ERROR);
         }
 
         int checkLength = checkString.length();
         if (checkLength < MIN_LOGIN_SIZE || checkLength > MAX_LOGIN_SIZE)
         {
-            return new ValidateResponse(false, "login", ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
+            return new ValidateResponse(false, "login", UserValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
         }
 /*
         if (onlySpaces(checkString))
@@ -893,7 +894,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
-            return new ValidateResponse(false, "login", ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
+            return new ValidateResponse(false, "login", UserValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
         }
 
         return new ValidateResponse(true, "", checkResult);

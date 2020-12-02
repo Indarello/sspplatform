@@ -111,7 +111,7 @@ public class Purchase
     /**
      * Массив сущностей предложений
      */
-    @OneToMany(mappedBy = "purchaseId")
+    @OneToMany(mappedBy = "purchase")
     private List<SupplyEntity> supplies;
 
     public Purchase()
