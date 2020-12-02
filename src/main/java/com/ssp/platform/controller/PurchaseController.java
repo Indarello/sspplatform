@@ -114,8 +114,7 @@ public class PurchaseController
         }
         catch (Exception e)
         {
-            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

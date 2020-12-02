@@ -56,14 +56,14 @@ public class PurchaseValidate
         String checkString = purchase.getName();
         if (checkString == null)
         {
-            setCheckResult("Поле наименование закупки должно быть заполнено!");
+            setCheckResult("Поле наименование закупки должно быть заполнено");
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 100)
         {
-            setCheckResult("Наименование закупки должно содержать от 1 до 100 символов!");
+            setCheckResult("Наименование закупки должно содержать от 1 до 100 символов");
             return;
         }
 
@@ -74,14 +74,14 @@ public class PurchaseValidate
         String checkString = purchase.getDescription();
         if (checkString == null)
         {
-            setCheckResult("Поле описание закупки должно быть заполнено!");
+            setCheckResult("Поле описание закупки должно быть заполнено");
             return;
         }
 
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 1000)
         {
-            setCheckResult("Описание закупки должно содержать от 1 до 1000 символов!");
+            setCheckResult("Описание закупки должно содержать от 1 до 1000 символов");
             return;
         }
 
@@ -92,7 +92,7 @@ public class PurchaseValidate
         Long proposalSec = purchase.getProposalDeadLine();
         if (proposalSec == null)
         {
-            setCheckResult("Дата окончания срока подачи предложений должна быть заполнена!");
+            setCheckResult("Дата окончания срока подачи предложений должна быть заполнена");
             return;
         }
 
@@ -100,7 +100,7 @@ public class PurchaseValidate
         if (proposalSec > nowSec + ONE_HUNDRED_YEARS)
         {
             setCheckResult("Дата окончания срока подачи предложений " +
-                    "должна быть не позже чем через 100 лет от текущей даты.");
+                    "должна быть не позже чем через 100 лет от текущей даты");
             return;
         }
 
@@ -129,6 +129,7 @@ public class PurchaseValidate
         }
     }
 
+    //TODO BigInt на Long
     private void validateBudget()
     {
         BigInteger budget = purchase.getBudget();
@@ -138,10 +139,16 @@ public class PurchaseValidate
             return;
         }
 
+        if(budget.compareTo(BigInteger.ZERO) < 0)
+        {
+            setCheckResult("Бюджет закупки не может быть отрицательный");
+            return;
+        }
+
         int checkLength = budget.toString().length();
         if (checkLength > 8)
         {
-            setCheckResult("Бюджет закупки должен быть не более 8 цифр!");
+            setCheckResult("Бюджет закупки должен быть не более 8 цифр");
             return;
         }
 
@@ -160,7 +167,7 @@ public class PurchaseValidate
         int checkLength = checkString.length();
         if (checkLength > 1000)
         {
-            setCheckResult("Общие требования должны содержать не более 1000 символов!");
+            setCheckResult("Общие требования должны содержать не более 1000 символов");
             return;
         }
     }
@@ -177,7 +184,7 @@ public class PurchaseValidate
         int checkLength = checkString.length();
         if (checkLength > 1000)
         {
-            setCheckResult("Состав команды должен содержать не более 1000 символов!");
+            setCheckResult("Состав команды должен содержать не более 1000 символов");
             return;
         }
     }
@@ -194,7 +201,7 @@ public class PurchaseValidate
         int checkLength = checkString.length();
         if (checkLength > 1000)
         {
-            setCheckResult("Условия работы должны содержать не более 1000 символов!");
+            setCheckResult("Условия работы должны содержать не более 1000 символов");
             return;
         }
 
@@ -233,7 +240,7 @@ public class PurchaseValidate
         if (checkLength > 100)
         {
             //Пока до конца не известно
-            setCheckResult("Причина отмены должна содержать не более 100 символов!");
+            setCheckResult("Причина отмены должна содержать не более 100 символов");
             return;
         }
     }

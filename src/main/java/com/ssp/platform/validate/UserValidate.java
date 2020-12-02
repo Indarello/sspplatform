@@ -403,8 +403,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         boolean specialCharacterPresent = false;
         boolean spacePresent = false;
 
-        //TODO: Кирилица лишняя
-
         String specialCharactersString = "!@#$%&*()'+,-.\\/:;<=>?[]^_`{|}";
 
         for (int i = 0; i < checkLength; i++)

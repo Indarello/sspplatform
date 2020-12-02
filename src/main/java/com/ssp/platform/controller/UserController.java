@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 
-//TODO try catch при сохранении
 @RestController
 public class UserController
 {
@@ -88,9 +87,16 @@ public class UserController
 
         User validUser = userValidate.getUser();
         validUser.setPassword(encoder.encode(ObjUser.getPassword()));
-        userService.save(validUser);
 
-        return new ResponseEntity<>(new ApiResponse(true, "Вы успешно зарегестрировались, ожидайте аккредитации от сотрудника"), HttpStatus.CREATED);
+        try
+        {
+            userService.save(validUser);
+            return new ResponseEntity<>(new ApiResponse(true, "Вы успешно зарегестрировались, ожидайте аккредитации от сотрудника"), HttpStatus.CREATED);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -109,9 +115,16 @@ public class UserController
 
         User validUser = userValidate.getUser();
         validUser.setPassword(encoder.encode(ObjUser.getPassword()));
-        userService.save(validUser);
 
-        return new ResponseEntity<>(new ApiResponse(true, "Сотрудник успешно зарегестрирован!"), HttpStatus.CREATED);
+        try
+        {
+            userService.save(validUser);
+            return new ResponseEntity<>(new ApiResponse(true, "Сотрудник успешно зарегестрирован!"), HttpStatus.CREATED);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -135,9 +148,16 @@ public class UserController
 
         User validUser = userValidate.getUser();
         validUser.setPassword(encoder.encode(ObjUser.getPassword()));
-        userService.save(validUser);
 
-        return new ResponseEntity<>(new ApiResponse(true, "Первый сотрудник успешно зарегестрирован!"), HttpStatus.CREATED);
+        try
+        {
+            userService.save(validUser);
+            return new ResponseEntity<>(new ApiResponse(true, "Первый сотрудник успешно зарегестрирован!"), HttpStatus.CREATED);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(value = "/users/{type}")
@@ -158,9 +178,7 @@ public class UserController
         UsersPageRequest validUsersPageRequest = usersPageValidate.getUsersPageRequest();
 
         Pageable pageable = PageRequest.of(validUsersPageRequest.getRequestPage(), validUsersPageRequest.getNumberOfElements());
-
         Page<User> searchResult = userService.findAllByRole(pageable, validUsersPageRequest.getType());
-
 
         return new ResponseEntity<>(searchResult, HttpStatus.OK);
     }
@@ -194,7 +212,7 @@ public class UserController
 
     @PutMapping(value = "/user")
     @PreAuthorize("hasAuthority('employee')")
-    public ResponseEntity<Object> editUser(@RequestBody User ObjUser)
+    public ResponseEntity<Object> editUser(@RequestBody User ObjUser, @RequestHeader("Authorization") String token)
     {
         ValidateResponse validateResponse = userValidate.validateUsernameLogin(ObjUser.getUsername());
 
@@ -219,7 +237,10 @@ public class UserController
         }
         else
         {
-            validateResponse = userValidate.validateEditEmployeeUser(oldUser);
+            User user = userDetailsService.loadUserByToken(token);
+            if(oldUser.getUsername().equals(user.getUsername())) validateResponse = userValidate.validateEditEmployeeUser(oldUser);
+            else return new ResponseEntity<>(new ApiResponse(false, "Вы не можете менять" +
+                    "информацию по аккаунту другого сотрудника"), HttpStatus.FORBIDDEN);
         }
 
         if(!validateResponse.isSuccess())
@@ -230,7 +251,14 @@ public class UserController
         User validUser = userValidate.getUser();
         validUser.setPassword(encoder.encode(ObjUser.getPassword()));
 
-        return new ResponseEntity<>(userService.save(validUser), HttpStatus.OK);
+        try
+        {
+            return new ResponseEntity<>(userService.save(validUser), HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
