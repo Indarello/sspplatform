@@ -46,7 +46,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="file_id" type="UUID">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>

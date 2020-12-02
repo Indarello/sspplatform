@@ -80,7 +80,6 @@ public class User
     @NotNull
     private String inn;
 
-
     @NotNull
     private String telephone;
 

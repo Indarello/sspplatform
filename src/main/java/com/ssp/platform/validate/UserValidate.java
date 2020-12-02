@@ -141,6 +141,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
     {
         /*
           Валидация параметров только если они предоставлены и отличны от прошлых
+          username, role изменить нельзя
          */
         String checkParameter = user.getPassword();
         String oldParameter = oldUser.getPassword();
@@ -223,6 +224,15 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             if(foundInvalid) return new ValidateResponse(false, "companyTechnologyStack", checkResult);
         }
 
+        checkParameter = user.getInn();
+        oldParameter = oldUser.getInn();
+        if(checkParameter == null) user.setInn(oldParameter);
+        else if(!checkParameter.equals(oldParameter))
+        {
+            checkInn();
+            if(foundInvalid) return new ValidateResponse(false, "TIN", checkResult);
+        }
+
         checkParameter = user.getTelephone();
         oldParameter = oldUser.getTelephone();
         if(checkParameter == null) user.setTelephone(oldParameter);
@@ -261,6 +271,11 @@ public class UserValidate extends com.ssp.platform.validate.Validator
      */
     public ValidateResponse validateEditEmployeeUser(User oldUser)
     {
+        /*
+          Валидация параметров только если они предоставлены и отличны от прошлых
+          username, role, status изменить нельзя
+         */
+
         String checkParameter = user.getPassword();
         String oldParameter = oldUser.getPassword();
         if(checkParameter == null) user.setPassword(oldParameter);
@@ -332,11 +347,12 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
+        /*
         if (onlySpaces(checkString))
         {
             setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
             return;
-        }
+        }*/
 
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
@@ -372,11 +388,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         }
 
         //TODO: проверить нужна ли эта функция
+        /*
         if (onlySpaces(checkString))
         {
             setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
+        */
 
         char currentCharacter;
         boolean numberPresent = false;
@@ -384,6 +402,8 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         boolean lowerCasePresent = false;
         boolean specialCharacterPresent = false;
         boolean spacePresent = false;
+
+        //TODO: Кирилица лишняя
 
         String specialCharactersString = "!@#$%&*()'+,-.\\/:;<=>?[]^_`{|}";
 
@@ -417,6 +437,12 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             setCheckResult(ValidatorMessages.WRONG_PASSWORD_SYMBOLS_ERROR);
             return;
         }
+
+        if (!isMatch(checkString, "[A-Za-z0-9^!@#$%&\\*()'\\+,\\-\\./:;<=\\>\\?\\[\\]^_`{\\|}\\\\]*"))
+        {
+            setCheckResult(ValidatorMessages.WRONG_PASSWORD_SYMBOLS_REGEX);
+            return;
+        }
     }
 
     private void checkFirstName()
@@ -435,11 +461,12 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
+        /*
         if (onlySpaces(checkString))
         {
             setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
             return;
-        }
+        }*/
 
         //TODO: Упростить regex
         if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
@@ -465,11 +492,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
+        /*
         if (onlySpaces(checkString))
         {
             setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
+         */
 
         if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
         {
@@ -497,11 +526,13 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
+        /*
         if (onlySpaces(checkString))
         {
             setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
+*/
 
         if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
         {
@@ -727,18 +758,19 @@ public class UserValidate extends com.ssp.platform.validate.Validator
 
         if (checkLength == 0) return;
 
-        if (checkLength < 11 || checkLength > 12)
+        if (checkLength < 11 || checkLength > 17)
         {
             setCheckResult(ValidatorMessages.WRONG_PHONE_NUMBER_SIZE_ERROR);
             return;
         }
 
+        /*
         if (onlySpaces(checkString))
         {
             setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
-
+*/
         if (!isMatch(checkString, "[0-9]*"))
         {
             setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR);
@@ -774,7 +806,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
             return;
         }
-
 
         if (!isMatch(checkString, ".{1,25}\\@.{2,15}\\..{2,7}"))
         {
@@ -825,12 +856,12 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             setCheckResult(ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
             return;
         }
-
+/*
         if (onlySpaces(checkString))
         {
             setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
             return;
-        }
+        }*/
 
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
@@ -856,11 +887,11 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         {
             return new ValidateResponse(false, "login", ValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
         }
-
+/*
         if (onlySpaces(checkString))
         {
             return new ValidateResponse(false, "login", ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
-        }
+        }*/
 
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
