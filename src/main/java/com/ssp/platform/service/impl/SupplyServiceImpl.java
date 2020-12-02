@@ -140,7 +140,10 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     @Override
-    public List<SupplyResponse> getPage(UUID purchaseId, int pageIndex, int pageSize) throws PageIndexException, PageSizeException {
+    public List<SupplyResponse> getPage(UUID purchaseId, Integer pageIndex, Integer pageSize) throws PageIndexException, PageSizeException {
+        if (pageIndex == null) pageIndex = 0;
+        if (pageSize == null ) pageSize = 10;
+
         if (pageIndex < 0) {
             throw new PageIndexException();
         }

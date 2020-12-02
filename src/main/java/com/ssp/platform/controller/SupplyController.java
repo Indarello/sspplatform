@@ -102,7 +102,10 @@ public class SupplyController {
 
     @GetMapping("/supplies")
     @PreAuthorize("hasAuthority('employee')")
-    public List<SupplyResponse> getPageOfSupplies(@RequestParam UUID purchaseId, @RequestParam int pageIndex, @RequestParam int pageSize) throws PageSizeException, PageIndexException {
+    public List<SupplyResponse> getPageOfSupplies(
+            @RequestParam UUID purchaseId,
+            @RequestParam(required = false) Integer pageIndex,
+            @RequestParam(required = false) Integer pageSize) throws PageSizeException, PageIndexException {
         return supplyService.getPage(purchaseId, pageIndex, pageSize);
     }
 }

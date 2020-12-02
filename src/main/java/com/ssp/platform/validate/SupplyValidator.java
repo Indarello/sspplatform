@@ -9,197 +9,169 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+import static com.ssp.platform.validate.ValidatorMessages.SupplyValidatorMessages.*;
+
 @Component
 public class SupplyValidator extends Validator {
-
     public static final int ROLE_EMPLOYEE = 0;
-
     public static final int ROLE_FIRM = 1;
 
     private final int MAX_SUPPLY_DESCRIPTION_SYMBOLS = 1000;
-
-    public static final long MAX_SUPPLY_BUDGET = 99999999L;
-
     private final int MAX_SUPPLY_COMMENT_SYMBOLS = 1000;
-
     private final int MAX_SUPPLY_RESULT_SYMBOLS = 1000;
+    private final long MAX_SUPPLY_BUDGET = 99999999L;
+
+    final String PURCHASE_ID_FIELD_NAME = "purchaseId";
+    final String DESCRIPTION_FIELD_NAME = "description";
+    final String BUDGET_FIELD_NAME = "budget";
+    final String COMMENT_FIELD_NAME = "comment";
+    final String STATUS_FIELD_NAME = "status";
+    final String RESULT_FIELD_NAME = "review_result";
+
+    private String checkResult = OK;
+    private boolean foundInvalid = false;
 
     private final PurchaseServiceImpl purchaseService;
-
-    private ValidatorResponse response;
 
     public SupplyValidator(PurchaseServiceImpl purchaseService) {
         this.purchaseService = purchaseService;
     }
 
     public ValidatorResponse validateSupplyCreating(SupplyEntity supplyEntity){
-        response = new ValidatorResponse(true, SupplyValidatorMessages.OK);
+        validatePurchaseId(supplyEntity.getPurchase().getId());
+        if (foundInvalid) return new ValidatorResponse(false, PURCHASE_ID_FIELD_NAME, checkResult);
 
-        if (!validatePurchaseId(supplyEntity.getPurchase().getId())){
-            return response;
-        }
+        validateDescription(supplyEntity.getDescription());
+        if (foundInvalid) return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
 
-        if (!validateDescription(supplyEntity.getDescription())){
-            return response;
-        }
-
-        if (!validateBudget(supplyEntity.getBudget())){
-            return response;
-        }
+        validateBudget(supplyEntity.getBudget());
+        if (foundInvalid) return new ValidatorResponse(false, BUDGET_FIELD_NAME, checkResult);
 
         validateComment(supplyEntity.getComment());
+        if (foundInvalid) return new ValidatorResponse(false, COMMENT_FIELD_NAME, checkResult);
 
-        return response;
+        return new ValidatorResponse(true, checkResult);
     }
 
     public ValidatorResponse validateSupplyUpdating(SupplyEntity updatedEntity, int role) {
-        response = new ValidatorResponse(true, SupplyValidatorMessages.OK);
 
         switch (role){
             case ROLE_FIRM:
-                if (!validateDescription(updatedEntity.getDescription())){
-                    return response;
-                }
+                validateDescription(updatedEntity.getDescription());
+                if (foundInvalid) return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
 
-                if (!validateBudget(updatedEntity.getBudget())){
-                    return response;
-                }
+                validateBudget(updatedEntity.getBudget());
+                if (foundInvalid) return new ValidatorResponse(false, BUDGET_FIELD_NAME, checkResult);
 
-                if (!validateComment(updatedEntity.getComment())){
-                    return response;
-                }
+                validateComment(updatedEntity.getComment());
+                if (foundInvalid) return new ValidatorResponse(false, COMMENT_FIELD_NAME, checkResult);
+
                 break;
 
             case ROLE_EMPLOYEE:
-                if (!validateStatus(updatedEntity.getStatus())){
-                    return response;
-                }
-                
-                if (!validateResult(updatedEntity.getResultOfConsideration())){
-                    return response;
-                }
+                validateStatus(updatedEntity.getStatus());
+                if (foundInvalid) return new ValidatorResponse(false, STATUS_FIELD_NAME, checkResult);
+
+                validateResult(updatedEntity.getResultOfConsideration());
+                if (foundInvalid) return new ValidatorResponse(false, RESULT_FIELD_NAME, checkResult);
+
                 break;
         }
 
-        return response;
+        return new ValidatorResponse(true, checkResult);
     }
 
-    private boolean validatePurchaseId(UUID id){
-        final String FIELD_NAME = "purchaseId";
-
+    private void validatePurchaseId(UUID id){
         if (!purchaseService.existById(id)){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_PURCHASE_ID_ERROR);
-            return false;
+            setCheckResult( WRONG_PURCHASE_ID_ERROR);
         }
-
-        return true;
     }
 
-    private boolean validateDescription(String description) {
-        final String FIELD_NAME = "description";
-
+    private void validateDescription(String description) {
         if (description == null) {
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_DESCRIPTION_ERROR);
-            return false;
+            setCheckResult(EMPTY_SUPPLY_DESCRIPTION_ERROR);
+            return;
         }
 
         if (description.isEmpty()) {
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_DESCRIPTION_ERROR);
-            return false;
+            setCheckResult(EMPTY_SUPPLY_DESCRIPTION_ERROR);
+            return;
         }
 
         if (onlySpaces(description)) {
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.ONLY_SPACES_ERROR);
-            return false;
+            setCheckResult(ONLY_SPACES_ERROR);
+            return;
         }
 
         if (description.length() > MAX_SUPPLY_DESCRIPTION_SYMBOLS) {
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_SUPPLY_DESCRIPTION_BOUNDS_ERROR);
-            return false;
+            setCheckResult(WRONG_SUPPLY_DESCRIPTION_BOUNDS_ERROR);
         }
-
-        return true;
     }
 
-    private boolean validateBudget(Long budget) {
-        final String FIELD_NAME = "budget";
-
+    private void validateBudget(Long budget) {
         if (budget == null){
-            return true;
+            return;
         }
 
         if (budget > MAX_SUPPLY_BUDGET){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_SUPPLY_BUDGET_BOUNDS_ERROR);
-            return false;
+            setCheckResult(WRONG_SUPPLY_BUDGET_BOUNDS_ERROR);
+            return;
         }
 
         if (budget < 0L){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.NEGATIVE_SUPPLY_BUDGET_ERROR);
-            return false;
+            setCheckResult(NEGATIVE_SUPPLY_BUDGET_ERROR);
         }
-
-        return true;
     }
 
-    private boolean validateComment(String comment){
-        final String FIELD_NAME = "comment";
-
+    private void validateComment(String comment){
         if (comment == null){
-            return true;
+            return;
         }
 
         if (comment.isEmpty()){
-            return true;
+            return;
         }
 
         if (onlySpaces(comment)){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.ONLY_SPACES_ERROR);
-            return false;
+            setCheckResult(ONLY_SPACES_ERROR);
+            return;
         }
 
         if (comment.length() > MAX_SUPPLY_COMMENT_SYMBOLS){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_SUPPLY_COMMENT_BOUNDS_ERROR);
-            return false;
+            setCheckResult(WRONG_SUPPLY_COMMENT_BOUNDS_ERROR);
         }
-
-        return true;
     }
 
-    private boolean validateStatus(SupplyStatus status){
-        final String FIELD_NAME = "status";
-
+    private void validateStatus(SupplyStatus status){
         if (status == null){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_STATUS_ERROR);
-            return false;
+            setCheckResult(EMPTY_SUPPLY_STATUS_ERROR);
         }
-
-        return true;
     }
 
-    private boolean validateResult(String result){
-        final String FIELD_NAME = "resultOfConsideration";
-        
+    private void validateResult(String result){
         if (result == null){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_RESULT_ERROR);
-            return false;
+            setCheckResult(EMPTY_SUPPLY_RESULT_ERROR);
+            return;
         }
         
         if (result.isEmpty()){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.EMPTY_SUPPLY_RESULT_ERROR);
-            return false;
+            setCheckResult(EMPTY_SUPPLY_RESULT_ERROR);
+            return;
         }
         
         if (onlySpaces(result)){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.ONLY_SPACES_ERROR);
-            return false;
+            setCheckResult(ONLY_SPACES_ERROR);
+            return;
         }
         
         if (result.length() > MAX_SUPPLY_RESULT_SYMBOLS){
-            response = new ValidatorResponse(false, FIELD_NAME, SupplyValidatorMessages.WRONG_SUPPLY_RESULT_BOUNDS_ERROR);
-            return false;
+            setCheckResult(WRONG_SUPPLY_RESULT_BOUNDS_ERROR);
         }
+    }
 
-        return true;
+    private void setCheckResult(String result){
+        foundInvalid = true;
+        checkResult = result;
     }
 
 }

@@ -13,17 +13,17 @@ import java.util.*;
 
 public interface SupplyService {
 
-    public void create(UUID purchaseId, String description, User authorId, Long budget, String comment, MultipartFile file)
-            throws SupplyException, IOException, NoSuchAlgorithmException;
+    void create(UUID purchaseId, String description, User authorId, Long budget, String comment, MultipartFile file)
+     throws SupplyException, IOException, NoSuchAlgorithmException;
 
-    public void update(UUID id, String description, Long budget, String comment, MultipartFile file)
-            throws SupplyException, IOException, NoSuchAlgorithmException;
+    void update(UUID id, String description, Long budget, String comment, MultipartFile file)
+     throws SupplyException, IOException, NoSuchAlgorithmException;
 
-    public void update(UUID id, SupplyStatus status, String result) throws SupplyException;
+    void update(UUID id, SupplyStatus status, String result) throws SupplyException;
 
-    public void delete(UUID id) throws SupplyException, IOException;
+    void delete(UUID id) throws SupplyException, IOException;
 
-    public SupplyResponse get(UUID id) throws SupplyException;
+    SupplyResponse get(UUID id) throws SupplyException;
 
-    List<SupplyResponse> getPage(UUID purchaseId, int pageIndex, int pageSize) throws PageIndexException, PageSizeException;
+    List<SupplyResponse> getPage(UUID purchaseId, Integer pageIndex, Integer pageSize) throws PageIndexException, PageSizeException;
 }
