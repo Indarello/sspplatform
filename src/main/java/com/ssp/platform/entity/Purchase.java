@@ -112,6 +112,7 @@ public class Purchase
      * Массив сущностей предложений
      */
     @OneToMany(mappedBy = "purchase")
+    @JsonIgnore
     private List<SupplyEntity> supplies;
 
     public Purchase()
