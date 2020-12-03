@@ -5,6 +5,7 @@ import com.ssp.platform.entity.enums.SupplyStatus;
 import com.ssp.platform.exceptions.PageExceptions.*;
 import com.ssp.platform.exceptions.SupplyException;
 import com.ssp.platform.repository.*;
+import com.ssp.platform.request.SupplyUpdateRequest;
 import com.ssp.platform.response.*;
 import com.ssp.platform.service.*;
 import com.ssp.platform.validate.*;
@@ -68,79 +69,90 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     @Override
-    public void update(UUID id, String description, Long budget, String comment, MultipartFile file)
-            throws SupplyException, IOException, NoSuchAlgorithmException {
-        FileEntity fileEntity = null;
-        ValidatorResponse response = null;
+    public void update(User user, UUID id, SupplyUpdateRequest updateRequest) throws SupplyException {
+        ValidatorResponse validatorResponse;
+        SupplyEntity supplyEntity = supplyRepository.getOne(id);
 
-        if (file != null){
-            response = fileValidator.validateFile(file);
-            if (!response.isSuccess()) throw new SupplyException(response);
-            fileEntity = fileService.addFile(file);
+        switch (user.getRole()){
+            case "firm":
+                if (user.equals(supplyEntity.getAuthor())){
+                    validatorResponse = supplyValidator.validateSupplyUpdating(updateRequest, SupplyValidator.ROLE_FIRM);
+                    if (!validatorResponse.isSuccess()) throw new SupplyException(validatorResponse);
+                }
+
+                if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
+                    supplyEntity.setDescription(updateRequest.getDescription());
+                }
+
+                if (updateRequest.getBudget() != null){
+                    supplyEntity.setBudget(updateRequest.getBudget());
+                }
+
+                if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
+                    supplyEntity.setComment(updateRequest.getComment());
+                }
+
+                break;
+
+            case "employee":
+                validatorResponse = supplyValidator.validateSupplyUpdating(updateRequest, SupplyValidator.ROLE_EMPLOYEE);
+                if (!validatorResponse.isSuccess()) throw new SupplyException(validatorResponse);
+
+                if (updateRequest.getStatus() != null){
+                    supplyEntity.setStatus(updateRequest.getStatus());
+                }
+
+                if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
+                    supplyEntity.setResultOfConsideration(updateRequest.getResult());
+                }
+
+                supplyEntity.setResultDate(System.currentTimeMillis() / DATE_DIVIDER);
+
+                break;
         }
 
-        SupplyEntity supplyEntity = supplyRepository.getOne(id);
-
-        if (description != null && !description.isEmpty()) supplyEntity.setDescription(description);
-        if (budget != null) supplyEntity.setBudget(budget);
-        if (comment != null && !comment.isEmpty()) supplyEntity.setComment(comment);
-        if (fileEntity != null) supplyEntity.setFile(fileEntity);
-
-        response = supplyValidator.validateSupplyUpdating(supplyEntity, SupplyValidator.ROLE_FIRM);
-        if (!response.isSuccess()) throw new SupplyException(response);
-
         supplyRepository.saveAndFlush(supplyEntity);
     }
 
     @Override
-    public void update(UUID id, SupplyStatus status, String result) throws SupplyException {
+    public void delete(User user, UUID id) throws SupplyException, IOException {
         SupplyEntity supplyEntity = supplyRepository.getOne(id);
 
-        supplyEntity.setStatus(status);
-        supplyEntity.setResultOfConsideration(result);
-        supplyEntity.setResultDate(System.currentTimeMillis() / DATE_DIVIDER);
+        switch (user.getRole()) {
+            case "firm":
+                if (user.equals(supplyEntity.getAuthor())){
+                    supplyRepository.delete(supplyEntity);
+                    fileService.delete(supplyEntity.getFile().getId());
+                }
+                break;
 
-        ValidatorResponse response = supplyValidator.validateSupplyUpdating(supplyEntity, SupplyValidator.ROLE_EMPLOYEE);
-        if (!response.isSuccess()) throw new SupplyException(response);
-
-        supplyRepository.saveAndFlush(supplyEntity);
+            case "employee":
+                supplyRepository.delete(supplyEntity);
+                fileService.delete(supplyEntity.getFile().getId());
+                break;
+        }
     }
 
     @Override
-    public void delete(UUID id) throws SupplyException, IOException {
+    public SupplyEntity get(User user, UUID id) throws SupplyException {
         SupplyEntity supplyEntity = supplyRepository.getOne(id);
-        supplyRepository.delete(supplyEntity);
 
-        fileService.delete(supplyEntity.getFile().getId());
+        switch (user.getRole()){
+            case "firm":
+                if (user.equals(supplyEntity.getAuthor())){
+                    return supplyEntity;
+                }
+                break;
+
+            case "employee":
+                return supplyEntity;
+        }
+
+        return null;
     }
 
     @Override
-    public SupplyResponse get(UUID id) throws SupplyException {
-        SupplyEntity supplyEntity = supplyRepository.getOne(id);
-        SupplyResponse supplyResponse = new SupplyResponse();
-
-        supplyResponse.setDescription(supplyEntity.getDescription());
-        supplyResponse.setCreateDate(supplyEntity.getCreateDate());
-        supplyResponse.setAuthor(supplyEntity.getAuthor().getLastName() + " " + supplyEntity.getAuthor().getFirstName());
-        supplyResponse.setBudget(supplyEntity.getBudget());
-        supplyResponse.setComment(supplyEntity.getComment());
-        supplyResponse.setStatus(supplyEntity.getStatus());
-        supplyResponse.setResultOfConsideration(supplyEntity.getResultOfConsideration());
-        supplyResponse.setResultDate(supplyEntity.getResultDate());
-
-        FileDTO fileDTO = new FileDTO(
-                supplyEntity.getFile().getName(),
-                supplyEntity.getFile().getMimeType(),
-                supplyEntity.getFile().getSize(),
-                supplyEntity.getFile().getHash()
-        );
-        supplyResponse.setFile(fileDTO);
-
-        return supplyResponse;
-    }
-
-    @Override
-    public List<SupplyResponse> getPage(UUID purchaseId, Integer pageIndex, Integer pageSize) throws PageIndexException, PageSizeException {
+    public Page<SupplyEntity> getPage(UUID purchaseId, Integer pageIndex, Integer pageSize) throws PageIndexException, PageSizeException {
         if (pageIndex == null) pageIndex = 0;
         if (pageSize == null ) pageSize = 10;
 
@@ -156,33 +168,6 @@ public class SupplyServiceImpl implements SupplyService {
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         Page<SupplyEntity> page = supplyRepository.findAllByPurchase(purchaseRepository.getOne(purchaseId), pageable);
-
-        List<SupplyResponse> out = new ArrayList<>();
-        for (SupplyEntity supplyEntity : page){
-            SupplyResponse supplyResponse = new SupplyResponse();
-
-            supplyResponse.setDescription(supplyEntity.getDescription());
-            supplyResponse.setCreateDate(supplyEntity.getCreateDate());
-            supplyResponse.setAuthor(supplyEntity.getAuthor().getUsername());
-            supplyResponse.setBudget(supplyEntity.getBudget());
-            supplyResponse.setComment(supplyEntity.getComment());
-            supplyResponse.setStatus(supplyEntity.getStatus());
-            supplyResponse.setResultOfConsideration(supplyEntity.getResultOfConsideration());
-            supplyResponse.setResultDate(supplyEntity.getResultDate());
-
-            if (supplyEntity.getFile() != null){
-                FileDTO fileDTO = new FileDTO(
-                        supplyEntity.getFile().getName(),
-                        supplyEntity.getFile().getMimeType(),
-                        supplyEntity.getFile().getSize(),
-                        supplyEntity.getFile().getHash()
-                );
-                supplyResponse.setFile(fileDTO);
-            }
-
-            out.add(supplyResponse);
-        }
-
-        return out;
+        return page;
     }
 }

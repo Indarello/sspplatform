@@ -2,9 +2,12 @@ package com.ssp.platform.validate;
 
 import com.ssp.platform.entity.SupplyEntity;
 import com.ssp.platform.entity.enums.SupplyStatus;
+import com.ssp.platform.repository.PurchaseRepository;
+import com.ssp.platform.request.SupplyUpdateRequest;
 import com.ssp.platform.response.ValidatorResponse;
 import com.ssp.platform.service.impl.PurchaseServiceImpl;
 import com.ssp.platform.validate.ValidatorMessages.SupplyValidatorMessages;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -53,27 +56,57 @@ public class SupplyValidator extends Validator {
         return new ValidatorResponse(true, checkResult);
     }
 
-    public ValidatorResponse validateSupplyUpdating(SupplyEntity updatedEntity, int role) {
+    public ValidatorResponse validateSupplyUpdating(SupplyUpdateRequest updateRequest, int role) {
 
         switch (role){
             case ROLE_FIRM:
-                validateDescription(updatedEntity.getDescription());
-                if (foundInvalid) return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
+                if (updateRequest.getStatus() != null){
+                    return new ValidatorResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                }
 
-                validateBudget(updatedEntity.getBudget());
-                if (foundInvalid) return new ValidatorResponse(false, BUDGET_FIELD_NAME, checkResult);
+                if (updateRequest.getResult() != null || !updateRequest.getResult().isEmpty()){
+                    return new ValidatorResponse(false, RESULT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                }
 
-                validateComment(updatedEntity.getComment());
-                if (foundInvalid) return new ValidatorResponse(false, COMMENT_FIELD_NAME, checkResult);
+                if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
+                    validateDescription(updateRequest.getDescription());
+                    if (foundInvalid) return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
+                }
+
+                if (updateRequest.getBudget() != null){
+                    validateBudget(updateRequest.getBudget());
+                    if (foundInvalid) return new ValidatorResponse(false, BUDGET_FIELD_NAME, checkResult);
+                }
+
+                if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
+                    validateComment(updateRequest.getComment());
+                    if (foundInvalid) return new ValidatorResponse(false, COMMENT_FIELD_NAME, checkResult);
+                }
 
                 break;
 
             case ROLE_EMPLOYEE:
-                validateStatus(updatedEntity.getStatus());
-                if (foundInvalid) return new ValidatorResponse(false, STATUS_FIELD_NAME, checkResult);
+                if (updateRequest.getDescription() != null || !updateRequest.getDescription().isEmpty()){
+                    return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                }
 
-                validateResult(updatedEntity.getResultOfConsideration());
-                if (foundInvalid) return new ValidatorResponse(false, RESULT_FIELD_NAME, checkResult);
+                if (updateRequest.getBudget() != null){
+                    return new ValidatorResponse(false, BUDGET_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                }
+
+                if (updateRequest.getComment() != null || !updateRequest.getComment().isEmpty()){
+                    return new ValidatorResponse(false, COMMENT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                }
+
+                if (updateRequest.getStatus() != null){
+                    validateStatus(updateRequest.getStatus());
+                    if (foundInvalid) return new ValidatorResponse(false, STATUS_FIELD_NAME, checkResult);
+                }
+
+                if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
+                    validateResult(updateRequest.getResult());
+                    if (foundInvalid) return new ValidatorResponse(false, RESULT_FIELD_NAME, checkResult);
+                }
 
                 break;
         }
@@ -83,7 +116,8 @@ public class SupplyValidator extends Validator {
 
     private void validatePurchaseId(UUID id){
         if (!purchaseService.existById(id)){
-            setCheckResult( WRONG_PURCHASE_ID_ERROR);
+            setCheckResult(WRONG_PURCHASE_ID_ERROR);
+            return;
         }
     }
 

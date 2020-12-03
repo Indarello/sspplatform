@@ -28,4 +28,6 @@ public class SupplyValidatorMessages {
 
     public static final String WRONG_SUPPLY_RESULT_BOUNDS_ERROR = "Поле 'Результат рассмотрения' должно содержать до 1000 символов";
 
+    public static final String WRONG_ROLE_FOR_UPDATING = "У Вас нет прав для изменения данного поля";
+
 }

@@ -16,6 +16,7 @@ import java.util.UUID;
 public class SupplyEntity {
 
     public static final long DATE_DIVIDER = 1000L;
+    public static final long THREE_THOUSAND_YEARS = 32503741200L;
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -69,8 +70,7 @@ public class SupplyEntity {
 
     public SupplyEntity(
             Purchase purchase, String description, User author,
-            Long budget, String comment, FileEntity file
-    ) {
+            Long budget, String comment, FileEntity file) {
         this.purchase = purchase;
         this.description = description;
         this.author = author;
@@ -79,6 +79,9 @@ public class SupplyEntity {
         this.file = file;
 
         createDate = System.currentTimeMillis() / DATE_DIVIDER;
-        status = SupplyStatus.CONSIDERED;
+        status = SupplyStatus.UNDER_REVIEW;
+
+        resultDate = THREE_THOUSAND_YEARS;
+        resultOfConsideration = "";
     }
 }
