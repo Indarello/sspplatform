@@ -467,8 +467,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }*/
 
-        //TODO: Упростить regex
-        if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
+        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
         {
             setCheckResult(UserValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
             return;
@@ -499,7 +498,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         }
          */
 
-        if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
+        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
         {
             setCheckResult(UserValidatorMessages.WRONG_LAST_NAME_SYMBOLS_ERROR);
             return;
@@ -533,7 +532,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         }
 */
 
-        if (!isMatch(checkString, "(^[А-Яа-яA-Za-z]+[ -]?[А-Яа-яA-Za-z]*[^!@#$ %&*()'+,\\- ./:;<=\\>?\\[\\]^_`{\\|}0-9]$)|([А-Яа-яA-Za-z]*)"))
+        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
         {
             setCheckResult(UserValidatorMessages.WRONG_PATRONYMIC_SYMBOLS_ERROR);
             return;
@@ -622,7 +621,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (!isMatch(checkString, "[A-Za-zа-яA-Я0-9 .,!@#№$;%:^?&*()_/\\-+={}]+", Pattern.CASE_INSENSITIVE))
+        if (!isMatch(checkString, "[A-Za-zа-яёЁA-Я0-9 .,!@#№$;%:^?&*()_/\\-+={}]+", Pattern.CASE_INSENSITIVE))
         {
             setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_ADDRESS_ERROR);
             return;
@@ -794,7 +793,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         }
 
         int checkLength = checkString.length();
-        if (checkLength < 3 || checkLength > 50)
+        if (checkLength < 7 || checkLength > 49)
         {
             setCheckResult(UserValidatorMessages.WRONG_EMAIL_SIZE_ERROR);
             return;

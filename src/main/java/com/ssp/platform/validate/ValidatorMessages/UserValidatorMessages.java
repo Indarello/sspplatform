@@ -70,7 +70,7 @@ public class UserValidatorMessages {
 
     public static final String EMPTY_EMAIL_FIELD_ERROR = "Поле e-mail должно быть заполнено";
 
-    public static final String WRONG_EMAIL_SIZE_ERROR = "E-mail может содержать от 3 до 50 символов";
+    public static final String WRONG_EMAIL_SIZE_ERROR = "E-mail может содержать от 7 до 49 символов";
 
     public static final String WRONG_EMAIL_MASK_SIZE_ERROR = "E-mail может содержать до знака “@“от 1 до 25 символов, от “@“ до “.“ от 2 до 15 символов и после “.“ от 2 до 7 символов";
 
