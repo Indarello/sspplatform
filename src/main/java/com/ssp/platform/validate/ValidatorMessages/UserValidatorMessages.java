@@ -10,7 +10,7 @@ public class UserValidatorMessages {
 
     public static final String WRONG_LOGIN_SIZE_ERROR = "Логин должен содержать от 2 до 30 символов";
 
-    public static final String WRONG_SYMBOLS_IN_LOGIN_ERROR = "Цифра не может быть первым символом. Недопустимы пробелы и спец символы";
+    public static final String WRONG_SYMBOLS_IN_LOGIN_ERROR = "Цифра не может быть первым символом. \nНедопустимы спецсимволы, пробелы и кириллица";
 
     public static final String LOGIN_ALREADY_EXIST_ERROR = "Данный логин уже занят";
 
@@ -58,6 +58,8 @@ public class UserValidatorMessages {
 
     public static final String WRONG_TIN_SIZE_ERROR = "Поле ИНН/УНН должно содержать от 9 до 12 символов";
 
+    public static final String NO_NUMBER_IN_TIN_ERROR = "Поле ИНН/УНН должно содержать хотя бы одну цифру";
+
     public static final String WRONG_SYMBOLS_IN_TIN_ERROR = "Недопустимы пробелы, кириллица, строчные буквы, спец символы";
 
     public static final String TIN_ALREADY_EXIST_ERROR = "Пользователь с данным ИНН/УНН уже существует";
@@ -72,7 +74,11 @@ public class UserValidatorMessages {
 
     public static final String WRONG_EMAIL_SIZE_ERROR = "E-mail может содержать от 7 до 49 символов";
 
-    public static final String WRONG_EMAIL_MASK_SIZE_ERROR = "E-mail может содержать до знака “@“от 1 до 25 символов, от “@“ до “.“ от 2 до 15 символов и после “.“ от 2 до 7 символов";
+    public static final String WRONG_EMAIL_MASK_TYPE_ERROR = "Неверный формат email";
+
+    public static final String WRONG_EMAIL_MASK_SIZE_ERROR = "E-mail должен содержать до знака “@“от 1 до 25 символов";
+    public static final String WRONG_EMAIL_MASK_SIZE_ERROR2 = "E-mail должен содержать от “@“ до “.“ от 2 до 15 символов";
+    public static final String WRONG_EMAIL_MASK_SIZE_ERROR3 = "E-mail должен содержать после “.“ от 2 до 7 символов";
 
     public static final String WRONG_SYMBOLS_IN_EMAIL_ERROR = "Недопустимы пробелы, кириллица";
 

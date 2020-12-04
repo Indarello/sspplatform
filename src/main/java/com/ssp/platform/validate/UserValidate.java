@@ -402,7 +402,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         boolean upperCasePresent = false;
         boolean lowerCasePresent = false;
         boolean specialCharacterPresent = false;
-        boolean spacePresent = false;
 
         String specialCharactersString = "!@#$%&*()'+,-.\\/:;<=>?[]^_`{|}";
 
@@ -425,13 +424,9 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             {
                 specialCharacterPresent = true;
             }
-            else if (Character.isSpaceChar(currentCharacter))
-            {
-                spacePresent = true;
-            }
         }
 
-        if (!((numberPresent || specialCharacterPresent) && upperCasePresent && lowerCasePresent && !spacePresent))
+        if (!((numberPresent || specialCharacterPresent) && upperCasePresent && lowerCasePresent))
         {
             setCheckResult(UserValidatorMessages.WRONG_PASSWORD_SYMBOLS_ERROR);
             return;
@@ -707,32 +702,15 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        char currentCharacter;
-        boolean numberPresent = false;
-        boolean upperCasePresent = false;
-
-        for (int i = 0; i < checkLength; i++)
-        {
-            currentCharacter = checkString.charAt(i);
-            if (Character.isDigit(currentCharacter))
-            {
-                numberPresent = true;
-            }
-            else if (Character.isUpperCase(currentCharacter))
-            {
-                upperCasePresent = true;
-            }
-        }
-
-        if ((!numberPresent && upperCasePresent))
+        if (!isMatch(checkString, "[A-Z0-9]*"))
         {
             setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
             return;
         }
 
-        if (!isMatch(checkString, "[A-Z0-9]*"))
+        if (!isMatch(checkString, "[A-Z0-9]*[0-9]+[A-Z0-9]*"))
         {
-            setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_TIN_ERROR);
+            setCheckResult(UserValidatorMessages.NO_NUMBER_IN_TIN_ERROR);
             return;
         }
 
@@ -805,9 +783,27 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (!isMatch(checkString, ".{1,25}\\@.{2,15}\\..{2,7}"))
+        if (!isMatch(checkString, ".*\\@.+\\..+"))
+        {
+            setCheckResult(UserValidatorMessages.WRONG_EMAIL_MASK_TYPE_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, ".{1,25}\\@.*"))
         {
             setCheckResult(UserValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR);
+            return;
+        }
+
+        if (!isMatch(checkString, ".{1,25}\\@.{2,15}\\..*"))
+        {
+            setCheckResult(UserValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR2);
+            return;
+        }
+
+        if (!isMatch(checkString, ".{1,25}\\@.{2,15}\\..{2,7}"))
+        {
+            setCheckResult(UserValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR3);
             return;
         }
 
