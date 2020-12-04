@@ -72,8 +72,8 @@ public class SupplyEntity {
         this.purchase = purchase;
         this.description = description;
         this.author = author;
-        this.budget = budget;
-        this.comment = comment;
+        this.budget = budget == null ? 0L : budget;
+        this.comment = comment == null ? "" : comment;
         this.file = file;
 
         createDate = System.currentTimeMillis() / DATE_DIVIDER;

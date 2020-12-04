@@ -35,8 +35,12 @@ public class SupplyController {
     @PostMapping("/supply")
     @PreAuthorize("hasAuthority('firm')")
     public ResponseEntity<Object> createSupply(
-            @RequestHeader("Authorization") String token, @RequestParam UUID purchaseId, @RequestParam String description, @RequestParam Long budget,
-            @RequestParam String comment, @RequestParam(value = "file") MultipartFile file) throws SupplyException, IOException, NoSuchAlgorithmException {
+            @RequestHeader("Authorization") String token,
+            @RequestParam UUID purchaseId,
+            @RequestParam String description,
+            @RequestParam(required = false) Long budget,
+            @RequestParam(required = false) String comment,
+            @RequestParam(value = "file", required = false) MultipartFile file) throws SupplyException, IOException, NoSuchAlgorithmException {
 
         User author = userDetailsService.loadUserByToken(token);
         supplyService.create(purchaseId, description, author, budget, comment, file);

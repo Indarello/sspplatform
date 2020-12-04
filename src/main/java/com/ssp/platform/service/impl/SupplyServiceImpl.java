@@ -53,11 +53,12 @@ public class SupplyServiceImpl implements SupplyService {
             throw new SupplyException(new ValidatorResponse(false, SupplyValidatorMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
         }
 
-        ValidatorResponse response = fileValidator.validateFile(file);
-        if (!response.isSuccess()) throw new SupplyException(response);
-
+        ValidatorResponse response;
         FileEntity fileEntity = null;
-        if (file == null){
+        if (file != null){
+            response = fileValidator.validateFile(file);
+            if (!response.isSuccess()) throw new SupplyException(response);
+
             fileEntity = fileService.addFile(file);
         }
         SupplyEntity supplyEntity = new SupplyEntity(purchaseRepository.getOne(purchaseId), description, author, budget, comment, fileEntity);
