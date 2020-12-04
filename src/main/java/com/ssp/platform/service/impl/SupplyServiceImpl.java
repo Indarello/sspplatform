@@ -123,13 +123,13 @@ public class SupplyServiceImpl implements SupplyService {
             case "firm":
                 if (user.equals(supplyEntity.getAuthor())){
                     supplyRepository.delete(supplyEntity);
-                    fileService.delete(supplyEntity.getFile().getId());
+                    //fileService.delete(supplyEntity.getFile().getId());
                 }
                 break;
 
             case "employee":
                 supplyRepository.delete(supplyEntity);
-                fileService.delete(supplyEntity.getFile().getId());
+                //fileService.delete(supplyEntity.getFile().getId());
                 break;
         }
     }
