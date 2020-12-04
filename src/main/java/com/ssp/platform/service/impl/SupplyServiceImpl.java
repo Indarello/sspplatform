@@ -152,7 +152,7 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     @Override
-    public Page<SupplyEntity> getPage(UUID purchaseId, Integer pageIndex, Integer pageSize) throws PageIndexException, PageSizeException {
+    public List<SupplyEntity> getPage(UUID purchaseId, Integer pageIndex, Integer pageSize) throws PageIndexException, PageSizeException {
         if (pageIndex == null) pageIndex = 0;
         if (pageSize == null ) pageSize = 10;
 
@@ -168,6 +168,6 @@ public class SupplyServiceImpl implements SupplyService {
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         Page<SupplyEntity> page = supplyRepository.findAllByPurchase(purchaseRepository.getOne(purchaseId), pageable);
-        return page;
+        return page.toList();
     }
 }

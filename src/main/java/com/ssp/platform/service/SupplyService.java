@@ -24,5 +24,5 @@ public interface SupplyService {
 
     SupplyEntity get(User user, UUID id) throws SupplyException;
 
-    Page<SupplyEntity> getPage(UUID purchaseId, Integer pageIndex, Integer pageSize) throws PageIndexException, PageSizeException;
+    List<SupplyEntity> getPage(UUID purchaseId, Integer pageIndex, Integer pageSize) throws PageIndexException, PageSizeException;
 }
