@@ -18,14 +18,12 @@ public class FileValidator extends Validator{
 
     private final int MAX_FILENAME_SIZE = 255;
 
-    private final String[] restrictedTypes;
-
     private final Pattern restrictedRegex;
 
     @Autowired
     public FileValidator(FileProperty fileProperty)
     {
-        restrictedTypes = fileProperty.getRestrictedTypes();
+        String[] restrictedTypes = fileProperty.getRestrictedTypes();
         String regex = ".*(\\.";
 
         for (String s : restrictedTypes)
