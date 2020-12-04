@@ -10,7 +10,7 @@ public class UserValidatorMessages {
 
     public static final String WRONG_LOGIN_SIZE_ERROR = "Логин должен содержать от 2 до 30 символов";
 
-    public static final String WRONG_SYMBOLS_IN_LOGIN_ERROR = "Цифра не может быть первым символом. \nНедопустимы спецсимволы, пробелы и кириллица";
+    public static final String WRONG_SYMBOLS_IN_LOGIN_ERROR = "Цифра не может быть первым символом. Недопустимы спецсимволы, пробелы и кириллица";
 
     public static final String LOGIN_ALREADY_EXIST_ERROR = "Данный логин уже занят";
 
@@ -76,7 +76,7 @@ public class UserValidatorMessages {
 
     public static final String WRONG_EMAIL_MASK_TYPE_ERROR = "Неверный формат email";
 
-    public static final String WRONG_EMAIL_MASK_SIZE_ERROR = "E-mail должен содержать до знака “@“от 1 до 25 символов";
+    public static final String WRONG_EMAIL_MASK_SIZE_ERROR = "E-mail должен содержать до знака “@“ от 1 до 25 символов";
     public static final String WRONG_EMAIL_MASK_SIZE_ERROR2 = "E-mail должен содержать от “@“ до “.“ от 2 до 15 символов";
     public static final String WRONG_EMAIL_MASK_SIZE_ERROR3 = "E-mail должен содержать после “.“ от 2 до 7 символов";
 
