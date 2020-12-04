@@ -36,7 +36,6 @@ public class SupplyEntity {
     @Column(name = "create_date")
     private Long createDate;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = User.class)
     @JoinColumn(name = "author")
     @NotFound(action = NotFoundAction.IGNORE)
@@ -58,7 +57,6 @@ public class SupplyEntity {
     @Column(name = "result_date")
     private Long resultDate;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = FileEntity.class)
     @JoinColumn(name = "file")
     @NotFound(action = NotFoundAction.IGNORE)
