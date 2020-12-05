@@ -51,7 +51,7 @@ public class SupplyServiceImpl implements SupplyService {
             throws SupplyException, IOException, NoSuchAlgorithmException {
 
         if (supplyRepository.existsByAuthorAndPurchaseId(author, purchaseId)) {
-            throw new SupplyException(new ValidateResponse(false, "", SupplyValidatorMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
+            throw new SupplyException(new ValidateResponse(false, SupplyValidatorMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
         }
 
         if (files != null && files.length > 20){
