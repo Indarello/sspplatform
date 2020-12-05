@@ -19,6 +19,6 @@ public class ValidateResponse {
     public ValidateResponse(boolean success, String message) {
         this.success = success;
         this.message = message;
-        field = "";
+        field = null;
     }
 }
