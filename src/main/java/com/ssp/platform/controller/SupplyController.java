@@ -76,7 +76,7 @@ public class SupplyController {
         return new ResponseEntity<>(new ApiResponse(true, "Предложение удалено"), HttpStatus.OK);
     }
 
-    @GetMapping("/supply/{id}/firm")
+    @GetMapping("/supply/{id}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
     public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) throws SupplyException {
         User user = userDetailsService.loadUserByToken(token);
