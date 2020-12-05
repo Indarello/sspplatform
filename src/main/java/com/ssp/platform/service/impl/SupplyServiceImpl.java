@@ -83,7 +83,7 @@ public class SupplyServiceImpl implements SupplyService {
         switch (user.getRole()){
             case "firm":
                 if (user.equals(supplyEntity.getAuthor())){
-                    validatorResponse = supplyValidator.validateSupplyUpdating(updateRequest, SupplyValidator.ROLE_FIRM);
+                    validatorResponse = supplyValidator.validateSupplyUpdating(updateRequest, supplyEntity, SupplyValidator.ROLE_FIRM);
                     if (!validatorResponse.isSuccess()) throw new SupplyException(validatorResponse);
                 }
 
@@ -120,7 +120,7 @@ public class SupplyServiceImpl implements SupplyService {
                     throw new SupplyException(new ValidateResponse(false, "files", WRONG_ROLE_FOR_UPDATING));
                 }
 
-                validatorResponse = supplyValidator.validateSupplyUpdating(updateRequest, SupplyValidator.ROLE_EMPLOYEE);
+                validatorResponse = supplyValidator.validateSupplyUpdating(updateRequest, supplyEntity, SupplyValidator.ROLE_EMPLOYEE);
                 if (!validatorResponse.isSuccess()) throw new SupplyException(validatorResponse);
 
                 if (updateRequest.getStatus() != null){

@@ -11,16 +11,16 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SupplyUpdateRequest {
 
-    String description;
+    private String description;
 
-    Long budget;
+    private Long budget;
 
-    String comment;
+    private String comment;
 
-    SupplyStatus status;
+    private SupplyStatus status;
 
-    String result;
+    private String result;
 
-    MultipartFile[] files;
+    private MultipartFile[] files;
 
 }

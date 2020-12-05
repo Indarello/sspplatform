@@ -64,7 +64,7 @@ public class SupplyController {
         User user = userDetailsService.loadUserByToken(token);
         supplyService.update(user, id, updateRequest);
 
-        return new ResponseEntity<>(new ApiResponse(true, "Предложение изменено"), HttpStatus.OK);
+        return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/supply/{id}")

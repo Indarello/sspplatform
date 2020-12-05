@@ -53,51 +53,51 @@ public class SupplyValidator extends Validator {
         return new ValidateResponse(true, checkResult);
     }
 
-    public ValidateResponse validateSupplyUpdating(SupplyUpdateRequest updateRequest, int role) {
+    public ValidateResponse validateSupplyUpdating(SupplyUpdateRequest updateRequest, SupplyEntity oldSupply, int role) {
         if (role == ROLE_FIRM){
-            if (updateRequest.getStatus() != null){
+            if (updateRequest.getStatus() != null && !oldSupply.getStatus().equals(updateRequest.getStatus())){
                 return new ValidateResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
-            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
+            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getResultOfConsideration().equals(updateRequest.getResult())){
                 return new ValidateResponse(false, RESULT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
-            if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
+            if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty() && !oldSupply.getDescription().equals(updateRequest.getDescription())){
                 validateDescription(updateRequest.getDescription());
                 if (foundInvalid) return new ValidateResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
             }
 
-            if (updateRequest.getBudget() != null){
+            if (updateRequest.getBudget() != null && !updateRequest.getBudget().equals(oldSupply.getBudget())){
                 validateBudget(updateRequest.getBudget());
                 if (foundInvalid) return new ValidateResponse(false, BUDGET_FIELD_NAME, checkResult);
             }
 
-            if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
+            if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty() && !oldSupply.getComment().equals(updateRequest.getComment())){
                 validateComment(updateRequest.getComment());
                 if (foundInvalid) return new ValidateResponse(false, COMMENT_FIELD_NAME, checkResult);
             }
         }
 
         if (role == ROLE_EMPLOYEE){
-            if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
+            if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty() && !oldSupply.getDescription().equals(updateRequest.getDescription())){
                 return new ValidateResponse(false, DESCRIPTION_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
-            if (updateRequest.getBudget() != null){
+            if (updateRequest.getBudget() != null && !updateRequest.getBudget().equals(oldSupply.getBudget())){
                 return new ValidateResponse(false, BUDGET_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
-            if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
+            if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty() && !oldSupply.getComment().equals(updateRequest.getComment())){
                 return new ValidateResponse(false, COMMENT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
-            if (updateRequest.getStatus() != null){
+            if (updateRequest.getStatus() != null && !oldSupply.getStatus().equals(updateRequest.getStatus())){
                 validateStatus(updateRequest.getStatus());
                 if (foundInvalid) return new ValidateResponse(false, STATUS_FIELD_NAME, checkResult);
             }
 
-            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
+            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getResultOfConsideration().equals(updateRequest.getResult())){
                 validateResult(updateRequest.getResult());
                 if (foundInvalid) return new ValidateResponse(false, RESULT_FIELD_NAME, checkResult);
             }
