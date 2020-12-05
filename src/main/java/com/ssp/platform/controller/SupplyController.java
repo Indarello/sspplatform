@@ -48,14 +48,19 @@ public class SupplyController {
         return new ResponseEntity<>(new ApiResponse(true, "Предложение создано"), HttpStatus.OK);
     }
 
-    //TODO я предварительно на быструю руку накидал фикс
-    @PutMapping("/supply")
+    @PutMapping(value = "/supply/{id}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> updateSupply(@RequestHeader("Authorization") String token, @RequestParam("id") UUID id,
-            @RequestParam("description") String description, @RequestParam("budget") Long budget, @RequestParam("comment") String comment,
-            @RequestParam("status") SupplyStatus status, @RequestParam("reviewResult") String result, @RequestParam("file") MultipartFile file
-            ) throws SupplyException, IOException, NoSuchAlgorithmException {
+    public ResponseEntity<Object> updateSupply(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") UUID id,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Long budget,
+            @RequestParam(required = false) String comment,
+            @RequestParam(required = false) SupplyStatus status,
+            @RequestParam(required = false) String result,
+            @RequestParam(required = false) MultipartFile file) throws SupplyException, IOException, NoSuchAlgorithmException {
         SupplyUpdateRequest updateRequest = new SupplyUpdateRequest(description, budget, comment, status, result, file);
+
         User user = userDetailsService.loadUserByToken(token);
         supplyService.update(user, id, updateRequest);
 

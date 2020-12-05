@@ -57,58 +57,53 @@ public class SupplyValidator extends Validator {
     }
 
     public ValidatorResponse validateSupplyUpdating(SupplyUpdateRequest updateRequest, int role) {
+        if (role == ROLE_FIRM){
+            if (updateRequest.getStatus() != null){
+                return new ValidatorResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+            }
 
-        switch (role){
-            case ROLE_FIRM:
-                if (updateRequest.getStatus() != null){
-                    return new ValidatorResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
-                }
+            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
+                return new ValidatorResponse(false, RESULT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+            }
 
-                if (updateRequest.getResult() != null || !updateRequest.getResult().isEmpty()){
-                    return new ValidatorResponse(false, RESULT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
-                }
+            if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
+                validateDescription(updateRequest.getDescription());
+                if (foundInvalid) return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
+            }
 
-                if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
-                    validateDescription(updateRequest.getDescription());
-                    if (foundInvalid) return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
-                }
+            if (updateRequest.getBudget() != null){
+                validateBudget(updateRequest.getBudget());
+                if (foundInvalid) return new ValidatorResponse(false, BUDGET_FIELD_NAME, checkResult);
+            }
 
-                if (updateRequest.getBudget() != null){
-                    validateBudget(updateRequest.getBudget());
-                    if (foundInvalid) return new ValidatorResponse(false, BUDGET_FIELD_NAME, checkResult);
-                }
+            if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
+                validateComment(updateRequest.getComment());
+                if (foundInvalid) return new ValidatorResponse(false, COMMENT_FIELD_NAME, checkResult);
+            }
+        }
 
-                if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
-                    validateComment(updateRequest.getComment());
-                    if (foundInvalid) return new ValidatorResponse(false, COMMENT_FIELD_NAME, checkResult);
-                }
+        if (role == ROLE_EMPLOYEE){
+            if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
+                return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+            }
 
-                break;
+            if (updateRequest.getBudget() != null){
+                return new ValidatorResponse(false, BUDGET_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+            }
 
-            case ROLE_EMPLOYEE:
-                if (updateRequest.getDescription() != null || !updateRequest.getDescription().isEmpty()){
-                    return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
-                }
+            if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
+                return new ValidatorResponse(false, COMMENT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+            }
 
-                if (updateRequest.getBudget() != null){
-                    return new ValidatorResponse(false, BUDGET_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
-                }
+            if (updateRequest.getStatus() != null){
+                validateStatus(updateRequest.getStatus());
+                if (foundInvalid) return new ValidatorResponse(false, STATUS_FIELD_NAME, checkResult);
+            }
 
-                if (updateRequest.getComment() != null || !updateRequest.getComment().isEmpty()){
-                    return new ValidatorResponse(false, COMMENT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
-                }
-
-                if (updateRequest.getStatus() != null){
-                    validateStatus(updateRequest.getStatus());
-                    if (foundInvalid) return new ValidatorResponse(false, STATUS_FIELD_NAME, checkResult);
-                }
-
-                if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
-                    validateResult(updateRequest.getResult());
-                    if (foundInvalid) return new ValidatorResponse(false, RESULT_FIELD_NAME, checkResult);
-                }
-
-                break;
+            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
+                validateResult(updateRequest.getResult());
+                if (foundInvalid) return new ValidatorResponse(false, RESULT_FIELD_NAME, checkResult);
+            }
         }
 
         return new ValidatorResponse(true, checkResult);
