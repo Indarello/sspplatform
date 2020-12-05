@@ -1,6 +1,6 @@
 package com.ssp.platform.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import com.ssp.platform.entity.enums.SupplyStatus;
 import lombok.Data;
 import org.hibernate.annotations.*;
@@ -14,6 +14,7 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "supply")
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer", "handler", "created"})
 public class SupplyEntity {
 
     public static final long DATE_DIVIDER = 1000L;
