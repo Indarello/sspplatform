@@ -15,10 +15,10 @@ import java.util.*;
 
 public interface SupplyService {
 
-    void create(UUID purchaseId, String description, User authorId, Long budget, String comment, MultipartFile file)
+    void create(UUID purchaseId, String description, User authorId, Long budget, String comment, MultipartFile[] files)
      throws SupplyException, IOException, NoSuchAlgorithmException;
 
-    void update(User user, UUID id, SupplyUpdateRequest updateRequest) throws SupplyException;
+    void update(User user, UUID id, SupplyUpdateRequest updateRequest) throws SupplyException, IOException, NoSuchAlgorithmException;
 
     void delete(User user, UUID id) throws SupplyException, IOException;
 

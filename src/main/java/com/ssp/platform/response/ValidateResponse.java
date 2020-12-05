@@ -15,4 +15,10 @@ public class ValidateResponse {
 		this.field = field;
 		this.message = message;
 	}
+
+    public ValidateResponse(boolean success, String message) {
+        this.success = success;
+        this.message = message;
+        field = "";
+    }
 }

@@ -40,10 +40,10 @@ public class SupplyController {
             @RequestParam String description,
             @RequestParam(required = false) Long budget,
             @RequestParam(required = false) String comment,
-            @RequestParam(value = "file", required = false) MultipartFile file) throws SupplyException, IOException, NoSuchAlgorithmException {
+            @RequestParam(value = "files", required = false) MultipartFile[] files) throws SupplyException, IOException, NoSuchAlgorithmException {
 
         User author = userDetailsService.loadUserByToken(token);
-        supplyService.create(purchaseId, description, author, budget, comment, file);
+        supplyService.create(purchaseId, description, author, budget, comment, files);
 
         return new ResponseEntity<>(new ApiResponse(true, "Предложение создано"), HttpStatus.OK);
     }
@@ -58,8 +58,8 @@ public class SupplyController {
             @RequestParam(required = false) String comment,
             @RequestParam(required = false) SupplyStatus status,
             @RequestParam(required = false) String result,
-            @RequestParam(required = false) MultipartFile file) throws SupplyException, IOException, NoSuchAlgorithmException {
-        SupplyUpdateRequest updateRequest = new SupplyUpdateRequest(description, budget, comment, status, result, file);
+            @RequestParam(required = false) MultipartFile[] files) throws SupplyException, IOException, NoSuchAlgorithmException {
+        SupplyUpdateRequest updateRequest = new SupplyUpdateRequest(description, budget, comment, status, result, files);
 
         User user = userDetailsService.loadUserByToken(token);
         supplyService.update(user, id, updateRequest);

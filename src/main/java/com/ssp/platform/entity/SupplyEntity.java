@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssp.platform.entity.enums.SupplyStatus;
 import lombok.Data;
 import org.hibernate.annotations.*;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Entity
@@ -57,10 +58,8 @@ public class SupplyEntity {
     @Column(name = "result_date")
     private Long resultDate;
 
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = FileEntity.class)
-    @JoinColumn(name = "file")
-    @NotFound(action = NotFoundAction.IGNORE)
-    private FileEntity file;
+    @OneToMany(mappedBy = "supply", targetEntity = FileEntity.class)
+    private List<FileEntity> files;
     
     public SupplyEntity(){
         createDate = System.currentTimeMillis() / DATE_DIVIDER;
@@ -68,13 +67,12 @@ public class SupplyEntity {
 
     public SupplyEntity(
             Purchase purchase, String description, User author,
-            Long budget, String comment, FileEntity file) {
+            Long budget, String comment) {
         this.purchase = purchase;
         this.description = description;
         this.author = author;
         this.budget = budget == null ? 0L : budget;
         this.comment = comment == null ? "" : comment;
-        this.file = file;
 
         createDate = System.currentTimeMillis() / DATE_DIVIDER;
         status = SupplyStatus.UNDER_REVIEW;

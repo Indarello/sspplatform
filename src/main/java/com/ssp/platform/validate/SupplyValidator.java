@@ -2,12 +2,9 @@ package com.ssp.platform.validate;
 
 import com.ssp.platform.entity.SupplyEntity;
 import com.ssp.platform.entity.enums.SupplyStatus;
-import com.ssp.platform.repository.PurchaseRepository;
 import com.ssp.platform.request.SupplyUpdateRequest;
-import com.ssp.platform.response.ValidatorResponse;
+import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.service.impl.PurchaseServiceImpl;
-import com.ssp.platform.validate.ValidatorMessages.SupplyValidatorMessages;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -40,73 +37,73 @@ public class SupplyValidator extends Validator {
         this.purchaseService = purchaseService;
     }
 
-    public ValidatorResponse validateSupplyCreating(SupplyEntity supplyEntity){
+    public ValidateResponse validateSupplyCreating(SupplyEntity supplyEntity){
         validatePurchaseId(supplyEntity.getPurchase().getId());
-        if (foundInvalid) return new ValidatorResponse(false, PURCHASE_ID_FIELD_NAME, checkResult);
+        if (foundInvalid) return new ValidateResponse(false, PURCHASE_ID_FIELD_NAME, checkResult);
 
         validateDescription(supplyEntity.getDescription());
-        if (foundInvalid) return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
+        if (foundInvalid) return new ValidateResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
 
         validateBudget(supplyEntity.getBudget());
-        if (foundInvalid) return new ValidatorResponse(false, BUDGET_FIELD_NAME, checkResult);
+        if (foundInvalid) return new ValidateResponse(false, BUDGET_FIELD_NAME, checkResult);
 
         validateComment(supplyEntity.getComment());
-        if (foundInvalid) return new ValidatorResponse(false, COMMENT_FIELD_NAME, checkResult);
+        if (foundInvalid) return new ValidateResponse(false, COMMENT_FIELD_NAME, checkResult);
 
-        return new ValidatorResponse(true, checkResult);
+        return new ValidateResponse(true, checkResult);
     }
 
-    public ValidatorResponse validateSupplyUpdating(SupplyUpdateRequest updateRequest, int role) {
+    public ValidateResponse validateSupplyUpdating(SupplyUpdateRequest updateRequest, int role) {
         if (role == ROLE_FIRM){
             if (updateRequest.getStatus() != null){
-                return new ValidatorResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                return new ValidateResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
             if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
-                return new ValidatorResponse(false, RESULT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                return new ValidateResponse(false, RESULT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
             if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
                 validateDescription(updateRequest.getDescription());
-                if (foundInvalid) return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
+                if (foundInvalid) return new ValidateResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
             }
 
             if (updateRequest.getBudget() != null){
                 validateBudget(updateRequest.getBudget());
-                if (foundInvalid) return new ValidatorResponse(false, BUDGET_FIELD_NAME, checkResult);
+                if (foundInvalid) return new ValidateResponse(false, BUDGET_FIELD_NAME, checkResult);
             }
 
             if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
                 validateComment(updateRequest.getComment());
-                if (foundInvalid) return new ValidatorResponse(false, COMMENT_FIELD_NAME, checkResult);
+                if (foundInvalid) return new ValidateResponse(false, COMMENT_FIELD_NAME, checkResult);
             }
         }
 
         if (role == ROLE_EMPLOYEE){
             if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
-                return new ValidatorResponse(false, DESCRIPTION_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                return new ValidateResponse(false, DESCRIPTION_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
             if (updateRequest.getBudget() != null){
-                return new ValidatorResponse(false, BUDGET_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                return new ValidateResponse(false, BUDGET_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
             if (updateRequest.getComment() != null && !updateRequest.getComment().isEmpty()){
-                return new ValidatorResponse(false, COMMENT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
+                return new ValidateResponse(false, COMMENT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
             if (updateRequest.getStatus() != null){
                 validateStatus(updateRequest.getStatus());
-                if (foundInvalid) return new ValidatorResponse(false, STATUS_FIELD_NAME, checkResult);
+                if (foundInvalid) return new ValidateResponse(false, STATUS_FIELD_NAME, checkResult);
             }
 
             if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
                 validateResult(updateRequest.getResult());
-                if (foundInvalid) return new ValidatorResponse(false, RESULT_FIELD_NAME, checkResult);
+                if (foundInvalid) return new ValidateResponse(false, RESULT_FIELD_NAME, checkResult);
             }
         }
 
-        return new ValidatorResponse(true, checkResult);
+        return new ValidateResponse(true, checkResult);
     }
 
     private void validatePurchaseId(UUID id){

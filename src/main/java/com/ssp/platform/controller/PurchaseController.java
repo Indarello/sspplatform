@@ -3,15 +3,15 @@ package com.ssp.platform.controller;
 import com.ssp.platform.entity.FileEntity;
 import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.User;
+import com.ssp.platform.exceptions.SupplyException;
 import com.ssp.platform.request.PurchasesPageRequest;
-import com.ssp.platform.response.ApiResponse;
-import com.ssp.platform.response.ValidateResponse;
+import com.ssp.platform.response.*;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
-import com.ssp.platform.validate.FileValidate;
-import com.ssp.platform.validate.PurchaseValidate;
-import com.ssp.platform.validate.PurchasesPageValidate;
+import com.ssp.platform.service.impl.FileServiceImpl;
+import com.ssp.platform.validate.*;
+import com.ssp.platform.validate.ValidatorMessages.FileValidatorMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class PurchaseController
@@ -33,13 +32,15 @@ public class PurchaseController
     private final PurchaseService purchaseService;
     private final UserDetailsServiceImpl userDetailsService;
     private final FileService fileService;
+    private final FileValidator fileValidator;
 
     @Autowired
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService)
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, FileValidator fileValidator)
     {
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
+        this.fileValidator = fileValidator;
     }
 
 
@@ -61,59 +62,38 @@ public class PurchaseController
         @RequestParam(value = "demands", required = false) String demands,
         @RequestParam(value = "team", required = false) String team,
         @RequestParam(value = "workCondition", required = false) String workCondition,
-        @RequestParam(value = "files", required = false) MultipartFile[] files
-    )   throws IOException, NoSuchAlgorithmException
-    {
+        @RequestParam(value = "files", required = false) MultipartFile[] files)   throws IOException, NoSuchAlgorithmException {
+        if(files != null && files.length > 20) {
+            return new ResponseEntity<>(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
+        }
+
         User author = userDetailsService.loadUserByToken(token);
 
-        Purchase objPurchase = new Purchase(author, name, description, proposalDeadLine,
-                finishDeadLine, budget, demands, team, workCondition);
-
+        Purchase objPurchase = new Purchase(author, name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition);
         PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
 
         ValidateResponse validateResponse = purchaseValidate.validatePurchaseCreate();
-        if(!validateResponse.isSuccess())
-        {
+        if(!validateResponse.isSuccess()) {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
         Purchase validatedPurchase = purchaseValidate.getPurchase();
-
-
-        FileEntity savedFiles = null;
-
-        if (files != null)
-        {
-            ValidateResponse validateResult = FileValidate.validateFiles(files);
-            if (!validateResult.isSuccess())
-            {
-                if(validateResult.getField().equals("size")) savedFiles = null;
-
-                else return new ResponseEntity<>(validateResult, HttpStatus.NOT_ACCEPTABLE);
-            }
-            else
-            {
-                //TODO доделать несколько файлов
-                savedFiles = fileService.addFile(files[0]);
-                validatedPurchase.setFile(savedFiles);
-            }
-        }
-
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
 
-        if(savedFiles != null)
-        {
-            savedFiles.setPurchase(savedPurchase);
-            fileService.save(savedFiles);
+        List<FileEntity> fileEntities = new ArrayList<>();
+        if (files != null && files.length > 0){
+            for (MultipartFile file : files){
+                validateResponse = fileValidator.validateFile(file);
+                if (!validateResponse.isSuccess()) return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
+
+                fileEntities.add(fileService.addFile(file, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE));
+            }
         }
 
-        try
-        {
+        try {
             //TODO: отправить приглашение на email
-            return new ResponseEntity<>(purchaseService.save(savedPurchase), HttpStatus.CREATED);
-        }
-        catch (Exception e)
-        {
+            return new ResponseEntity<>(purchaseService.get(savedPurchase.getId()), HttpStatus.CREATED);
+        } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

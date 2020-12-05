@@ -10,6 +10,8 @@ public interface PurchaseService {
 
 	Purchase save(Purchase purchase);
 
+	Purchase get(UUID id);
+
 	Page<Purchase> getAll(Pageable pageable);
 
 	Optional<Purchase> changePurchase(Purchase purchase);

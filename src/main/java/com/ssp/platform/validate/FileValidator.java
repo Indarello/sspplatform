@@ -1,7 +1,7 @@
 package com.ssp.platform.validate;
 
 import com.ssp.platform.property.FileProperty;
-import com.ssp.platform.response.ValidatorResponse;
+import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.validate.ValidatorMessages.FileValidatorMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,19 +39,19 @@ public class FileValidator extends Validator{
 
     }
 
-    public ValidatorResponse validateFile(MultipartFile file){
+    public ValidateResponse validateFile(MultipartFile file){
         if (file == null){
-            return new ValidatorResponse(true, FileValidatorMessages.OK);
+            return new ValidateResponse(true, "", FileValidatorMessages.OK);
         }
 
         if (file.getSize() > MAX_FILE_SIZE){
-            return new ValidatorResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILE_SIZE_ERROR);
+            return new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILE_SIZE_ERROR);
         }
 
         String fileName = file.getOriginalFilename();
 
         if (fileName.length() > MAX_FILENAME_SIZE){
-            return new ValidatorResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILENAME_SIZE_ERROR);
+            return new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILENAME_SIZE_ERROR);
         }
 
         /**if (!isMatch(fileName, "([а-яА-Яa-zA-Z0-9\\s_\\\\.\\-\\(\\):])+(.rar|.zip)$")){
@@ -60,10 +60,10 @@ public class FileValidator extends Validator{
 
         if(checkRestrictedType(fileName))
         {
-            return new ValidatorResponse(false, FIELD_NAME, "Файл с таким расширением запрещено загружать");
+            return new ValidateResponse(false, FIELD_NAME, "Файл с таким расширением запрещено загружать");
         }
 
-        return new ValidatorResponse(true, FileValidatorMessages.OK);
+        return new ValidateResponse(true, FileValidatorMessages.OK);
     }
 
     private boolean checkRestrictedType(String fileName)
@@ -73,13 +73,13 @@ public class FileValidator extends Validator{
         return matcher.matches();
     }
 
-    public ValidatorResponse validateFiles(MultipartFile[] files){
+    public ValidateResponse validateFiles(MultipartFile[] files){
         for (MultipartFile file : files){
-            ValidatorResponse validatorResponse = validateFile(file);
+            ValidateResponse validatorResponse = validateFile(file);
             if (!validatorResponse.isSuccess()) return validatorResponse;
         }
 
-        return new ValidatorResponse(true, FileValidatorMessages.OK);
+        return new ValidateResponse(true, "", FileValidatorMessages.OK);
     }
 
 }

@@ -11,4 +11,6 @@ public class FileValidatorMessages {
     public static final String WRONG_FILE_SIZE_ERROR = "Допускаются файлы, размер которых не превышает 10МБ";
 
     public static final String WRONG_FILENAME_SIZE_ERROR = "Имя файла не должно превышать 255 символов";
+
+    public static final String TOO_MUCH_FILES = "Можно загрузить не более 20 файлов";
 }

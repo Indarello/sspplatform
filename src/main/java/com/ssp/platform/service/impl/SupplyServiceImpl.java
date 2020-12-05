@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import static com.ssp.platform.validate.ValidatorMessages.SupplyValidatorMessages.WRONG_ROLE_FOR_UPDATING;
+
 @Service
 public class SupplyServiceImpl implements SupplyService {
 
@@ -36,8 +38,7 @@ public class SupplyServiceImpl implements SupplyService {
 
     public SupplyServiceImpl(
             SupplyRepository supplyRepository, FileServiceImpl fileService, SupplyValidator supplyValidator, FileValidator fileValidator,
-            PurchaseRepository purchaseRepository
-    ) {
+            PurchaseRepository purchaseRepository) {
         this.supplyRepository = supplyRepository;
         this.fileService = fileService;
         this.supplyValidator = supplyValidator;
@@ -46,32 +47,37 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     @Override
-    public void create(UUID purchaseId, String description, User author, Long budget, String comment, MultipartFile file)
+    public void create(UUID purchaseId, String description, User author, Long budget, String comment, MultipartFile[] files)
             throws SupplyException, IOException, NoSuchAlgorithmException {
 
         if (supplyRepository.existsByAuthorAndPurchaseId(author, purchaseId)) {
-            throw new SupplyException(new ValidatorResponse(false, SupplyValidatorMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
+            throw new SupplyException(new ValidateResponse(false, "", SupplyValidatorMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
         }
 
-        ValidatorResponse response;
-        FileEntity fileEntity = null;
-        if (file != null){
-            response = fileValidator.validateFile(file);
-            if (!response.isSuccess()) throw new SupplyException(response);
-
-            fileEntity = fileService.addFile(file);
+        if (files != null && files.length > 20){
+            throw new SupplyException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
         }
-        SupplyEntity supplyEntity = new SupplyEntity(purchaseRepository.getOne(purchaseId), description, author, budget, comment, fileEntity);
 
-        response = supplyValidator.validateSupplyCreating(supplyEntity);
+        SupplyEntity supplyEntity = new SupplyEntity(purchaseRepository.getOne(purchaseId), description, author, budget, comment);
+        ValidateResponse response = supplyValidator.validateSupplyCreating(supplyEntity);
         if (!response.isSuccess()) throw new SupplyException(response);
 
         supplyRepository.save(supplyEntity);
+
+        List<FileEntity> fileEntities = new ArrayList<>();
+        if (files != null && files.length > 0){
+            for (MultipartFile file : files){
+                response = fileValidator.validateFile(file);
+                if (!response.isSuccess()) throw new SupplyException(response);
+
+                fileEntities.add(fileService.addFile(file, supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY));
+            }
+        }
     }
 
     @Override
-    public void update(User user, UUID id, SupplyUpdateRequest updateRequest) throws SupplyException {
-        ValidatorResponse validatorResponse;
+    public void update(User user, UUID id, SupplyUpdateRequest updateRequest) throws SupplyException, IOException, NoSuchAlgorithmException {
+        ValidateResponse validatorResponse;
         SupplyEntity supplyEntity = supplyRepository.getOne(id);
 
         switch (user.getRole()){
@@ -93,9 +99,27 @@ public class SupplyServiceImpl implements SupplyService {
                     supplyEntity.setComment(updateRequest.getComment());
                 }
 
+                if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 20){
+                    throw new SupplyException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
+                }
+
+                List<FileEntity> fileEntities = new ArrayList<>();
+                if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 0){
+                    for (MultipartFile file : updateRequest.getFiles()){
+                        ValidateResponse response = fileValidator.validateFile(file);
+                        if (!response.isSuccess()) throw new SupplyException(response);
+
+                        fileEntities.add(fileService.addFile(file, supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY));
+                    }
+                }
+
                 break;
 
             case "employee":
+                if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 0){
+                    throw new SupplyException(new ValidateResponse(false, "files", WRONG_ROLE_FOR_UPDATING));
+                }
+
                 validatorResponse = supplyValidator.validateSupplyUpdating(updateRequest, SupplyValidator.ROLE_EMPLOYEE);
                 if (!validatorResponse.isSuccess()) throw new SupplyException(validatorResponse);
 

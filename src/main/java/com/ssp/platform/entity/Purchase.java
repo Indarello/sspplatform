@@ -103,10 +103,8 @@ public class Purchase
     @NotNull
     private String workCondition;
 
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = FileEntity.class)
-    @JoinColumn(name = "file_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    private FileEntity file;
+    @OneToMany(mappedBy = "purchase", targetEntity = FileEntity.class)
+    private List<FileEntity> files;
 
     /**
      * Массив сущностей предложений

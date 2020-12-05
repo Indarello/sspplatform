@@ -2,12 +2,16 @@ package com.ssp.platform.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.*;
+
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Data
@@ -23,10 +27,13 @@ public class FileEntity {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    @OneToOne
-    @JoinColumn(name="purchase_file")
     @JsonIgnore
-    private Purchase purchase;
+    @Column(name="purchase_file")
+    private UUID purchase;
+
+    @JsonIgnore
+    @Column(name = "supply_id")
+    private UUID supply;
 
     @NotNull
     private String name;
@@ -40,16 +47,8 @@ public class FileEntity {
     @NotNull
     private String hash;
 
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "file")
-    private List<Purchase> purchases;
-
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "file")
-    private List<SupplyEntity> supplies;
-
     public void setHash() throws NoSuchAlgorithmException {
-        String modifiedName = name + mimeType + size;
+        String modifiedName = name + mimeType + size + new Timestamp(System.nanoTime());
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(modifiedName.getBytes(StandardCharsets.UTF_8));
         hash = new BigInteger(1, messageDigest.digest()).toString(16);

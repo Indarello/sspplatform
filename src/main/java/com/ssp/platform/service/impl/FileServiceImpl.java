@@ -1,7 +1,7 @@
 package com.ssp.platform.service.impl;
 
+import com.ssp.platform.entity.*;
 import com.ssp.platform.property.FileProperty;
-import com.ssp.platform.entity.FileEntity;
 import com.ssp.platform.repository.FileRepository;
 import com.ssp.platform.response.FileResponse;
 import com.ssp.platform.service.FileService;
@@ -20,6 +20,9 @@ import java.util.UUID;
 @Service
 public class FileServiceImpl implements FileService {
 
+    public static int LOCATION_PURCHASE = 0;
+    public static int LOCATION_SUPPLY = 1;
+
     @Autowired
     private final FileRepository fileRepository;
 
@@ -35,14 +38,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileEntity save(FileEntity file)
-    {
+    public FileEntity save(FileEntity file) {
         return fileRepository.save(file);
     }
 
     @Override
-    public FileEntity addFile(MultipartFile file) throws NoSuchAlgorithmException, IOException {
-        return createFile(file);
+    public FileEntity addFile(MultipartFile file, UUID id, int location) throws NoSuchAlgorithmException, IOException {
+        return createFile(file, id, location);
     }
 
     @Override
@@ -64,30 +66,27 @@ public class FileServiceImpl implements FileService {
     public void delete(UUID id) throws IOException {
         FileEntity fileEntity = fileRepository.getOne(id);
 
-        if (fileEntity.getSupplies().isEmpty()){
-            String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
+        String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
+        deleteFile(fileEntity.getHash(), extension);
 
-            deleteFile(fileEntity.getHash(), extension);
-            fileRepository.delete(fileEntity);
-        }
+        fileRepository.delete(fileEntity);
     }
 
-    private FileEntity createFile(MultipartFile file) throws NoSuchAlgorithmException, IOException {
+    private FileEntity createFile(MultipartFile file, UUID id, int location) throws NoSuchAlgorithmException, IOException {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setName(file.getOriginalFilename());
         fileEntity.setMimeType(file.getContentType());
         fileEntity.setSize(file.getSize());
         fileEntity.setHash();
 
-        if (fileRepository.existsByHash(fileEntity.getHash())){
-            fileEntity = fileRepository.getOneByHash(fileEntity.getHash());
-            return fileEntity;
-        } else {
-            String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
-            storeFile(file, fileEntity.getHash(), extension);
+        if (location == LOCATION_PURCHASE) fileEntity.setPurchase(id);
+        if (location == LOCATION_SUPPLY) fileEntity.setSupply(id);
 
-            return fileRepository.save(fileEntity);
-        }
+        System.out.println(fileEntity.getName());
+        String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
+        storeFile(file, fileEntity.getHash(), extension);
+
+        return fileRepository.save(fileEntity);
     }
 
     private void storeFile(MultipartFile file, String hash, String fileExtension) throws IOException {

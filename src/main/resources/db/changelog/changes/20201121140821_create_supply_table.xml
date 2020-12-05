@@ -43,10 +43,6 @@
             <column name="result_date" type="bigint">
                 <constraints nullable="true"/>
             </column>
-
-            <column name="file" type="UUID">
-                <constraints nullable="true"/>
-            </column>
         </createTable>
     </changeSet>
 </databaseChangeLog>

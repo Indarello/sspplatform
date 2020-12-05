@@ -21,6 +21,6 @@ public class SupplyUpdateRequest {
 
     String result;
 
-    MultipartFile file;
+    MultipartFile[] files;
 
 }

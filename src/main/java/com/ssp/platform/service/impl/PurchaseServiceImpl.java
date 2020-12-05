@@ -30,6 +30,11 @@ public class PurchaseServiceImpl implements PurchaseService
     }
 
     @Override
+    public Purchase get(UUID id) {
+        return purchaseRepository.getOne(id);
+    }
+
+    @Override
     public Page<Purchase> getAll(Pageable pageable)
     {
         return purchaseRepository.findAll(pageable);
