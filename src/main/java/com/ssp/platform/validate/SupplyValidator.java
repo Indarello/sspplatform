@@ -41,6 +41,9 @@ public class SupplyValidator extends Validator {
         validatePurchaseId(supplyEntity.getPurchase().getId());
         if (foundInvalid) return new ValidateResponse(false, PURCHASE_ID_FIELD_NAME, checkResult);
 
+        validateCreateDate(supplyEntity.getPurchase().getProposalDeadLine(), supplyEntity.getCreateDate());
+        if (foundInvalid) return new ValidateResponse(false, checkResult);
+
         validateDescription(supplyEntity.getDescription());
         if (foundInvalid) return new ValidateResponse(false, DESCRIPTION_FIELD_NAME, checkResult);
 
@@ -109,7 +112,12 @@ public class SupplyValidator extends Validator {
     private void validatePurchaseId(UUID id){
         if (!purchaseService.existById(id)){
             setCheckResult(WRONG_PURCHASE_ID_ERROR);
-            return;
+        }
+    }
+
+    private void validateCreateDate(long purchaseDeadLine, long supplyCreateDate){
+        if (supplyCreateDate > purchaseDeadLine){
+            setCheckResult(SUPPLY_WRONG_DATE_ERROR);
         }
     }
 

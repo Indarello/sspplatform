@@ -1,9 +1,9 @@
 package com.ssp.platform.entity.enums;
 
 public enum SupplyStatus {
-    UNDER_REVIEW("На рассмотрении"),   //Рассматривается
-    DENIED("Отклонено"),             //Отклонено
-    WINNER("Победитель");           //Победитель
+    WINNER("Победитель"),
+    UNDER_REVIEW("На рассмотрении"),
+    DENIED("Отклонено");
 
     private String message;
 
