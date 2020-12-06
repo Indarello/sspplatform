@@ -54,7 +54,7 @@ public class SupplyEntity {
     private SupplyStatus status;
 
     @Column(name = "result_of_consideration")
-    private String resultOfConsideration;
+    private String reviewResult;
 
     @Column(name = "result_date")
     private Long resultDate;
@@ -79,6 +79,6 @@ public class SupplyEntity {
         status = SupplyStatus.UNDER_REVIEW;
 
         resultDate = THREE_THOUSAND_YEARS;
-        resultOfConsideration = "";
+        reviewResult = "";
     }
 }

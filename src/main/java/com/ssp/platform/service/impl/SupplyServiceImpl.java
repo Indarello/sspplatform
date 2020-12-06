@@ -60,6 +60,7 @@ public class SupplyServiceImpl implements SupplyService {
 
         SupplyEntity supplyEntity = new SupplyEntity(purchaseRepository.getOne(purchaseId), description, author, budget, comment);
         ValidateResponse response = supplyValidator.validateSupplyCreating(supplyEntity);
+        System.out.println(response);
         if (!response.isSuccess()) throw new SupplyException(response);
 
         supplyRepository.save(supplyEntity);
@@ -128,7 +129,7 @@ public class SupplyServiceImpl implements SupplyService {
                 }
 
                 if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
-                    supplyEntity.setResultOfConsideration(updateRequest.getResult());
+                    supplyEntity.setReviewResult(updateRequest.getResult());
                 }
 
                 supplyEntity.setResultDate(System.currentTimeMillis() / DATE_DIVIDER);

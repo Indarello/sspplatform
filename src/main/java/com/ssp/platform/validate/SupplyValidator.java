@@ -38,6 +38,9 @@ public class SupplyValidator extends Validator {
     }
 
     public ValidateResponse validateSupplyCreating(SupplyEntity supplyEntity){
+        checkResult = OK;
+        foundInvalid = false;
+
         validatePurchaseId(supplyEntity.getPurchase().getId());
         if (foundInvalid) return new ValidateResponse(false, PURCHASE_ID_FIELD_NAME, checkResult);
 
@@ -57,12 +60,15 @@ public class SupplyValidator extends Validator {
     }
 
     public ValidateResponse validateSupplyUpdating(SupplyUpdateRequest updateRequest, SupplyEntity oldSupply, int role) {
+        checkResult = OK;
+        foundInvalid = false;
+
         if (role == ROLE_FIRM){
             if (updateRequest.getStatus() != null && !oldSupply.getStatus().equals(updateRequest.getStatus())){
                 return new ValidateResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
-            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getResultOfConsideration().equals(updateRequest.getResult())){
+            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getReviewResult().equals(updateRequest.getResult())){
                 return new ValidateResponse(false, RESULT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
@@ -100,7 +106,7 @@ public class SupplyValidator extends Validator {
                 if (foundInvalid) return new ValidateResponse(false, STATUS_FIELD_NAME, checkResult);
             }
 
-            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getResultOfConsideration().equals(updateRequest.getResult())){
+            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getReviewResult().equals(updateRequest.getResult())){
                 validateResult(updateRequest.getResult());
                 if (foundInvalid) return new ValidateResponse(false, RESULT_FIELD_NAME, checkResult);
             }
@@ -112,12 +118,14 @@ public class SupplyValidator extends Validator {
     private void validatePurchaseId(UUID id){
         if (!purchaseService.existById(id)){
             setCheckResult(WRONG_PURCHASE_ID_ERROR);
+            return;
         }
     }
 
     private void validateCreateDate(long purchaseDeadLine, long supplyCreateDate){
         if (supplyCreateDate > purchaseDeadLine){
             setCheckResult(SUPPLY_WRONG_DATE_ERROR);
+            return;
         }
     }
 
