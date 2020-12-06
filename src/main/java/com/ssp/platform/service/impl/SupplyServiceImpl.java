@@ -129,7 +129,7 @@ public class SupplyServiceImpl implements SupplyService {
                 }
 
                 if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty()){
-                    supplyEntity.setReviewResult(updateRequest.getResult());
+                    supplyEntity.setResult(updateRequest.getResult());
                 }
 
                 supplyEntity.setResultDate(System.currentTimeMillis() / DATE_DIVIDER);

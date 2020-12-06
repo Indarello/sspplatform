@@ -68,7 +68,7 @@ public class SupplyValidator extends Validator {
                 return new ValidateResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
-            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getReviewResult().equals(updateRequest.getResult())){
+            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getResult().equals(updateRequest.getResult())){
                 return new ValidateResponse(false, RESULT_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);
             }
 
@@ -106,7 +106,7 @@ public class SupplyValidator extends Validator {
                 if (foundInvalid) return new ValidateResponse(false, STATUS_FIELD_NAME, checkResult);
             }
 
-            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getReviewResult().equals(updateRequest.getResult())){
+            if (updateRequest.getResult() != null && !updateRequest.getResult().isEmpty() && !oldSupply.getResult().equals(updateRequest.getResult())){
                 validateResult(updateRequest.getResult());
                 if (foundInvalid) return new ValidateResponse(false, RESULT_FIELD_NAME, checkResult);
             }
