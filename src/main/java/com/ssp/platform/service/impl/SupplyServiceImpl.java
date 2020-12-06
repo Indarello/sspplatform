@@ -193,7 +193,7 @@ public class SupplyServiceImpl implements SupplyService {
         }
 
 
-        Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("status").descending().and(Sort.by("createDate").ascending()));
+        Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("status").descending().and(Sort.by("createDate").descending()));
         Page<SupplyEntity> page = supplyRepository.findAllByPurchase(purchaseRepository.getOne(purchaseId), pageable);
         return page.toList();
     }
