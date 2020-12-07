@@ -66,11 +66,11 @@ public class SupplyController {
 
         User user = userDetailsService.loadUserByToken(token);
         SupplyEntity old = supplyService.get(user, id);
-        logger.info(old.toString());
+        logger.info(old.getDescription() + "|" + old.getComment() + "|" + old.getStatus() + "|" + old.getResult());
         supplyService.update(user, id, updateRequest);
 
         SupplyEntity updated = supplyService.get(user, id);
-        logger.info(updated.toString());
+        logger.info(updated.getDescription() + "|" + updated.getComment() + "|" + updated.getStatus() + "|" + updated.getResult());
 
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
     }
