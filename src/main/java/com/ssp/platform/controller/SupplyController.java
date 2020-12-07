@@ -59,6 +59,9 @@ public class SupplyController {
             @RequestParam(required = false) SupplyStatus status,
             @RequestParam(required = false) String result,
             @RequestParam(required = false) MultipartFile[] files) throws SupplyException, IOException, NoSuchAlgorithmException {
+
+        logger.info("received: " + description + "|" + budget + "|" + comment + "|" + status + "|" + result);
+
         SupplyUpdateRequest updateRequest = new SupplyUpdateRequest(description, budget, comment, status, result, files);
 
         User user = userDetailsService.loadUserByToken(token);
