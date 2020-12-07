@@ -65,7 +65,12 @@ public class SupplyController {
         SupplyUpdateRequest updateRequest = new SupplyUpdateRequest(description, budget, comment, status, result, files);
 
         User user = userDetailsService.loadUserByToken(token);
+        SupplyEntity old = supplyService.get(user, id);
+        logger.info(old.toString());
         supplyService.update(user, id, updateRequest);
+
+        SupplyEntity updated = supplyService.get(user, id);
+        logger.info(updated.toString());
 
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
     }
