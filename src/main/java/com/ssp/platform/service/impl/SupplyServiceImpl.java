@@ -192,9 +192,19 @@ public class SupplyServiceImpl implements SupplyService {
             pageSize = 10;
         }
 
+        List<SupplyEntity> list = supplyRepository.findAllByPurchase(purchaseRepository.getOne(purchaseId));
+        Collections.sort(list, new Comparator<SupplyEntity>() {
+            @Override
+            public int compare(SupplyEntity o1, SupplyEntity o2) {
+                if (o2.getStatus() == o1.getStatus()){
+                    return o2.getCreateDate().compareTo(o1.getCreateDate());
+                }
+                return o1.getStatus().compareTo(o2.getStatus());
+            }
+        });
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("status").descending().and(Sort.by("createDate").descending()));
         Page<SupplyEntity> page = supplyRepository.findAllByPurchase(purchaseRepository.getOne(purchaseId), pageable);
-        return page.toList();
+        return list;
     }
 }

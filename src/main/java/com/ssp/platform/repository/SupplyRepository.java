@@ -14,4 +14,5 @@ public interface SupplyRepository extends JpaRepository<SupplyEntity, UUID> {
 
     Page<SupplyEntity> findAllByPurchase(Purchase purchase, Pageable pageable);
 
+    List<SupplyEntity> findAllByPurchase(Purchase purchase);
 }
