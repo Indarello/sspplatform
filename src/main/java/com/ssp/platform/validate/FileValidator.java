@@ -54,10 +54,6 @@ public class FileValidator extends Validator{
             return new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILENAME_SIZE_ERROR);
         }
 
-        /**if (!isMatch(fileName, "([а-яА-Яa-zA-Z0-9\\s_\\\\.\\-\\(\\):])+(.rar|.zip)$")){
-            return new ValidatorResponse(false, FIELD_NAME, ValidatorMessages.WRONG_FILE_TYPE_ERROR);
-        }*/
-
         if(checkRestrictedType(fileName))
         {
             return new ValidateResponse(false, FIELD_NAME, "Файл с таким расширением запрещено загружать");

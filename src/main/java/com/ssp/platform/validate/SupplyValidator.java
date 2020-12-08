@@ -63,6 +63,10 @@ public class SupplyValidator extends Validator {
         checkResult = OK;
         foundInvalid = false;
 
+        if (oldSupply.getStatus() != SupplyStatus.UNDER_REVIEW || (System.currentTimeMillis() / 1000L) > oldSupply.getPurchase().getProposalDeadLine()){
+            return new ValidateResponse(false, TIME_IS_OVER);
+        }
+
         if (role == ROLE_FIRM){
             if (updateRequest.getStatus() != null && !oldSupply.getStatus().equals(updateRequest.getStatus())){
                 return new ValidateResponse(false, STATUS_FIELD_NAME, WRONG_ROLE_FOR_UPDATING);

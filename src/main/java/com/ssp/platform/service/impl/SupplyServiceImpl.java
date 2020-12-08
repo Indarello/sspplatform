@@ -26,6 +26,8 @@ public class SupplyServiceImpl implements SupplyService {
 
     public static final long DATE_DIVIDER = 1000L;
 
+    public static final int MAX_FILES = 20;
+
     private final SupplyRepository supplyRepository;
 
     private final PurchaseRepository purchaseRepository;
@@ -60,7 +62,6 @@ public class SupplyServiceImpl implements SupplyService {
 
         SupplyEntity supplyEntity = new SupplyEntity(purchaseRepository.getOne(purchaseId), description, author, budget, comment);
         ValidateResponse response = supplyValidator.validateSupplyCreating(supplyEntity);
-        System.out.println(response);
         if (!response.isSuccess()) throw new SupplyException(response);
 
         supplyRepository.save(supplyEntity);
@@ -100,12 +101,15 @@ public class SupplyServiceImpl implements SupplyService {
                     supplyEntity.setComment(updateRequest.getComment());
                 }
 
-                if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 20){
+                if (updateRequest.getFiles() != null && updateRequest.getFiles().length > MAX_FILES){
                     throw new SupplyException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
                 }
 
                 List<FileEntity> fileEntities = new ArrayList<>();
                 if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 0){
+                    if (supplyEntity.getFiles().size() + updateRequest.getFiles().length > MAX_FILES){
+                        throw new SupplyException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
+                    }
                     for (MultipartFile file : updateRequest.getFiles()){
                         ValidateResponse response = fileValidator.validateFile(file);
                         if (!response.isSuccess()) throw new SupplyException(response);
@@ -148,13 +152,19 @@ public class SupplyServiceImpl implements SupplyService {
             case "firm":
                 if (user.equals(supplyEntity.getAuthor())){
                     supplyRepository.delete(supplyEntity);
-                    //fileService.delete(supplyEntity.getFile().getId());
+                    List<FileEntity> files = supplyEntity.getFiles();
+                    for (FileEntity file : files){
+                        fileService.delete(file.getId());
+                    }
                 }
                 break;
 
             case "employee":
                 supplyRepository.delete(supplyEntity);
-                //fileService.delete(supplyEntity.getFile().getId());
+                List<FileEntity> files = supplyEntity.getFiles();
+                for (FileEntity file : files){
+                    fileService.delete(file.getId());
+                }
                 break;
         }
     }
@@ -193,14 +203,11 @@ public class SupplyServiceImpl implements SupplyService {
         }
 
         List<SupplyEntity> list = supplyRepository.findAllByPurchase(purchaseRepository.getOne(purchaseId));
-        list.sort(new Comparator<SupplyEntity>() {
-            @Override
-            public int compare(SupplyEntity o1, SupplyEntity o2) {
-                if (o2.getStatus() == o1.getStatus()) {
-                    return o2.getCreateDate().compareTo(o1.getCreateDate());
-                }
-                return o1.getStatus().compareTo(o2.getStatus());
+        list.sort((o1, o2) -> {
+            if (o2.getStatus() == o1.getStatus()) {
+                return o2.getCreateDate().compareTo(o1.getCreateDate());
             }
+            return o1.getStatus().compareTo(o2.getStatus());
         });
         return list;
     }

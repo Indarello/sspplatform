@@ -32,4 +32,6 @@ public class SupplyValidatorMessages {
 
     public static final String WRONG_ROLE_FOR_UPDATING = "У Вас нет прав для изменения данного поля";
 
+    public static final String TIME_IS_OVER = "На данном этапе нельзя изменить предложение";
+
 }

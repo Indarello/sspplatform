@@ -10,6 +10,7 @@ import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.impl.*;
 import org.slf4j.*;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,17 +61,10 @@ public class SupplyController {
             @RequestParam(required = false) String result,
             @RequestParam(required = false) MultipartFile[] files) throws SupplyException, IOException, NoSuchAlgorithmException {
 
-        logger.info("received: " + description + "|" + budget + "|" + comment + "|" + status + "|" + result);
-
         SupplyUpdateRequest updateRequest = new SupplyUpdateRequest(description, budget, comment, status, result, files);
 
         User user = userDetailsService.loadUserByToken(token);
-        SupplyEntity old = supplyService.get(user, id);
-        logger.info(old.getDescription() + "|" + old.getComment() + "|" + old.getStatus() + "|" + old.getResult());
         supplyService.update(user, id, updateRequest);
-
-        SupplyEntity updated = supplyService.get(user, id);
-        logger.info(updated.getDescription() + "|" + updated.getComment() + "|" + updated.getStatus() + "|" + updated.getResult());
 
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
     }
