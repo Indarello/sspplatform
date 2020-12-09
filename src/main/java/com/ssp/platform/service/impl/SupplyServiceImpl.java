@@ -118,6 +118,8 @@ public class SupplyServiceImpl implements SupplyService {
                     }
                 }
 
+                supplyEntity.setFiles(fileEntities);
+
                 break;
 
             case "employee":
