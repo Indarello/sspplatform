@@ -70,7 +70,7 @@ public class Purchase
      * Бюджет закупки
      */
     @NotNull
-    private BigInteger budget;
+    private Long budget;
 
     /**
      * Общие требования по закупке
@@ -119,7 +119,7 @@ public class Purchase
     }
 
     public Purchase(User author, String name, String description, Long proposalDeadLine, Long finishDeadLine,
-                    BigInteger budget, String demands, String team, String workCondition)
+                    Long budget, String demands, String team, String workCondition)
     {
         this.author = author;
         this.name = name;

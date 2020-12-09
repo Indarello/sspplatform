@@ -23,6 +23,8 @@ public interface SupplyService {
 
     void delete(User user, UUID id) throws SupplyException, IOException;
 
+    void delete(UUID id) throws SupplyException, IOException;
+
     SupplyEntity get(User user, UUID id) throws SupplyException;
 
 

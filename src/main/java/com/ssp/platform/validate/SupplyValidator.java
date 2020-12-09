@@ -3,9 +3,11 @@ package com.ssp.platform.validate;
 import com.ssp.platform.entity.SupplyEntity;
 import com.ssp.platform.entity.enums.SupplyStatus;
 import com.ssp.platform.exceptions.SupplyValidationException;
+import com.ssp.platform.repository.PurchaseRepository;
 import com.ssp.platform.request.SupplyUpdateRequest;
 import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.service.impl.PurchaseServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -30,10 +32,11 @@ public class SupplyValidator extends Validator {
     private static final String STATUS_FIELD_NAME = "status";
     private static final String RESULT_FIELD_NAME = "review_result";
 
-    private final PurchaseServiceImpl purchaseService;
+    private final PurchaseRepository purchaseRepository;
 
-    public SupplyValidator(PurchaseServiceImpl purchaseService) {
-        this.purchaseService = purchaseService;
+    @Autowired
+    public SupplyValidator(PurchaseRepository purchaseRepository) {
+        this.purchaseRepository = purchaseRepository;
     }
 
     public void validateSupplyCreating(SupplyEntity supplyEntity) throws SupplyValidationException {
@@ -106,7 +109,7 @@ public class SupplyValidator extends Validator {
     }
 
     private void validatePurchaseId(UUID id) throws SupplyValidationException {
-        if (!purchaseService.existById(id)){
+        if (!purchaseRepository.existsById(id)){
             throw new SupplyValidationException(new ValidateResponse(false, PURCHASE_ID_FIELD_NAME, WRONG_PURCHASE_ID_ERROR));
         }
     }

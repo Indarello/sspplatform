@@ -1,8 +1,10 @@
 package com.ssp.platform.service;
 
 import com.ssp.platform.entity.Purchase;
+import com.ssp.platform.exceptions.SupplyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,7 +18,7 @@ public interface PurchaseService {
 
 	Optional<Purchase> changePurchase(Purchase purchase);
 
-	boolean deletePurchase(UUID id);
+	boolean deletePurchase(Purchase purchase) throws IOException, SupplyException;
 
 	Optional<Purchase> findById(UUID id);
 

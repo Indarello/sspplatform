@@ -127,6 +127,10 @@ public class SupplyServiceImpl implements SupplyService {
                         fileService.delete(file.getId());
                     }
                 }
+                //TODO: и если закупка не его то ???
+                //TODO: тут можно сначала просто сверить роль и автора и если не пойдет то выйти из метода,
+                //TODO: у тебя тут одинаковый код в обоих блоках
+                //TODO я думаю лучше сначала удалить файлы а потом предложение
                 break;
 
             case "employee":
@@ -137,6 +141,19 @@ public class SupplyServiceImpl implements SupplyService {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void delete(UUID id) throws IOException
+    {
+        SupplyEntity supplyEntity = supplyRepository.getOne(id);
+
+        List<FileEntity> files = supplyEntity.getFiles();
+        for (FileEntity file : files)
+        {
+            fileService.delete(file.getId());
+        }
+        supplyRepository.delete(supplyEntity);
     }
 
     @Override

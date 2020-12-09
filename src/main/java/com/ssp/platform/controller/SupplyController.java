@@ -20,6 +20,7 @@ import java.util.*;
 @RestController
 public class SupplyController {
 
+    //TODO: Impl, Autowired
     private final SupplyServiceImpl supplyService;
     private final UserDetailsServiceImpl userDetailsService;
 

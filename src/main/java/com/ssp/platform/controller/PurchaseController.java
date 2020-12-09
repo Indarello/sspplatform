@@ -3,14 +3,16 @@ package com.ssp.platform.controller;
 import com.ssp.platform.entity.FileEntity;
 import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.User;
-import com.ssp.platform.exceptions.SupplyException;
 import com.ssp.platform.request.PurchasesPageRequest;
-import com.ssp.platform.response.*;
+import com.ssp.platform.response.ApiResponse;
+import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
 import com.ssp.platform.service.impl.FileServiceImpl;
-import com.ssp.platform.validate.*;
+import com.ssp.platform.validate.FileValidator;
+import com.ssp.platform.validate.PurchaseValidate;
+import com.ssp.platform.validate.PurchasesPageValidate;
 import com.ssp.platform.validate.ValidatorMessages.FileValidatorMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +26,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 public class PurchaseController
@@ -47,23 +52,26 @@ public class PurchaseController
     /**
      * Добавление сущности закупки
      * Пришлось разложить на Param, т.к. файл нельзя предоставить в json
+     *
      * @return ResponseEntity со статусом
      */
     @PostMapping(value = "/purchase", produces = "application/json")
     @PreAuthorize("hasAuthority('employee')")
     public ResponseEntity<Object> addPurchase
     (
-        @RequestHeader("Authorization") String token,
-        @RequestParam(value = "name") String name,
-        @RequestParam(value = "description") String description,
-        @RequestParam(value = "proposalDeadLine") Long proposalDeadLine,
-        @RequestParam(value = "finishDeadLine", required = false) Long finishDeadLine,
-        @RequestParam(value = "budget", required = false) BigInteger budget,
-        @RequestParam(value = "demands", required = false) String demands,
-        @RequestParam(value = "team", required = false) String team,
-        @RequestParam(value = "workCondition", required = false) String workCondition,
-        @RequestParam(value = "files", required = false) MultipartFile[] files)   throws IOException, NoSuchAlgorithmException {
-        if(files != null && files.length > 20) {
+            @RequestHeader("Authorization") String token,
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "description") String description,
+            @RequestParam(value = "proposalDeadLine") Long proposalDeadLine,
+            @RequestParam(value = "finishDeadLine", required = false) Long finishDeadLine,
+            @RequestParam(value = "budget", required = false) Long budget,
+            @RequestParam(value = "demands", required = false) String demands,
+            @RequestParam(value = "team", required = false) String team,
+            @RequestParam(value = "workCondition", required = false) String workCondition,
+            @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException, NoSuchAlgorithmException
+    {
+        if (files != null && files.length > 20)
+        {
             return new ResponseEntity<>(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
         }
 
@@ -73,7 +81,8 @@ public class PurchaseController
         PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
 
         ValidateResponse validateResponse = purchaseValidate.validatePurchaseCreate();
-        if(!validateResponse.isSuccess()) {
+        if (!validateResponse.isSuccess())
+        {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
@@ -81,19 +90,25 @@ public class PurchaseController
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
 
         List<FileEntity> fileEntities = new ArrayList<>();
-        if (files != null && files.length > 0){
-            for (MultipartFile file : files){
+        if (files != null && files.length > 0)
+        {
+            for (MultipartFile file : files)
+            {
                 validateResponse = fileValidator.validateFile(file);
-                if (!validateResponse.isSuccess()) return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
+                if (!validateResponse.isSuccess())
+                    return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
 
                 fileEntities.add(fileService.addFile(file, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE));
             }
         }
 
-        try {
+        try
+        {
             //TODO: отправить приглашение на email
             return new ResponseEntity<>(purchaseService.get(savedPurchase.getId()), HttpStatus.CREATED);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -113,7 +128,7 @@ public class PurchaseController
         PurchasesPageValidate purchasesPageValidate = new PurchasesPageValidate(purchasesPageRequest);
         ValidateResponse validateResponse = purchasesPageValidate.validatePurchasePage();
 
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -189,26 +204,30 @@ public class PurchaseController
      */
     @DeleteMapping(value = "/purchase/{id}", produces = "application/json")
     @PreAuthorize("hasAuthority('employee')")
-    public ResponseEntity<Object> deletePurchase(@PathVariable(name = "id") String id)
+    public ResponseEntity<Object> deletePurchase(@PathVariable(name = "id") UUID id)
     {
-        if (id.isEmpty())
+        if (id == null)
         {
-            return new ResponseEntity<>(new ApiResponse(false, "Empty id"), HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(new ApiResponse(false, "Параметр id не предоставлен"), HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        Optional<Purchase> searchResult = purchaseService.findById(id);
+
+        if (!searchResult.isPresent())
+        {
+            return new ResponseEntity<>(new ApiResponse(false, "Закупка не найдена по id"), HttpStatus.NOT_FOUND);
         }
 
         try
         {
-            if (purchaseService.deletePurchase(UUID.fromString(id)))
-            {
-                return new ResponseEntity<>(new ApiResponse(true, "List deleted"), HttpStatus.OK);
-            }
-            return new ResponseEntity<>(new ApiResponse(false, "List not found"), HttpStatus.NOT_FOUND);
-
+            purchaseService.deletePurchase(searchResult.get());
+            return new ResponseEntity<>(new ApiResponse(false, "Закупка успешно удалена"), HttpStatus.NOT_FOUND);
         }
         catch (Exception e)
         {
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
 }

@@ -1,26 +1,36 @@
 package com.ssp.platform.service.impl;
 
+import com.ssp.platform.entity.FileEntity;
 import com.ssp.platform.entity.Purchase;
+import com.ssp.platform.entity.SupplyEntity;
+import com.ssp.platform.exceptions.SupplyException;
 import com.ssp.platform.repository.PurchaseRepository;
+import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
+import com.ssp.platform.service.SupplyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService
 {
-
+    private final FileService fileService;
     private final PurchaseRepository purchaseRepository;
+    private final SupplyService supplyService;
 
     @Autowired
-    PurchaseServiceImpl(PurchaseRepository purchaseRepository)
+    PurchaseServiceImpl(FileService fileService, PurchaseRepository purchaseRepository, SupplyService supplyService)
     {
+        this.fileService = fileService;
         this.purchaseRepository = purchaseRepository;
+        this.supplyService = supplyService;
     }
 
     @Override
@@ -30,7 +40,8 @@ public class PurchaseServiceImpl implements PurchaseService
     }
 
     @Override
-    public Purchase get(UUID id) {
+    public Purchase get(UUID id)
+    {
         return purchaseRepository.getOne(id);
     }
 
@@ -52,15 +63,21 @@ public class PurchaseServiceImpl implements PurchaseService
     }
 
     @Override
-    public boolean deletePurchase(UUID id)
+    public boolean deletePurchase(Purchase purchase) throws IOException, SupplyException
     {
-        Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
-        if (optionalPurchase.isPresent())
+        List<SupplyEntity> supplies = purchase.getSupplies();
+        for (SupplyEntity supply : supplies)
         {
-            purchaseRepository.deleteById(id);
-            return true;
+            supplyService.delete(supply.getId());
         }
-        return false;
+
+        List<FileEntity> files = purchase.getFiles();
+        for (FileEntity file : files)
+        {
+            fileService.delete(file.getId());
+        }
+
+        return true;
     }
 
     @Override
@@ -70,7 +87,8 @@ public class PurchaseServiceImpl implements PurchaseService
     }
 
     @Override
-    public boolean existById(UUID id) {
+    public boolean existById(UUID id)
+    {
         return purchaseRepository.existsById(id);
     }
 }

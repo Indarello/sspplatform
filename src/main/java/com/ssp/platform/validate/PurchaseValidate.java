@@ -1,6 +1,8 @@
 package com.ssp.platform.validate;
 
 import com.ssp.platform.entity.Purchase;
+import com.ssp.platform.entity.User;
+import com.ssp.platform.entity.enums.PurchaseStatus;
 import com.ssp.platform.response.ValidateResponse;
 import lombok.Data;
 import java.math.BigInteger;
@@ -47,6 +49,89 @@ public class PurchaseValidate
 
         validateWorkCondition();
         if (foundInvalid) return new ValidateResponse(false, "workCondition", checkResult);
+
+        return new ValidateResponse(true, "", checkResult);
+    }
+
+    public ValidateResponse validatePurchaseEdit(Purchase oldPurchase)
+    {
+        String newStringParam = purchase.getName();
+        String oldStringParam = oldPurchase.getName();
+        if(newStringParam == null) purchase.setName(oldStringParam);
+        else if(!newStringParam.equals(oldStringParam))
+        {
+            validateName();
+            if (foundInvalid) return new ValidateResponse(false, "name", checkResult);
+        }
+
+        newStringParam = purchase.getDescription();
+        oldStringParam = oldPurchase.getDescription();
+        if(newStringParam == null) purchase.setDescription(oldStringParam);
+        else if(!newStringParam.equals(oldStringParam))
+        {
+            validateDescription();
+            if (foundInvalid) return new ValidateResponse(false, "description", checkResult);
+        }
+
+        Long newLongParam = purchase.getProposalDeadLine();
+        Long oldLongParam = oldPurchase.getProposalDeadLine();
+        if(newStringParam == null) purchase.setProposalDeadLine(oldLongParam);
+        else if(!oldLongParam.equals(newLongParam))
+        {
+            validateProposalDeadLine();
+            if (foundInvalid) return new ValidateResponse(false, "proposalDeadLine", checkResult);
+        }
+
+        newLongParam = purchase.getFinishDeadLine();
+        oldLongParam = oldPurchase.getFinishDeadLine();
+        if(newStringParam == null) purchase.setFinishDeadLine(oldLongParam);
+        else if(!oldLongParam.equals(newLongParam))
+        {
+            validateFinishDeadLine();
+            if (foundInvalid) return new ValidateResponse(false, "finishDeadLine", checkResult);
+        }
+
+        newLongParam = purchase.getBudget();
+        oldLongParam = oldPurchase.getBudget();
+        if(newStringParam == null) purchase.setBudget(oldLongParam);
+        else if(!oldLongParam.equals(newLongParam))
+        {
+            validateBudget();
+            if (foundInvalid) return new ValidateResponse(false, "budget", checkResult);
+        }
+
+        newStringParam = purchase.getDemands();
+        oldStringParam = oldPurchase.getDemands();
+        if(newStringParam == null) purchase.setDemands(oldStringParam);
+        else if(!newStringParam.equals(oldStringParam))
+        {
+            validateDemands();
+            if (foundInvalid) return new ValidateResponse(false, "demands", checkResult);
+        }
+
+        newStringParam = purchase.getTeam();
+        oldStringParam = oldPurchase.getTeam();
+        if(newStringParam == null) purchase.setTeam(oldStringParam);
+        else if(!newStringParam.equals(oldStringParam))
+        {
+            validateTeam();
+            if (foundInvalid) return new ValidateResponse(false, "team", checkResult);
+        }
+
+        newStringParam = purchase.getWorkCondition();
+        oldStringParam = oldPurchase.getWorkCondition();
+        if(newStringParam == null) purchase.setWorkCondition(oldStringParam);
+        else if(!newStringParam.equals(oldStringParam))
+        {
+            validateWorkCondition();
+            if (foundInvalid) return new ValidateResponse(false, "workCondition", checkResult);
+        }
+
+        /*
+        PurchaseStatus newStatus = purchase.getWorkCondition();
+        PurchaseStatus oldStatus = oldPurchase.getWorkCondition();
+*/
+        //TODO validateStatus, cancel reason
 
         return new ValidateResponse(true, "", checkResult);
     }
@@ -129,24 +214,22 @@ public class PurchaseValidate
         }
     }
 
-    //TODO BigInt на Long
     private void validateBudget()
     {
-        BigInteger budget = purchase.getBudget();
+        Long budget = purchase.getBudget();
         if (budget == null)
         {
-            purchase.setBudget(BigInteger.ZERO);
+            purchase.setBudget(0L);
             return;
         }
 
-        if(budget.compareTo(BigInteger.ZERO) < 0)
+        if(budget < 0)
         {
             setCheckResult("Бюджет закупки не может быть отрицательный");
             return;
         }
 
-        int checkLength = budget.toString().length();
-        if (checkLength > 8)
+        if (budget > 99999999)
         {
             setCheckResult("Бюджет закупки должен быть не более 8 цифр");
             return;
@@ -209,22 +292,7 @@ public class PurchaseValidate
 
     private void validateStatus()
     {
-		/*
-		Status status = purchase.getStatus();
-		if (status == null){
-			setCheckResult("Параметр status не предоставлен");
-			return;
-		}
 
-		 */
-//		Status status = purchase.getStatus();
-//		if (status.getMessage().equals("начата") ||
-//				status.getMessage().equals("отменена")||
-//				status.getMessage().equals("сделано")){
-//			return "ok";
-//		}
-
-//		return setCheckResult("Неизвестный статус! Статусы: начата, отменена, сделано");
     }
 
     private void validateCancelReason()
@@ -237,7 +305,7 @@ public class PurchaseValidate
         }
 
         int checkLength = checkString.length();
-        if (checkLength > 100)
+        if (checkLength > 1000)
         {
             //Пока до конца не известно
             setCheckResult("Причина отмены должна содержать не более 100 символов");
