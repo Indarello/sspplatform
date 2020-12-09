@@ -1,5 +1,6 @@
 package com.ssp.platform.validate;
 
+import com.ssp.platform.exceptions.FileValidationException;
 import com.ssp.platform.property.FileProperty;
 import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.validate.ValidatorMessages.FileValidatorMessages;
@@ -10,7 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class FileValidator extends Validator{
+public class FileValidatorNew extends Validator{
+    public static final int MAX_FILES = 20;
 
     private static final String FIELD_NAME = "file";
 
@@ -20,7 +22,7 @@ public class FileValidator extends Validator{
     private final Pattern restrictedRegex;
 
     @Autowired
-    public FileValidator(FileProperty fileProperty) {
+    public FileValidatorNew(FileProperty fileProperty) {
         String[] restrictedTypes = fileProperty.getRestrictedTypes();
         String regex = ".*(\\.";
 
@@ -34,36 +36,32 @@ public class FileValidator extends Validator{
         restrictedRegex = Pattern.compile(regex);
     }
 
-    public ValidateResponse validateFiles(MultipartFile[] files){
-        for (MultipartFile file : files){
-            ValidateResponse validatorResponse = validateFile(file);
-            if (!validatorResponse.isSuccess()) return validatorResponse;
-        }
+    public void validateFiles(MultipartFile[] files) throws FileValidationException {
+        if (files == null) return;
+        if (files.length == 0) return;
 
-        return new ValidateResponse(true, "", FileValidatorMessages.OK);
+        if (files.length > MAX_FILES) throw new FileValidationException(new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.TOO_MUCH_FILES));
+
+        for (MultipartFile file : files) validateFile(file);
     }
 
-    public ValidateResponse validateFile(MultipartFile file) {
+    public void validateFile(MultipartFile file) throws FileValidationException {
         if (file == null){
-            return new ValidateResponse(true, "", FileValidatorMessages.OK);
+            return;
         }
 
         if (file.getSize() > MAX_FILE_SIZE){
-            return new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILE_SIZE_ERROR);
+            throw new FileValidationException(new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILE_SIZE_ERROR));
         }
 
         String fileName = file.getOriginalFilename();
-
-        if (fileName.length() > MAX_FILENAME_SIZE){
-            return new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILENAME_SIZE_ERROR);
+        if (fileName != null && fileName.length() > MAX_FILENAME_SIZE){
+            throw new FileValidationException(new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILENAME_SIZE_ERROR));
         }
 
-        if(checkRestrictedType(fileName))
-        {
-            return new ValidateResponse(false, FIELD_NAME, "Один из файлов имеет недопустимый формат");
+        if(checkRestrictedType(fileName)) {
+            throw new FileValidationException(new ValidateResponse(false, FIELD_NAME, FileValidatorMessages.WRONG_FILE_TYPE_ERROR));
         }
-
-        return new ValidateResponse(true, FileValidatorMessages.OK);
     }
 
     private boolean checkRestrictedType(String fileName) {

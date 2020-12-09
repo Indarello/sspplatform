@@ -6,7 +6,7 @@ public class FileValidatorMessages {
 
     public static final String ONLY_SPACES_ERROR = "Поле не может состоять только из пробелов";
 
-    public static final String WRONG_FILE_TYPE_ERROR = "Неверный тип файла. Допускаются файлы с расширением .rar и .zip";
+    public static final String WRONG_FILE_TYPE_ERROR = "Недопустимый тип одного из файлов";
 
     public static final String WRONG_FILE_SIZE_ERROR = "Допускаются файлы, размер которых не превышает 10МБ";
 

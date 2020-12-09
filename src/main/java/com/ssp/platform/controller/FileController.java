@@ -38,7 +38,7 @@ public class FileController {
             Resource resource = fileResponse.getResource();
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(fileResponse.getFile().getMimeType()))
+                    .contentType(MediaType.parseMediaType(fileResponse.getFile().getType()))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
         }

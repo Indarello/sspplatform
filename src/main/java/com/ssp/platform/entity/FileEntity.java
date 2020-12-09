@@ -39,7 +39,8 @@ public class FileEntity {
     private String name;
 
     @NotNull
-    private String mimeType;
+    @Column(name = "mime_type")
+    private String type;
 
     @NotNull
     private long size;
@@ -47,8 +48,19 @@ public class FileEntity {
     @NotNull
     private String hash;
 
+    public FileEntity(String name, String type, long size) throws NoSuchAlgorithmException {
+        this.name = name;
+        this.type = type;
+        this.size = size;
+
+        String modifiedName = name + type + size + new Timestamp(System.nanoTime());
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(modifiedName.getBytes(StandardCharsets.UTF_8));
+        hash = new BigInteger(1, messageDigest.digest()).toString(16);
+    }
+
     public void setHash() throws NoSuchAlgorithmException {
-        String modifiedName = name + mimeType + size + new Timestamp(System.nanoTime());
+        String modifiedName = name + type + size + new Timestamp(System.nanoTime());
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(modifiedName.getBytes(StandardCharsets.UTF_8));
         hash = new BigInteger(1, messageDigest.digest()).toString(16);
