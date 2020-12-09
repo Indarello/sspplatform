@@ -56,7 +56,7 @@ public class FileValidator extends Validator{
 
         if(checkRestrictedType(fileName))
         {
-            return new ValidateResponse(false, FIELD_NAME, "Файл с таким расширением запрещено загружать");
+            return new ValidateResponse(false, FIELD_NAME, "Один из файлов имеет недопустимый формат");
         }
 
         return new ValidateResponse(true, FileValidatorMessages.OK);
