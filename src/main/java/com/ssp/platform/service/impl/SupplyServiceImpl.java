@@ -64,17 +64,16 @@ public class SupplyServiceImpl implements SupplyService {
         ValidateResponse response = supplyValidator.validateSupplyCreating(supplyEntity);
         if (!response.isSuccess()) throw new SupplyException(response);
 
-        supplyRepository.save(supplyEntity);
-
-        List<FileEntity> fileEntities = new ArrayList<>();
         if (files != null && files.length > 0){
             for (MultipartFile file : files){
                 response = fileValidator.validateFile(file);
                 if (!response.isSuccess()) throw new SupplyException(response);
 
-                fileEntities.add(fileService.addFile(file, supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY));
+                fileService.addFile(file, supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY);
             }
         }
+
+        supplyRepository.save(supplyEntity);
     }
 
     @Override
@@ -87,6 +86,18 @@ public class SupplyServiceImpl implements SupplyService {
                 if (user.equals(supplyEntity.getAuthor())){
                     validatorResponse = supplyValidator.validateSupplyUpdating(updateRequest, supplyEntity, SupplyValidator.ROLE_FIRM);
                     if (!validatorResponse.isSuccess()) throw new SupplyException(validatorResponse);
+                }
+
+                if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 0){
+                    if (supplyEntity.getFiles().size() + updateRequest.getFiles().length > MAX_FILES){
+                        throw new SupplyException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
+                    }
+                    for (MultipartFile file : updateRequest.getFiles()){
+                        ValidateResponse response = fileValidator.validateFile(file);
+                        if (!response.isSuccess()) throw new SupplyException(response);
+
+                        fileService.addFile(file, supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY);
+                    }
                 }
 
                 if (updateRequest.getDescription() != null && !updateRequest.getDescription().isEmpty()){
@@ -104,21 +115,6 @@ public class SupplyServiceImpl implements SupplyService {
                 if (updateRequest.getFiles() != null && updateRequest.getFiles().length > MAX_FILES){
                     throw new SupplyException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
                 }
-
-                List<FileEntity> fileEntities = new ArrayList<>();
-                if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 0){
-                    if (supplyEntity.getFiles().size() + updateRequest.getFiles().length > MAX_FILES){
-                        throw new SupplyException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
-                    }
-                    for (MultipartFile file : updateRequest.getFiles()){
-                        ValidateResponse response = fileValidator.validateFile(file);
-                        if (!response.isSuccess()) throw new SupplyException(response);
-
-                        fileEntities.add(fileService.addFile(file, supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY));
-                    }
-                }
-
-                supplyEntity.setFiles(fileEntities);
 
                 break;
 
