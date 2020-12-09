@@ -66,4 +66,8 @@ public class FileEntity {
         hash = new BigInteger(1, messageDigest.digest()).toString(16);
     }
 
+    public void setSupply(UUID id){
+        supply = id;
+    }
+
 }
