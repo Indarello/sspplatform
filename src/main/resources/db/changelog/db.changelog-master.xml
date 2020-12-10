@@ -8,4 +8,6 @@
 	<include  file="db/changelog/changes/20201117110500_create_purchase_tables.xml"/>
 	<include  file="db/changelog/changes/20201027175100_create_file_tables.xml"/>
 	<include file="db/changelog/changes/20201121140821_create_supply_table.xml"/>
-</databaseChangeLog> 
+    <include file="db/changelog/changes/20201201151500_create_question_tables.xml"/>
+	<include file="db/changelog/changes/20201201150500_create_answer_tables.xml"/>
+</databaseChangeLog>

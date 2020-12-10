@@ -59,7 +59,7 @@ public class SupplyEntity {
     @Column(name = "result_date")
     private Long resultDate;
 
-    @OneToMany(mappedBy = "supply", targetEntity = FileEntity.class)
+    @OneToMany(mappedBy = "supply", targetEntity = FileEntity.class, fetch = FetchType.EAGER)
     private List<FileEntity> files;
     
     public SupplyEntity(){
