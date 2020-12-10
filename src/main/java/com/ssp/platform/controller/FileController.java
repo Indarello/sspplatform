@@ -3,6 +3,7 @@ package com.ssp.platform.controller;
 import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.response.FileResponse;
 import com.ssp.platform.service.FileService;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -14,12 +15,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 @RestController
 public class FileController {
     private final FileService fileService;
+
+    Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
     public FileController(FileService fileService){
@@ -38,9 +42,8 @@ public class FileController {
         } else {
             Resource resource = fileResponse.getResource();
 
-
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(fileResponse.getFile().getType())))
+                    //.contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromStream(resource.getInputStream())))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
         }
