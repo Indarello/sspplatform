@@ -439,7 +439,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
+        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+([ -]?[А-ЯёЁа-яA-Za-z]+)?"))
         {
             setCheckResult(UserValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
             return;
@@ -462,7 +462,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
+        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+([ -]?[А-ЯёЁа-яA-Za-z]+)?"))
         {
             setCheckResult(UserValidatorMessages.WRONG_LAST_NAME_SYMBOLS_ERROR);
             return;
@@ -488,7 +488,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
+        if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+([ -]?[А-ЯёЁа-яA-Za-z]+)?"))
         {
             setCheckResult(UserValidatorMessages.WRONG_PATRONYMIC_SYMBOLS_ERROR);
             return;
@@ -725,7 +725,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         }
 
         int checkLength = checkString.length();
-        if (checkLength < 7 || checkLength > 49)
+        if (checkLength < 7 || checkLength > 192)
         {
             setCheckResult(UserValidatorMessages.WRONG_EMAIL_SIZE_ERROR);
             return;
@@ -743,25 +743,25 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (!isMatch(checkString, ".{1,25}\\@.*"))
+        if (!isMatch(checkString, ".{1,64}\\@.*"))
         {
             setCheckResult(UserValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR);
             return;
         }
 
-        if (!isMatch(checkString, ".{1,25}\\@.{2,15}\\..*"))
+        if (!isMatch(checkString, ".{1,64}\\@.{2,63}\\..*"))
         {
             setCheckResult(UserValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR2);
             return;
         }
 
-        if (!isMatch(checkString, ".{1,25}\\@.{2,15}\\..{2,7}"))
+        if (!isMatch(checkString, ".{1,64}\\@.{2,63}\\..{2,63}"))
         {
             setCheckResult(UserValidatorMessages.WRONG_EMAIL_MASK_SIZE_ERROR3);
             return;
         }
 
-        if (!isMatch(checkString, "[a-z0-9._\\-]{1,25}\\@[a-z0-9._\\-]{2,15}\\.[a-z0-9._\\-]{2,7}", Pattern.CASE_INSENSITIVE))
+        if (!isMatch(checkString, "[a-zA-Z0-9^!@#$%&~_‘`/=\\?\\{\\}\\|\\-\\+\\*]+\\@[a-z0-9._\\-]+\\.[a-z0-9._\\-]+", Pattern.CASE_INSENSITIVE))
         {
             setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_EMAIL_ERROR);
             return;

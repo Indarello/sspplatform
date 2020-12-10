@@ -72,13 +72,13 @@ public class UserValidatorMessages {
 
     public static final String EMPTY_EMAIL_FIELD_ERROR = "Поле e-mail должно быть заполнено";
 
-    public static final String WRONG_EMAIL_SIZE_ERROR = "E-mail может содержать от 7 до 49 символов";
+    public static final String WRONG_EMAIL_SIZE_ERROR = "E-mail может содержать от 7 до 192 символов";
 
     public static final String WRONG_EMAIL_MASK_TYPE_ERROR = "Неверный формат email";
 
-    public static final String WRONG_EMAIL_MASK_SIZE_ERROR = "E-mail должен содержать до знака “@“ от 1 до 25 символов";
-    public static final String WRONG_EMAIL_MASK_SIZE_ERROR2 = "E-mail должен содержать от “@“ до “.“ от 2 до 15 символов";
-    public static final String WRONG_EMAIL_MASK_SIZE_ERROR3 = "E-mail должен содержать после “.“ от 2 до 7 символов";
+    public static final String WRONG_EMAIL_MASK_SIZE_ERROR = "E-mail должен содержать до знака “@“ от 1 до 64 символов";
+    public static final String WRONG_EMAIL_MASK_SIZE_ERROR2 = "E-mail должен содержать от “@“ до “.“ от 2 до 63 символов";
+    public static final String WRONG_EMAIL_MASK_SIZE_ERROR3 = "E-mail должен содержать после “.“ от 2 до 63 символов";
 
     public static final String WRONG_SYMBOLS_IN_EMAIL_ERROR = "Недопустимы пробелы, кириллица";
 
