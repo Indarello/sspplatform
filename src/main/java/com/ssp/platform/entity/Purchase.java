@@ -118,9 +118,13 @@ public class Purchase
         this.createDate = System.currentTimeMillis()/1000;
     }
 
+    /**
+     * Конструктор для создания закупки
+     */
     public Purchase(User author, String name, String description, Long proposalDeadLine, Long finishDeadLine,
                     Long budget, String demands, String team, String workCondition)
     {
+        this.id = UUID.randomUUID();
         this.author = author;
         this.name = name;
         this.description = description;
@@ -135,6 +139,10 @@ public class Purchase
         this.workCondition = workCondition;
     }
 
+
+    /**
+     * Конструктор при изменении закупки
+     */
     public Purchase(UUID id, User author, String name, String description, Long proposalDeadLine,
                     Long finishDeadLine, Long budget, String demands, String team, String workCondition,
                     PurchaseStatus status, String cancelReason)

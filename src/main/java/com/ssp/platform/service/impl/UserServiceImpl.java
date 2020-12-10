@@ -41,10 +41,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
-    public boolean existsByPhoneNumber(String phoneNumber) {
-        System.out.println("PHONE NUMBER");
-        return userRepository.existsByTelephone(phoneNumber);
-    }
+    public boolean existsByPhoneNumber(String phoneNumber) { return userRepository.existsByTelephone(phoneNumber); }
 
     @Override
     public boolean existsByInn(String tIN) {

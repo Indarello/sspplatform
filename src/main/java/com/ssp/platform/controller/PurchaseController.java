@@ -12,7 +12,6 @@ import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
 import com.ssp.platform.service.impl.FileServiceImpl;
-import com.ssp.platform.validate.FileValidator;
 import com.ssp.platform.validate.PurchaseValidate;
 import com.ssp.platform.validate.PurchasesPageValidate;
 import com.ssp.platform.validate.ValidatorMessages.FileValidatorMessages;
@@ -25,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -42,7 +42,7 @@ public class PurchaseController
     private final FileService fileService;
 
     @Autowired
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, FileValidator fileValidator)
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService)
     {
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
@@ -69,7 +69,7 @@ public class PurchaseController
             @RequestParam(value = "demands", required = false) String demands,
             @RequestParam(value = "team", required = false) String team,
             @RequestParam(value = "workCondition", required = false) String workCondition,
-            @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException, NoSuchAlgorithmException, FileValidationException
+            @RequestParam(value = "files", required = false) MultipartFile[] files) throws NoSuchAlgorithmException, IOException, FileValidationException
     {
         if (files != null && files.length > 20)
         {
@@ -89,12 +89,16 @@ public class PurchaseController
 
         Purchase validatedPurchase = purchaseValidate.getPurchase();
 
+        //TODO: разобраться с exceptions, поместить в try
+        //TODO: закупка все равно сохранится если файлы не прошли валидацию, Александр сначала должен это исправить
+        Purchase savedPurchase = purchaseService.save(validatedPurchase);
+        List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+
+        validatedPurchase.setFiles(savedFiles);
+
         try
         {
             //TODO: отправить приглашение на email
-            Purchase savedPurchase = purchaseService.save(validatedPurchase);
-
-            List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
             savedPurchase.setFiles(savedFiles);
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
@@ -182,7 +186,7 @@ public class PurchaseController
             @RequestParam(value = "workCondition", required = false) String workCondition,
             @RequestParam(value = "status", required = false) PurchaseStatus status,
             @RequestParam(value = "cancelReason", required = false) String cancelReason,
-            @RequestParam(value = "files", required = false) MultipartFile[] files)
+            @RequestParam(value = "files", required = false) MultipartFile[] files) throws NoSuchAlgorithmException, IOException, FileValidationException
     {
         if(id == null)
         {
@@ -214,14 +218,17 @@ public class PurchaseController
             return new ResponseEntity<>(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
         }
 
+        //TODO: разобраться с exceptions, поместить в try
+        Purchase savedPurchase = purchaseService.save(validatedPurchase);
+        List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+        List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        savedPurchase.setFiles(combinedList);
+
         try
         {
-            Purchase savedPurchase = purchaseService.save(validatedPurchase);
-            List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
-            List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
-                    .collect(Collectors.toList());
 
-            savedPurchase.setFiles(combinedList);
 
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
