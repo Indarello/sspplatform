@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class FileController {
             Resource resource = fileResponse.getResource();
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(fileResponse.getFile().getType()))
+                    .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(resource.getFilename())))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
         }
