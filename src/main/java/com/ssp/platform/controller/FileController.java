@@ -39,7 +39,7 @@ public class FileController {
             Resource resource = fileResponse.getResource();
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(resource.getFilename())))
+                    .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromStream(resource.getInputStream())))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
         }
