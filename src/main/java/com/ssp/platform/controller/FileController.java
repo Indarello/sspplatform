@@ -38,8 +38,9 @@ public class FileController {
         } else {
             Resource resource = fileResponse.getResource();
 
+
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromStream(resource.getInputStream())))
+                    .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(fileResponse.getFile().getType())))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
         }
