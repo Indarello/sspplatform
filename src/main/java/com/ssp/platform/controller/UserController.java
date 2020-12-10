@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.Optional;
 
 
@@ -58,7 +60,7 @@ public class UserController
         User ObjUser = new User(username, password);
         userValidate.UserValidateReset(ObjUser);
         ValidateResponse validateResponse = userValidate.validateLogin();
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -80,7 +82,7 @@ public class UserController
     {
         userValidate.UserValidateReset(ObjUser);
         ValidateResponse validateResponse = userValidate.validateFirmUser();
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -108,7 +110,7 @@ public class UserController
     {
         userValidate.UserValidateReset(ObjUser);
         ValidateResponse validateResponse = userValidate.validateEmployeeUser();
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -141,7 +143,7 @@ public class UserController
 
         userValidate.UserValidateReset(ObjUser);
         ValidateResponse validateResponse = userValidate.validateEmployeeUser();
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -163,21 +165,33 @@ public class UserController
     @GetMapping(value = "/users/{type}")
     @PreAuthorize("hasAuthority('employee')")
     public ResponseEntity<Object> getUsers(@PathVariable(name = "type") String type,
-           @RequestParam(value = "requestPage", required = false) Integer requestPage,
-           @RequestParam(value = "numberOfElements", required = false) Integer numberOfElements)
+                                           @RequestParam(value = "requestPage", required = false) Integer requestPage,
+                                           @RequestParam(value = "numberOfElements", required = false) Integer numberOfElements)
     {
         UsersPageRequest usersPageRequest = new UsersPageRequest(requestPage, numberOfElements, type);
         UsersPageValidate usersPageValidate = new UsersPageValidate(usersPageRequest);
         ValidateResponse validateResponse = usersPageValidate.validateUsersPage();
 
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
         UsersPageRequest validUsersPageRequest = usersPageValidate.getUsersPageRequest();
 
-        Pageable pageable = PageRequest.of(validUsersPageRequest.getRequestPage(), validUsersPageRequest.getNumberOfElements());
+        Pageable pageable;
+        if (type.equals("firm"))
+        {
+            pageable = PageRequest.of(validUsersPageRequest.getRequestPage(),
+                    validUsersPageRequest.getNumberOfElements(), Sort.by("firmName").descending());
+        }
+        //else if (type.equals("employee"))
+        else
+        {
+            pageable = PageRequest.of(validUsersPageRequest.getRequestPage(),
+                    validUsersPageRequest.getNumberOfElements(), Sort.by("lastName").descending());
+        }
+
         Page<User> searchResult = userService.findAllByRole(pageable, validUsersPageRequest.getType());
 
         return new ResponseEntity<>(searchResult, HttpStatus.OK);
@@ -189,7 +203,7 @@ public class UserController
     {
         ValidateResponse validateResponse = userValidate.validateUsernameLogin(username);
 
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -216,7 +230,7 @@ public class UserController
     {
         ValidateResponse validateResponse = userValidate.validateUsernameLogin(ObjUser.getUsername());
 
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -238,12 +252,13 @@ public class UserController
         else
         {
             User user = userDetailsService.loadUserByToken(token);
-            if(oldUser.getUsername().equals(user.getUsername())) validateResponse = userValidate.validateEditEmployeeUser(oldUser);
+            if (oldUser.getUsername().equals(user.getUsername()))
+                validateResponse = userValidate.validateEditEmployeeUser(oldUser);
             else return new ResponseEntity<>(new ApiResponse(false, "Вы не можете менять" +
                     "информацию по аккаунту другого сотрудника"), HttpStatus.FORBIDDEN);
         }
 
-        if(!validateResponse.isSuccess())
+        if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }

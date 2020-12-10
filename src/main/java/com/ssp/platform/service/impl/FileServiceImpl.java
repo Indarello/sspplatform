@@ -31,7 +31,10 @@ public class FileServiceImpl implements FileService {
 
     @Autowired
     public FileServiceImpl(FileProperty fileProperty, FileRepository fileRepository, FileValidatorNew fileValidator) throws IOException {
-        fileStorageLocation = Paths.get(fileProperty.getUploadDirectory()).toAbsolutePath().normalize();
+        String directory = fileProperty.getUploadDirectory();
+        if(directory.contains(":")) fileStorageLocation = Paths.get(directory);
+        else fileStorageLocation = Paths.get(directory).toAbsolutePath().normalize();
+
         this.fileRepository = fileRepository;
         if (!Files.exists(fileStorageLocation)) {
             Files.createDirectory(fileStorageLocation);
