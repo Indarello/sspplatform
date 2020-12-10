@@ -3,13 +3,11 @@ package com.ssp.platform.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
@@ -103,13 +101,15 @@ public class Purchase
     @NotNull
     private String workCondition;
 
-    @OneToMany(mappedBy = "purchase", targetEntity = FileEntity.class)
+    @OneToMany(mappedBy = "purchase", targetEntity = FileEntity.class, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<FileEntity> files;
 
     /**
      * Массив сущностей предложений
      */
-    @OneToMany(mappedBy = "purchase")
+    @OneToMany(mappedBy = "purchase", fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JsonIgnore
     private List<SupplyEntity> supplies;
 
@@ -133,5 +133,23 @@ public class Purchase
         this.cancelReason = "";
         this.team = team;
         this.workCondition = workCondition;
+    }
+
+    public Purchase(UUID id, User author, String name, String description, Long proposalDeadLine,
+                    Long finishDeadLine, Long budget, String demands, String team, String workCondition,
+                    PurchaseStatus status, String cancelReason)
+    {
+        this.id = id;
+        this.author = author;
+        this.name = name;
+        this.description = description;
+        this.proposalDeadLine = proposalDeadLine;
+        this.finishDeadLine = finishDeadLine;
+        this.budget = budget;
+        this.demands = demands;
+        this.team = team;
+        this.workCondition = workCondition;
+        this.status = status;
+        this.cancelReason = cancelReason;
     }
 }

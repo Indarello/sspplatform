@@ -5,10 +5,13 @@ import com.ssp.platform.entity.User;
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import com.ssp.platform.response.ValidateResponse;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.math.BigInteger;
 
+@EqualsAndHashCode(callSuper = true) //Временно
 @Data
-public class PurchaseValidate
+public class PurchaseValidate extends Validator
 {
     public static final long ONE_HUNDRED_YEARS = 3155760000L;
     public static final long ONE_HOUR = 3600L;
@@ -55,10 +58,14 @@ public class PurchaseValidate
 
     public ValidateResponse validatePurchaseEdit(Purchase oldPurchase)
     {
+        purchase.setCreateDate(oldPurchase.getCreateDate());
+        purchase.setFiles(oldPurchase.getFiles());
+        purchase.setSupplies(oldPurchase.getSupplies());
+
         String newStringParam = purchase.getName();
         String oldStringParam = oldPurchase.getName();
-        if(newStringParam == null) purchase.setName(oldStringParam);
-        else if(!newStringParam.equals(oldStringParam))
+        if (newStringParam == null) purchase.setName(oldStringParam);
+        else if (!newStringParam.equals(oldStringParam))
         {
             validateName();
             if (foundInvalid) return new ValidateResponse(false, "name", checkResult);
@@ -66,8 +73,8 @@ public class PurchaseValidate
 
         newStringParam = purchase.getDescription();
         oldStringParam = oldPurchase.getDescription();
-        if(newStringParam == null) purchase.setDescription(oldStringParam);
-        else if(!newStringParam.equals(oldStringParam))
+        if (newStringParam == null) purchase.setDescription(oldStringParam);
+        else if (!newStringParam.equals(oldStringParam))
         {
             validateDescription();
             if (foundInvalid) return new ValidateResponse(false, "description", checkResult);
@@ -75,8 +82,8 @@ public class PurchaseValidate
 
         Long newLongParam = purchase.getProposalDeadLine();
         Long oldLongParam = oldPurchase.getProposalDeadLine();
-        if(newStringParam == null) purchase.setProposalDeadLine(oldLongParam);
-        else if(!oldLongParam.equals(newLongParam))
+        if (newStringParam == null) purchase.setProposalDeadLine(oldLongParam);
+        else if (!oldLongParam.equals(newLongParam))
         {
             validateProposalDeadLine();
             if (foundInvalid) return new ValidateResponse(false, "proposalDeadLine", checkResult);
@@ -84,8 +91,8 @@ public class PurchaseValidate
 
         newLongParam = purchase.getFinishDeadLine();
         oldLongParam = oldPurchase.getFinishDeadLine();
-        if(newStringParam == null) purchase.setFinishDeadLine(oldLongParam);
-        else if(!oldLongParam.equals(newLongParam))
+        if (newStringParam == null) purchase.setFinishDeadLine(oldLongParam);
+        else if (!oldLongParam.equals(newLongParam))
         {
             validateFinishDeadLine();
             if (foundInvalid) return new ValidateResponse(false, "finishDeadLine", checkResult);
@@ -93,8 +100,8 @@ public class PurchaseValidate
 
         newLongParam = purchase.getBudget();
         oldLongParam = oldPurchase.getBudget();
-        if(newStringParam == null) purchase.setBudget(oldLongParam);
-        else if(!oldLongParam.equals(newLongParam))
+        if (newStringParam == null) purchase.setBudget(oldLongParam);
+        else if (!oldLongParam.equals(newLongParam))
         {
             validateBudget();
             if (foundInvalid) return new ValidateResponse(false, "budget", checkResult);
@@ -102,8 +109,8 @@ public class PurchaseValidate
 
         newStringParam = purchase.getDemands();
         oldStringParam = oldPurchase.getDemands();
-        if(newStringParam == null) purchase.setDemands(oldStringParam);
-        else if(!newStringParam.equals(oldStringParam))
+        if (newStringParam == null) purchase.setDemands(oldStringParam);
+        else if (!newStringParam.equals(oldStringParam))
         {
             validateDemands();
             if (foundInvalid) return new ValidateResponse(false, "demands", checkResult);
@@ -111,8 +118,8 @@ public class PurchaseValidate
 
         newStringParam = purchase.getTeam();
         oldStringParam = oldPurchase.getTeam();
-        if(newStringParam == null) purchase.setTeam(oldStringParam);
-        else if(!newStringParam.equals(oldStringParam))
+        if (newStringParam == null) purchase.setTeam(oldStringParam);
+        else if (!newStringParam.equals(oldStringParam))
         {
             validateTeam();
             if (foundInvalid) return new ValidateResponse(false, "team", checkResult);
@@ -120,18 +127,30 @@ public class PurchaseValidate
 
         newStringParam = purchase.getWorkCondition();
         oldStringParam = oldPurchase.getWorkCondition();
-        if(newStringParam == null) purchase.setWorkCondition(oldStringParam);
-        else if(!newStringParam.equals(oldStringParam))
+        if (newStringParam == null) purchase.setWorkCondition(oldStringParam);
+        else if (!newStringParam.equals(oldStringParam))
         {
             validateWorkCondition();
             if (foundInvalid) return new ValidateResponse(false, "workCondition", checkResult);
         }
 
-        /*
-        PurchaseStatus newStatus = purchase.getWorkCondition();
-        PurchaseStatus oldStatus = oldPurchase.getWorkCondition();
-*/
-        //TODO validateStatus, cancel reason
+        PurchaseStatus newStatus = purchase.getStatus();
+        PurchaseStatus oldStatus = oldPurchase.getStatus();
+        if (newStringParam == null) purchase.setStatus(oldStatus);
+        else if (!newStatus.equals(oldStatus))
+        {
+            validateStatus();
+            if (foundInvalid) return new ValidateResponse(false, "status", checkResult);
+        }
+
+        newStringParam = purchase.getCancelReason();
+        oldStringParam = oldPurchase.getCancelReason();
+        if (newStringParam == null) purchase.setCancelReason(oldStringParam);
+        else if (!newStringParam.equals(oldStringParam))
+        {
+            validateCancelReason();
+            if (foundInvalid) return new ValidateResponse(false, "cancelReason", checkResult);
+        }
 
         return new ValidateResponse(true, "", checkResult);
     }
@@ -142,6 +161,12 @@ public class PurchaseValidate
         if (checkString == null)
         {
             setCheckResult("Поле наименование закупки должно быть заполнено");
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Наименование закупки не может состоять из одних пробелов");
             return;
         }
 
@@ -163,6 +188,12 @@ public class PurchaseValidate
             return;
         }
 
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Описание закупки не может состоять из одних пробелов");
+            return;
+        }
+
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 1000)
         {
@@ -181,15 +212,15 @@ public class PurchaseValidate
             return;
         }
 
-        long nowSec = System.currentTimeMillis()/1000;
-        if (proposalSec > nowSec + ONE_HUNDRED_YEARS)
+        long createSec = purchase.getCreateDate();
+        if (proposalSec > createSec + ONE_HUNDRED_YEARS)
         {
             setCheckResult("Дата окончания срока подачи предложений " +
-                    "должна быть не позже чем через 100 лет от текущей даты");
+                    "должна быть не позже чем через 100 лет от даты создания предложения");
             return;
         }
 
-        if (proposalSec < nowSec + ONE_HOUR)
+        if (proposalSec < createSec + ONE_HOUR)
         {
             setCheckResult("Время окончания срока подачи предложений " +
                     "не может быть раньше чем через час после создания предложения");
@@ -223,7 +254,7 @@ public class PurchaseValidate
             return;
         }
 
-        if(budget < 0)
+        if (budget < 0)
         {
             setCheckResult("Бюджет закупки не может быть отрицательный");
             return;
@@ -247,6 +278,12 @@ public class PurchaseValidate
             return;
         }
 
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Общие требования не могут состоять из одних пробелов");
+            return;
+        }
+
         int checkLength = checkString.length();
         if (checkLength > 1000)
         {
@@ -261,6 +298,12 @@ public class PurchaseValidate
         if (checkString == null)
         {
             purchase.setTeam("");
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Состав команды не может состоять из одних пробелов");
             return;
         }
 
@@ -281,6 +324,12 @@ public class PurchaseValidate
             return;
         }
 
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Условия работы не может состоять из одних пробелов");
+            return;
+        }
+
         int checkLength = checkString.length();
         if (checkLength > 1000)
         {
@@ -292,7 +341,24 @@ public class PurchaseValidate
 
     private void validateStatus()
     {
-
+        if (purchase.getStatus() == PurchaseStatus.bidAccepting)
+        {
+            long nowSec = System.currentTimeMillis() / 1000;
+            if (nowSec >= purchase.getProposalDeadLine())
+            {
+                setCheckResult("Время приема предложений закончено");
+                return;
+            }
+        }
+        else if (purchase.getStatus() == PurchaseStatus.bidReview)
+        {
+            long nowSec = System.currentTimeMillis() / 1000;
+            if (nowSec < purchase.getProposalDeadLine())
+            {
+                setCheckResult("Установите срок подачи предложения меньший текущего времени");
+                return;
+            }
+        }
     }
 
     private void validateCancelReason()
@@ -304,11 +370,16 @@ public class PurchaseValidate
             return;
         }
 
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Причина отмены не может состоять из одних пробелов");
+            return;
+        }
+
         int checkLength = checkString.length();
         if (checkLength > 1000)
         {
-            //Пока до конца не известно
-            setCheckResult("Причина отмены должна содержать не более 100 символов");
+            setCheckResult("Причина отмены должна содержать не более 1000 символов");
             return;
         }
     }

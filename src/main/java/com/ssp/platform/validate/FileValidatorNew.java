@@ -46,8 +46,8 @@ public class FileValidatorNew extends Validator{
     }
 
     public void validateFile(MultipartFile file) throws FileValidationException {
-        if (file == null){
-            return;
+        if (file == null || file.getSize() < 1){
+            throw new FileValidationException(new ValidateResponse(false, FIELD_NAME, "Один из файлов не предоставлен"));
         }
 
         if (file.getSize() > MAX_FILE_SIZE){

@@ -77,6 +77,7 @@ public class PurchaseServiceImpl implements PurchaseService
             fileService.delete(file.getId());
         }
 
+        purchaseRepository.delete(purchase);
         return true;
     }
 

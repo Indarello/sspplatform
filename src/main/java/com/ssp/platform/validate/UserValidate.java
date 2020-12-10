@@ -348,13 +348,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        /*
-        if (onlySpaces(checkString))
-        {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
-            return;
-        }*/
-
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
             setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
@@ -387,15 +380,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             setCheckResult(UserValidatorMessages.WRONG_PASSWORD_SIZE_ERROR);
             return;
         }
-
-        //TODO: проверить нужна ли эта функция
-        /*
-        if (onlySpaces(checkString))
-        {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
-            return;
-        }
-        */
 
         char currentCharacter;
         boolean numberPresent = false;
@@ -455,13 +439,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        /*
-        if (onlySpaces(checkString))
-        {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
-            return;
-        }*/
-
         if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
         {
             setCheckResult(UserValidatorMessages.WRONG_FIRST_NAME_SYMBOLS_ERROR);
@@ -484,14 +461,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             setCheckResult(UserValidatorMessages.WRONG_LAST_NAME_SIZE_ERROR);
             return;
         }
-
-        /*
-        if (onlySpaces(checkString))
-        {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
-            return;
-        }
-         */
 
         if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
         {
@@ -518,14 +487,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             setCheckResult(UserValidatorMessages.WRONG_PATRONYMIC_SIZE_ERROR);
             return;
         }
-
-        /*
-        if (onlySpaces(checkString))
-        {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
-            return;
-        }
-*/
 
         if (!isMatch(checkString, "[А-ЯёЁа-яA-Za-z]+[ -]?([А-ЯёЁа-яA-Za-z]+)"))
         {
@@ -740,13 +701,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        /*
-        if (onlySpaces(checkString))
-        {
-            setCheckResult(ValidatorMessages.ONLY_SPACES_ERROR);
-            return;
-        }
-*/
         if (!isMatch(checkString, "[0-9]*"))
         {
             setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_PHONE_NUMBER_ERROR);
@@ -850,12 +804,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             setCheckResult(UserValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
             return;
         }
-/*
-        if (onlySpaces(checkString))
-        {
-            setCheckResult(ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
-            return;
-        }*/
 
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
@@ -881,11 +829,6 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         {
             return new ValidateResponse(false, "login", UserValidatorMessages.WRONG_LOGIN_SIZE_ERROR);
         }
-/*
-        if (onlySpaces(checkString))
-        {
-            return new ValidateResponse(false, "login", ValidatorMessages.WRONG_SYMBOLS_IN_LOGIN_ERROR);
-        }*/
 
         if (!isMatch(checkString, "(?!\\d|[ ])\\w+", Pattern.CASE_INSENSITIVE))
         {
