@@ -264,7 +264,6 @@ public class UserController
         }
 
         User validUser = userValidate.getUser();
-        validUser.setPassword(encoder.encode(ObjUser.getPassword()));
 
         try
         {

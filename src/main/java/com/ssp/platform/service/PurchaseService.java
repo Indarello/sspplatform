@@ -16,11 +16,11 @@ public interface PurchaseService {
 
 	Page<Purchase> getAll(Pageable pageable);
 
-	Optional<Purchase> changePurchase(Purchase purchase);
-
 	boolean deletePurchase(Purchase purchase) throws IOException, SupplyException;
 
 	Optional<Purchase> findById(UUID id);
 
 	boolean existById(UUID id);
+
+	public void sendEmail(Purchase purchase);
 }

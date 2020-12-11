@@ -3,21 +3,25 @@ package com.ssp.platform.service.impl;
 import com.ssp.platform.entity.FileEntity;
 import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.SupplyEntity;
+import com.ssp.platform.entity.User;
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import com.ssp.platform.exceptions.SupplyException;
+import com.ssp.platform.property.EmailAnnouncementProperty;
 import com.ssp.platform.repository.PurchaseRepository;
 import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
 import com.ssp.platform.service.SupplyService;
+import com.ssp.platform.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,13 +33,33 @@ public class PurchaseServiceImpl implements PurchaseService
     private final FileService fileService;
     private final PurchaseRepository purchaseRepository;
     private final SupplyService supplyService;
+    private final UserService userService;
+    private final MailServiceImpl mailServiceImpl;
 
+    private final int emailStatus;
+    private final String emailHost;
+    private final String emailHeading;
+    private final String emailFirstLine;
+    private final int emailDescription;
+    private final int emailBudget;
+
+
+//TODO UTF-8 в properties сделать
     @Autowired
-    PurchaseServiceImpl(FileService fileService, PurchaseRepository purchaseRepository, SupplyService supplyService)
+    PurchaseServiceImpl(FileService fileService, PurchaseRepository purchaseRepository, SupplyService supplyService,
+                        UserService userService, EmailAnnouncementProperty emailAnnouncementProperty, MailServiceImpl mailServiceImpl)
     {
         this.fileService = fileService;
         this.purchaseRepository = purchaseRepository;
         this.supplyService = supplyService;
+        this.userService = userService;
+        this.emailStatus = emailAnnouncementProperty.getStatus();
+        this.emailHost = emailAnnouncementProperty.getHost();
+        this.emailHeading = emailAnnouncementProperty.getHeading();
+        this.emailFirstLine = emailAnnouncementProperty.getFirstLine();
+        this.emailDescription = emailAnnouncementProperty.getDescription();
+        this.emailBudget = emailAnnouncementProperty.getBudget();
+        this.mailServiceImpl = mailServiceImpl;
     }
 
     @Override
@@ -54,17 +78,6 @@ public class PurchaseServiceImpl implements PurchaseService
     public Page<Purchase> getAll(Pageable pageable)
     {
         return purchaseRepository.findAll(pageable);
-    }
-
-    @Override
-    public Optional<Purchase> changePurchase(Purchase purchase)
-    {
-        Optional<Purchase> optionalPurchase = purchaseRepository.findById(purchase.getId());
-        if (optionalPurchase.isPresent())
-        {
-            return Optional.of(purchaseRepository.saveAndFlush(purchase));
-        }
-        return Optional.empty();
     }
 
     @Override
@@ -116,6 +129,47 @@ public class PurchaseServiceImpl implements PurchaseService
             {
                 purchase.setStatus(PurchaseStatus.bidReview);
                 purchaseRepository.save(purchase);
+            }
+        }
+    }
+
+    @Override
+    public void sendEmail(Purchase purchase)
+    {
+        if(emailStatus == 0) return;
+
+        String message = emailFirstLine + "<br>";
+        message = message + "Название закупки: " + purchase.getName() + "<br>";
+        if(emailDescription == 1)
+        {
+            message = message + "Описание закупки: " + purchase.getDescription() + "<br>";
+        }
+        if(emailBudget == 1)
+        {
+            Long budget = purchase.getBudget();
+            if (budget > 0) message = message + "Бюджет закупки: " + budget + "<br>";
+        }
+
+        message = message + "Закупка доступна по адресу: " + emailHost + "/purchase/" + purchase.getId();
+
+        List<User> users = userService.findByRoleAndStatus("firm", "Approved");
+
+        Date nowDate = new Date();
+
+        for (User user : users)
+        {
+            try
+            {
+                mailServiceImpl.sendMail(emailHeading, message, user.getEmail(), nowDate);
+            }
+            catch (MessagingException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                //TODO логирование в обоих exceptions
             }
         }
     }

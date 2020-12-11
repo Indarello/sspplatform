@@ -25,9 +25,7 @@ public class SupplyServiceImpl implements SupplyService {
 
     private final SupplyRepository supplyRepository;
     private final PurchaseRepository purchaseRepository;
-
     private final FileServiceImpl fileService;
-
     private final SupplyValidator supplyValidator;
 
     public SupplyServiceImpl(

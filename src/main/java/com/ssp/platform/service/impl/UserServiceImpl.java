@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -61,5 +62,11 @@ public class UserServiceImpl implements UserService
     public Optional<User> findByUsername(String username)
     {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public List<User> findByRoleAndStatus(String role, String status)
+    {
+        return userRepository.findByRoleAndStatus(role, status);
     }
 }

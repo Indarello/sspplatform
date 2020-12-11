@@ -278,16 +278,19 @@ public class PurchaseValidate extends Validator
             return;
         }
 
-        if (onlySpaces(checkString))
-        {
-            setCheckResult("Общие требования не могут состоять из одних пробелов");
-            return;
-        }
-
         int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
         if (checkLength > 1000)
         {
             setCheckResult("Общие требования должны содержать не более 1000 символов");
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Общие требования не могут состоять из одних пробелов");
             return;
         }
     }
@@ -301,16 +304,19 @@ public class PurchaseValidate extends Validator
             return;
         }
 
-        if (onlySpaces(checkString))
-        {
-            setCheckResult("Состав команды не может состоять из одних пробелов");
-            return;
-        }
-
         int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
         if (checkLength > 1000)
         {
             setCheckResult("Состав команды должен содержать не более 1000 символов");
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Состав команды не может состоять из одних пробелов");
             return;
         }
     }
@@ -324,19 +330,21 @@ public class PurchaseValidate extends Validator
             return;
         }
 
-        if (onlySpaces(checkString))
-        {
-            setCheckResult("Условия работы не может состоять из одних пробелов");
-            return;
-        }
-
         int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
         if (checkLength > 1000)
         {
             setCheckResult("Условия работы должны содержать не более 1000 символов");
             return;
         }
 
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Условия работы не может состоять из одних пробелов");
+            return;
+        }
     }
 
     private void validateStatus()
@@ -370,16 +378,19 @@ public class PurchaseValidate extends Validator
             return;
         }
 
-        if (onlySpaces(checkString))
-        {
-            setCheckResult("Причина отмены не может состоять из одних пробелов");
-            return;
-        }
-
         int checkLength = checkString.length();
+
+        if (checkLength == 0) return;
+
         if (checkLength > 1000)
         {
             setCheckResult("Причина отмены должна содержать не более 1000 символов");
+            return;
+        }
+
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Причина отмены не может состоять из одних пробелов");
             return;
         }
     }

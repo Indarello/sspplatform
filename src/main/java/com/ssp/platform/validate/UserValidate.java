@@ -146,12 +146,14 @@ public class UserValidate extends com.ssp.platform.validate.Validator
          */
         String checkParameter = user.getPassword();
         String oldParameter = oldUser.getPassword();
+        user.setPassword(oldParameter);
+        /*
         if(checkParameter == null) user.setPassword(oldParameter);
         else if(!checkParameter.equals(oldParameter))
         {
             checkPassword();
             if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
-        }
+        }*/
 
         checkParameter = user.getFirstName();
         oldParameter = oldUser.getFirstName();
@@ -261,7 +263,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             if(foundInvalid) return new ValidateResponse(false, "status", checkResult);
         }
 
-
+        //TODO: user.setSupplies(oldUser.getPurchases());
         user.setRole("firm");
 
         return new ValidateResponse(true, "", checkResult);
@@ -277,14 +279,17 @@ public class UserValidate extends com.ssp.platform.validate.Validator
           username, role, status изменить нельзя
          */
 
+
         String checkParameter = user.getPassword();
         String oldParameter = oldUser.getPassword();
+        user.setPassword(oldParameter);
+        /*
         if(checkParameter == null) user.setPassword(oldParameter);
         else if(!checkParameter.equals(oldParameter))
         {
             checkPassword();
             if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
-        }
+        }*/
 
         checkParameter = user.getFirstName();
         oldParameter = oldUser.getFirstName();
@@ -323,6 +328,8 @@ public class UserValidate extends com.ssp.platform.validate.Validator
         user.setEmail("");
         user.setRole("employee");
         user.setStatus("Approved");
+        user.setPurchases(oldUser.getPurchases());
+
 
         return new ValidateResponse(true, "", checkResult);
     }
@@ -761,7 +768,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (!isMatch(checkString, "[a-zA-Z0-9^!@#$%&~_‘`/=\\?\\{\\}\\|\\-\\+\\*]+\\@[a-z0-9._\\-]+\\.[a-z0-9._\\-]+", Pattern.CASE_INSENSITIVE))
+        if (!isMatch(checkString, "[a-zA-Z0-9.^!@#$%&~_‘`/=\\?\\{\\}\\|\\-\\+\\*]+\\@[a-z0-9._\\-]+\\.[a-z0-9._\\-]+", Pattern.CASE_INSENSITIVE))
         {
             setCheckResult(UserValidatorMessages.WRONG_SYMBOLS_IN_EMAIL_ERROR);
             return;

@@ -94,11 +94,12 @@ public class PurchaseController
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
         List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
 
-        validatedPurchase.setFiles(savedFiles);
+        savedPurchase.setFiles(savedFiles);
 
         try
         {
-            //TODO: отправить приглашение на email
+            //TODO в отдельный поток
+            purchaseService.sendEmail(savedPurchase);
             savedPurchase.setFiles(savedFiles);
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }

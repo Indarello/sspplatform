@@ -1,5 +1,6 @@
 package com.ssp.platform.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -24,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, Long>
     boolean existsByInn(String tIN);
 
     Page<User> findAllByRole(Pageable pageable, String role);
+
+    List<User> findByRoleAndStatus(String role, String status);
 }

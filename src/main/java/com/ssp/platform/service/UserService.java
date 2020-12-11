@@ -3,6 +3,8 @@ package com.ssp.platform.service;
 import com.ssp.platform.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,4 +27,6 @@ public interface UserService
     Page<User> findAllByRole(Pageable pageable, String role);
 
     Optional<User> findByUsername(String username);
+
+    List<User> findByRoleAndStatus(String role, String status);
 }
