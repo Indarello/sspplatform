@@ -143,7 +143,7 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     @Override
-    public SupplyEntity get(User user, UUID id) throws SupplyException {
+    public SupplyEntity get(User user, UUID id) {
         SupplyEntity supplyEntity = supplyRepository.getOne(id);
 
         switch (user.getRole()){

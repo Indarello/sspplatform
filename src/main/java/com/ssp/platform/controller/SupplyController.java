@@ -6,10 +6,13 @@ import com.ssp.platform.response.*;
 import com.ssp.platform.entity.*;
 import com.ssp.platform.entity.enums.SupplyStatus;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
+import com.ssp.platform.service.SupplyService;
 import com.ssp.platform.service.impl.*;
 import org.slf4j.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,13 +23,13 @@ import java.util.*;
 @RestController
 public class SupplyController {
 
-    //TODO: Impl, Autowired
-    private final SupplyServiceImpl supplyService;
+    private final SupplyService supplyService;
     private final UserDetailsServiceImpl userDetailsService;
 
     Logger logger = LoggerFactory.getLogger(SupplyController.class);
 
-    public SupplyController(SupplyServiceImpl supplyService, UserDetailsServiceImpl userDetailsService) {
+    @Autowired
+    public SupplyController(SupplyService supplyService, UserDetailsServiceImpl userDetailsService) {
         this.supplyService = supplyService;
         this.userDetailsService = userDetailsService;
     }
@@ -59,7 +62,7 @@ public class SupplyController {
             @RequestParam(required = false) SupplyStatus status,
             @RequestParam(required = false) String result,
             @RequestParam(required = false) MultipartFile[] files)
-            throws SupplyException, IOException, NoSuchAlgorithmException, SupplyValidationException, FileValidationException, SupplyServiceException {
+            throws IOException, NoSuchAlgorithmException, SupplyValidationException, FileValidationException, SupplyServiceException {
 
         SupplyUpdateRequest updateRequest = new SupplyUpdateRequest(description, budget, comment, status, result, files);
 
@@ -72,7 +75,7 @@ public class SupplyController {
     @DeleteMapping("/supply/{id}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
     public ResponseEntity<Object> deleteSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id)
-            throws SupplyException, IOException, FileServiceException, SupplyServiceException {
+            throws IOException, FileServiceException, SupplyServiceException {
         User user = userDetailsService.loadUserByToken(token);
         supplyService.delete(user, id);
 
@@ -81,7 +84,7 @@ public class SupplyController {
 
     @GetMapping("/supply/{id}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) throws SupplyException {
+    public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) {
         User user = userDetailsService.loadUserByToken(token);
 
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);

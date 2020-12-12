@@ -16,7 +16,7 @@ public interface PurchaseService {
 
 	Page<Purchase> getAll(Pageable pageable);
 
-	boolean deletePurchase(Purchase purchase) throws IOException, SupplyException, FileServiceException, SupplyServiceException;
+	boolean deletePurchase(Purchase purchase) throws IOException, FileServiceException, SupplyServiceException;
 
 	Optional<Purchase> findById(UUID id);
 

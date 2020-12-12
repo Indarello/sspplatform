@@ -81,7 +81,7 @@ public class PurchaseServiceImpl implements PurchaseService
     }
 
     @Override
-    public boolean deletePurchase(Purchase purchase) throws IOException, SupplyException, FileServiceException, SupplyServiceException {
+    public boolean deletePurchase(Purchase purchase) throws IOException, FileServiceException, SupplyServiceException {
         List<SupplyEntity> supplies = purchase.getSupplies();
         for (SupplyEntity supply : supplies)
         {
