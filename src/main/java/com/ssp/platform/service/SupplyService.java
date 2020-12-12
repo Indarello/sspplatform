@@ -21,12 +21,9 @@ public interface SupplyService {
     void update(User user, UUID id, SupplyUpdateRequest updateRequest)
             throws SupplyException, IOException, NoSuchAlgorithmException, SupplyValidationException, SupplyServiceException, FileValidationException;
 
-    void delete(User user, UUID id) throws SupplyException, IOException;
-
-    void delete(UUID id) throws SupplyException, IOException;
+    void delete(User user, UUID id) throws SupplyException, IOException, FileServiceException, SupplyServiceException;
 
     SupplyEntity get(User user, UUID id) throws SupplyException;
-
 
     List<SupplyEntity> getList(UUID purchaseId);
 }

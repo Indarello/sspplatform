@@ -1,6 +1,6 @@
 package com.ssp.platform.validate.ValidatorMessages;
 
-public class UserValidatorMessages {
+public class UserMessages {
 
     public static final String OK = "OK";
 

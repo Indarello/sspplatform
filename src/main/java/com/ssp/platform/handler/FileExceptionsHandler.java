@@ -19,4 +19,9 @@ public class FileExceptionsHandler {
     protected ResponseEntity<ApiResponse> handleNotFoundException(){
         return new ResponseEntity<>(new ApiResponse(false, "Файл удалён"), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(FileServiceException.class)
+    protected ResponseEntity<ApiResponse> handleNotFoundException(FileServiceException exception){
+        return new ResponseEntity<>(exception.getResponse(), HttpStatus.BAD_REQUEST);
+    }
 }

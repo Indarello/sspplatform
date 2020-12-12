@@ -1,10 +1,10 @@
 package com.ssp.platform.service.impl;
 
 import com.ssp.platform.entity.*;
-import com.ssp.platform.exceptions.FileValidationException;
+import com.ssp.platform.exceptions.*;
 import com.ssp.platform.property.FileProperty;
 import com.ssp.platform.repository.FileRepository;
-import com.ssp.platform.response.FileResponse;
+import com.ssp.platform.response.*;
 import com.ssp.platform.service.FileService;
 import com.ssp.platform.validate.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,7 @@ import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.*;
@@ -25,12 +26,12 @@ public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
 
-    private final FileValidatorNew fileValidator;
+    private final FileValidator fileValidator;
 
     private final Path fileStorageLocation;
 
     @Autowired
-    public FileServiceImpl(FileProperty fileProperty, FileRepository fileRepository, FileValidatorNew fileValidator) throws IOException {
+    public FileServiceImpl(FileProperty fileProperty, FileRepository fileRepository, FileValidator fileValidator) throws IOException {
         String directory = fileProperty.getUploadDirectory();
         if(directory.contains(":")) fileStorageLocation = Paths.get(directory);
         else fileStorageLocation = Paths.get(directory).toAbsolutePath().normalize();
@@ -53,26 +54,31 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<FileEntity> addFiles(MultipartFile[] files, UUID id, int location) throws NoSuchAlgorithmException, IOException, FileValidationException {
+    public void validateFiles(MultipartFile[] files) throws FileValidationException {
         fileValidator.validateFiles(files);
+    }
 
+    @Override
+    public void addFiles(MultipartFile[] files, UUID id, int location) throws NoSuchAlgorithmException, IOException {
         List<FileEntity> fileEntities = new ArrayList<>();
 
-        for (MultipartFile file : files){
-            FileEntity fileEntity = new FileEntity(
-                    file.getOriginalFilename(),
-                    file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")),
-                    file.getSize()
-            );
+        if (files != null && files.length > 0){
+            for (MultipartFile file : files){
+                FileEntity fileEntity = new FileEntity(
+                        file.getOriginalFilename(),
+                        file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")),
+                        file.getSize()
+                );
 
-            if (location == LOCATION_PURCHASE) fileEntity.setPurchase(id);
-            if (location == LOCATION_SUPPLY) fileEntity.setSupply(id);
+                if (location == LOCATION_PURCHASE) fileEntity.setPurchase(id);
+                if (location == LOCATION_SUPPLY) fileEntity.setSupply(id);
 
-            fileEntities.add(fileEntity);
+                fileEntities.add(fileEntity);
+            }
+
+            storeFiles(fileEntities, files);
+            fileRepository.saveAll(fileEntities);
         }
-
-        storeFiles(fileEntities, files);
-        return fileRepository.saveAll(fileEntities);
     }
 
     @Override
@@ -91,13 +97,18 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void delete(UUID id) throws IOException {
+    public void delete(UUID id) throws IOException, FileServiceException {
         FileEntity fileEntity = fileRepository.getOne(id);
 
-        String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
-        deleteFile(fileEntity.getHash(), extension);
-
-        fileRepository.delete(fileEntity);
+        try {
+            deleteFile(fileEntity.getHash(), fileEntity.getType());
+            fileRepository.delete(fileEntity);
+        } catch (EntityNotFoundException e) {
+            throw new FileServiceException(new ApiResponse(false, "Запрашиваемый файл не найден"));
+        } catch (NoSuchFileException e){
+            fileRepository.delete(fileEntity);
+            throw new FileServiceException(new ApiResponse(false, "Запрашиваемый файл не найден"));
+        }
     }
 
     private FileEntity createFile(MultipartFile file, UUID id, int location) throws NoSuchAlgorithmException, IOException {

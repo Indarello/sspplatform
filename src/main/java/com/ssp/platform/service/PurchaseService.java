@@ -1,7 +1,7 @@
 package com.ssp.platform.service;
 
 import com.ssp.platform.entity.Purchase;
-import com.ssp.platform.exceptions.SupplyException;
+import com.ssp.platform.exceptions.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.io.IOException;
@@ -16,7 +16,7 @@ public interface PurchaseService {
 
 	Page<Purchase> getAll(Pageable pageable);
 
-	boolean deletePurchase(Purchase purchase) throws IOException, SupplyException;
+	boolean deletePurchase(Purchase purchase) throws IOException, SupplyException, FileServiceException, SupplyServiceException;
 
 	Optional<Purchase> findById(UUID id);
 

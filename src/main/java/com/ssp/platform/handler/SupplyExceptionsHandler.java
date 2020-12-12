@@ -1,7 +1,7 @@
 package com.ssp.platform.handler;
 
 import com.ssp.platform.exceptions.*;
-import com.ssp.platform.response.ValidateResponse;
+import com.ssp.platform.response.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,7 @@ public class SupplyExceptionsHandler {
     }
 
     @ExceptionHandler(SupplyServiceException.class)
-    protected ResponseEntity<ValidateResponse> handleSupplyServiceException(SupplyServiceException exception){
+    protected ResponseEntity<ApiResponse> handleSupplyServiceException(SupplyServiceException exception){
         return new ResponseEntity<>(exception.getResponse(), HttpStatus.BAD_REQUEST);
     }
 }

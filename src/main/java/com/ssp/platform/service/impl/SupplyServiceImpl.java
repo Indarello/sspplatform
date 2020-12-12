@@ -15,7 +15,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-import static com.ssp.platform.validate.ValidatorMessages.SupplyValidatorMessages.WRONG_ROLE_FOR_UPDATING;
+import static com.ssp.platform.validate.ValidatorMessages.SupplyMessages.WRONG_ROLE_FOR_DELETING;
+import static com.ssp.platform.validate.ValidatorMessages.SupplyMessages.WRONG_ROLE_FOR_UPDATING;
 
 @Service
 public class SupplyServiceImpl implements SupplyService {
@@ -29,7 +30,7 @@ public class SupplyServiceImpl implements SupplyService {
     private final SupplyValidator supplyValidator;
 
     public SupplyServiceImpl(
-            SupplyRepository supplyRepository, FileServiceImpl fileService, SupplyValidator supplyValidator, FileValidatorNew fileValidator,
+            SupplyRepository supplyRepository, FileServiceImpl fileService, SupplyValidator supplyValidator, FileValidator fileValidator,
             PurchaseRepository purchaseRepository) {
         this.supplyRepository = supplyRepository;
         this.fileService = fileService;
@@ -42,15 +43,16 @@ public class SupplyServiceImpl implements SupplyService {
             throws IOException, NoSuchAlgorithmException, SupplyValidationException, FileValidationException, SupplyServiceException {
 
         if (supplyRepository.existsByAuthorAndPurchaseId(author, purchaseId)) {
-            throw new SupplyServiceException(new ValidateResponse(false, SupplyValidatorMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
+            throw new SupplyServiceException(new ApiResponse(false, SupplyMessages.SUPPLY_ALREADY_EXIST_BY_USER_ERROR));
         }
 
         SupplyEntity supplyEntity = new SupplyEntity(purchaseRepository.getOne(purchaseId), description, author, budget, comment);
-        supplyValidator.validateSupplyCreating(supplyEntity);
 
-        fileService.addFiles(files, supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY);
+        supplyValidator.validateSupplyCreating(supplyEntity);
+        fileService.validateFiles(files);
 
         supplyRepository.save(supplyEntity);
+        fileService.addFiles(files, supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY);
     }
 
     @Override
@@ -77,12 +79,12 @@ public class SupplyServiceImpl implements SupplyService {
                 }
 
                 if (updateRequest.getFiles() != null && updateRequest.getFiles().length > MAX_FILES){
-                    throw new FileValidationException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
+                    throw new FileValidationException(new ValidateResponse(false, "files", FileMessages.TOO_MUCH_FILES));
                 }
 
                 if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 0){
                     if (supplyEntity.getFiles().size() + updateRequest.getFiles().length > MAX_FILES){
-                        throw new FileValidationException(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES));
+                        throw new FileValidationException(new ValidateResponse(false, "files", FileMessages.TOO_MUCH_FILES));
                     }
 
                     fileService.addFiles(updateRequest.getFiles(), supplyEntity.getId(), FileServiceImpl.LOCATION_SUPPLY);
@@ -92,7 +94,7 @@ public class SupplyServiceImpl implements SupplyService {
 
             case "employee":
                 if (updateRequest.getFiles() != null && updateRequest.getFiles().length > 0){
-                    throw new SupplyServiceException(new ValidateResponse(false, "files", WRONG_ROLE_FOR_UPDATING));
+                    throw new SupplyValidationException(new ValidateResponse(false, "files", WRONG_ROLE_FOR_UPDATING));
                 }
 
                 supplyValidator.validateSupplyUpdating(updateRequest, supplyEntity, SupplyValidator.ROLE_EMPLOYEE);
@@ -113,44 +115,30 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     @Override
-    public void delete(User user, UUID id) throws SupplyException, IOException {
+    public void delete(User user, UUID id) throws IOException, FileServiceException, SupplyServiceException {
         SupplyEntity supplyEntity = supplyRepository.getOne(id);
 
         switch (user.getRole()) {
             case "firm":
                 if (user.equals(supplyEntity.getAuthor())){
-                    supplyRepository.delete(supplyEntity);
-                    List<FileEntity> files = supplyEntity.getFiles();
-                    for (FileEntity file : files){
-                        fileService.delete(file.getId());
-                    }
+                    delete(supplyEntity);
+                    break;
                 }
-                //TODO: и если закупка не его то ???
-                //TODO: тут можно сначала просто сверить роль и автора и если не пойдет то выйти из метода,
-                //TODO: у тебя тут одинаковый код в обоих блоках
-                //TODO я думаю лучше сначала удалить файлы а потом предложение
-                break;
+                
+                throw new SupplyServiceException(new ApiResponse(false, WRONG_ROLE_FOR_DELETING));
 
             case "employee":
-                supplyRepository.delete(supplyEntity);
-                List<FileEntity> files = supplyEntity.getFiles();
-                for (FileEntity file : files){
-                    fileService.delete(file.getId());
-                }
+                delete(supplyEntity);
                 break;
+            default:
+                throw new SupplyServiceException(new ApiResponse(false, WRONG_ROLE_FOR_DELETING));
         }
     }
-
-    @Override
-    public void delete(UUID id) throws IOException
-    {
-        SupplyEntity supplyEntity = supplyRepository.getOne(id);
-
+    
+    private void delete(SupplyEntity supplyEntity) throws IOException, FileServiceException {
         List<FileEntity> files = supplyEntity.getFiles();
-        for (FileEntity file : files)
-        {
-            fileService.delete(file.getId());
-        }
+        
+        for (FileEntity file : files) fileService.delete(file.getId());
         supplyRepository.delete(supplyEntity);
     }
 

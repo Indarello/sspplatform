@@ -5,7 +5,7 @@ import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.SupplyEntity;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.entity.enums.PurchaseStatus;
-import com.ssp.platform.exceptions.SupplyException;
+import com.ssp.platform.exceptions.*;
 import com.ssp.platform.property.EmailAnnouncementProperty;
 import com.ssp.platform.repository.PurchaseRepository;
 import com.ssp.platform.service.FileService;
@@ -81,12 +81,11 @@ public class PurchaseServiceImpl implements PurchaseService
     }
 
     @Override
-    public boolean deletePurchase(Purchase purchase) throws IOException, SupplyException
-    {
+    public boolean deletePurchase(Purchase purchase) throws IOException, SupplyException, FileServiceException, SupplyServiceException {
         List<SupplyEntity> supplies = purchase.getSupplies();
         for (SupplyEntity supply : supplies)
         {
-            supplyService.delete(supply.getId());
+            supplyService.delete(purchase.getAuthor(), supply.getId());
         }
 
         List<FileEntity> files = purchase.getFiles();

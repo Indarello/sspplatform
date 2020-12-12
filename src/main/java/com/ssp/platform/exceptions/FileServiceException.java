@@ -1,11 +1,11 @@
 package com.ssp.platform.exceptions;
 
-import com.ssp.platform.response.ApiResponse;
+import com.ssp.platform.response.*;
 
-public class SupplyServiceException extends Exception {
+public class FileServiceException extends Exception {
     private final ApiResponse response;
 
-    public SupplyServiceException(ApiResponse response) {
+    public FileServiceException(ApiResponse response) {
         super(response.getMessage());
         this.response = response;
     }

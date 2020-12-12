@@ -1,6 +1,6 @@
 package com.ssp.platform.validate.ValidatorMessages;
 
-public class FileValidatorMessages {
+public class FileMessages {
 
     public static final String OK = "OK";
 

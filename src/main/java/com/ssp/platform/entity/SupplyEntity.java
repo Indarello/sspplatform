@@ -21,8 +21,8 @@ public class SupplyEntity {
     public static final long THREE_THOUSAND_YEARS = 32503741200L;
 
     @Id
-    //@GeneratedValue(generator = "UUID")
-    //@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id")
     private UUID id;
 
@@ -69,7 +69,7 @@ public class SupplyEntity {
     public SupplyEntity(
             Purchase purchase, String description, User author,
             Long budget, String comment) {
-        id = UUID.randomUUID();
+        //id = UUID.randomUUID();
         this.purchase = purchase;
         this.description = description;
         this.author = author;

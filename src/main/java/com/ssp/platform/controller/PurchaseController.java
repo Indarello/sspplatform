@@ -1,6 +1,5 @@
 package com.ssp.platform.controller;
 
-import com.ssp.platform.entity.FileEntity;
 import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.entity.enums.PurchaseStatus;
@@ -14,7 +13,7 @@ import com.ssp.platform.service.PurchaseService;
 import com.ssp.platform.service.impl.FileServiceImpl;
 import com.ssp.platform.validate.PurchaseValidate;
 import com.ssp.platform.validate.PurchasesPageValidate;
-import com.ssp.platform.validate.ValidatorMessages.FileValidatorMessages;
+import com.ssp.platform.validate.ValidatorMessages.FileMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,12 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 public class PurchaseController
@@ -73,7 +68,7 @@ public class PurchaseController
     {
         if (files != null && files.length > 20)
         {
-            return new ResponseEntity<>(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(new ValidateResponse(false, "files", FileMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
         }
 
         User author = userDetailsService.loadUserByToken(token);
@@ -92,15 +87,15 @@ public class PurchaseController
         //TODO: разобраться с exceptions, поместить в try
         //TODO: закупка все равно сохранится если файлы не прошли валидацию, Александр сначала должен это исправить
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
-        List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+        fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
 
-        savedPurchase.setFiles(savedFiles);
+        //savedPurchase.setFiles(savedFiles);
 
         try
         {
             //TODO в отдельный поток
             purchaseService.sendEmail(savedPurchase);
-            savedPurchase.setFiles(savedFiles);
+            //savedPurchase.setFiles(savedFiles);
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
         catch (Exception e)
@@ -216,16 +211,16 @@ public class PurchaseController
 
         if (files != null && files.length + oldPurchase.getFiles().size() > 20)
         {
-            return new ResponseEntity<>(new ValidateResponse(false, "files", FileValidatorMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(new ValidateResponse(false, "files", FileMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
         }
 
         //TODO: разобраться с exceptions, поместить в try
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
-        List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
-        List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
-                .collect(Collectors.toList());
+        fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+        //List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
+        //        .collect(Collectors.toList());
 
-        savedPurchase.setFiles(combinedList);
+        //savedPurchase.setFiles(combinedList);
 
         try
         {

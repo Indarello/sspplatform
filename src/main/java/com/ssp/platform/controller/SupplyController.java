@@ -71,7 +71,8 @@ public class SupplyController {
 
     @DeleteMapping("/supply/{id}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> deleteSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) throws SupplyException, IOException {
+    public ResponseEntity<Object> deleteSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id)
+            throws SupplyException, IOException, FileServiceException, SupplyServiceException {
         User user = userDetailsService.loadUserByToken(token);
         supplyService.delete(user, id);
 

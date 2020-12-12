@@ -1,6 +1,6 @@
 package com.ssp.platform.validate.ValidatorMessages;
 
-public class SupplyValidatorMessages {
+public class SupplyMessages {
 
     public static final String OK = "OK";
 
@@ -31,6 +31,8 @@ public class SupplyValidatorMessages {
     public static final String WRONG_SUPPLY_RESULT_BOUNDS_ERROR = "Поле 'Результат рассмотрения' должно содержать до 1000 символов";
 
     public static final String WRONG_ROLE_FOR_UPDATING = "У Вас нет прав для изменения данного поля";
+
+    public static final String WRONG_ROLE_FOR_DELETING = "У Вас нет прав для удаления данной закупки";
 
     public static final String TIME_IS_OVER = "На данном этапе нельзя изменить предложение";
 

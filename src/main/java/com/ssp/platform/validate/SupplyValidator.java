@@ -6,14 +6,13 @@ import com.ssp.platform.exceptions.SupplyValidationException;
 import com.ssp.platform.repository.PurchaseRepository;
 import com.ssp.platform.request.SupplyUpdateRequest;
 import com.ssp.platform.response.ValidateResponse;
-import com.ssp.platform.service.impl.PurchaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static com.ssp.platform.validate.ValidatorMessages.SupplyValidatorMessages.*;
-import static com.ssp.platform.validate.ValidatorMessages.SupplyValidatorMessages.WRONG_SUPPLY_RESULT_BOUNDS_ERROR;
+import static com.ssp.platform.validate.ValidatorMessages.SupplyMessages.*;
+import static com.ssp.platform.validate.ValidatorMessages.SupplyMessages.WRONG_SUPPLY_RESULT_BOUNDS_ERROR;
 
 @Component
 public class SupplyValidator extends Validator {
@@ -115,7 +114,7 @@ public class SupplyValidator extends Validator {
     }
 
     private void validateCreateDate(long purchaseDeadLine, long supplyCreateDate) throws SupplyValidationException {
-        if (supplyCreateDate > purchaseDeadLine){
+        if (supplyCreateDate > purchaseDeadLine) {
             throw new SupplyValidationException(new ValidateResponse(false, SUPPLY_WRONG_DATE_ERROR));
         }
     }
@@ -141,11 +140,11 @@ public class SupplyValidator extends Validator {
     private void validateBudget(Long budget) throws SupplyValidationException {
         if (budget == null) return;
 
-        if (budget > MAX_SUPPLY_BUDGET){
+        if (budget > MAX_SUPPLY_BUDGET) {
             throw new SupplyValidationException(new ValidateResponse(false, BUDGET_FIELD_NAME, WRONG_SUPPLY_BUDGET_BOUNDS_ERROR));
         }
 
-        if (budget < 0L){
+        if (budget < 0L) {
             throw new SupplyValidationException(new ValidateResponse(false, BUDGET_FIELD_NAME, NEGATIVE_SUPPLY_BUDGET_ERROR));
         }
     }
@@ -154,35 +153,35 @@ public class SupplyValidator extends Validator {
         if (comment == null) return;
         if (comment.isEmpty()) return;
 
-        if (onlySpaces(comment)){
+        if (onlySpaces(comment)) {
             throw new SupplyValidationException(new ValidateResponse(false, COMMENT_FIELD_NAME, ONLY_SPACES_ERROR));
         }
 
-        if (comment.length() > MAX_SUPPLY_COMMENT_SYMBOLS){
+        if (comment.length() > MAX_SUPPLY_COMMENT_SYMBOLS) {
             throw new SupplyValidationException(new ValidateResponse(false, COMMENT_FIELD_NAME, WRONG_SUPPLY_COMMENT_BOUNDS_ERROR));
         }
     }
 
     private void validateStatus(SupplyStatus status) throws SupplyValidationException {
-        if (status == null){
+        if (status == null) {
             throw new SupplyValidationException(new ValidateResponse(false, STATUS_FIELD_NAME, EMPTY_SUPPLY_STATUS_ERROR));
         }
     }
 
     private void validateResult(String result) throws SupplyValidationException {
-        if (result == null){
+        if (result == null) {
             throw new SupplyValidationException(new ValidateResponse(false, RESULT_FIELD_NAME, EMPTY_SUPPLY_RESULT_ERROR));
         }
 
-        if (result.isEmpty()){
+        if (result.isEmpty()) {
             throw new SupplyValidationException(new ValidateResponse(false, RESULT_FIELD_NAME, EMPTY_SUPPLY_RESULT_ERROR));
         }
 
-        if (onlySpaces(result)){
+        if (onlySpaces(result)) {
             throw new SupplyValidationException(new ValidateResponse(false, RESULT_FIELD_NAME, ONLY_SPACES_ERROR));
         }
 
-        if (result.length() > MAX_SUPPLY_RESULT_SYMBOLS){
+        if (result.length() > MAX_SUPPLY_RESULT_SYMBOLS) {
             throw new SupplyValidationException(new ValidateResponse(false, RESULT_FIELD_NAME, WRONG_SUPPLY_RESULT_BOUNDS_ERROR));
         }
     }

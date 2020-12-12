@@ -1,5 +1,6 @@
 package com.ssp.platform.controller;
 
+import com.ssp.platform.exceptions.FileServiceException;
 import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.response.FileResponse;
 import com.ssp.platform.service.FileService;
@@ -43,14 +44,13 @@ public class FileController {
             Resource resource = fileResponse.getResource();
 
             return ResponseEntity.ok()
-                    //.contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromStream(resource.getInputStream())))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
         }
     }
 
     @DeleteMapping("/file/{fileId}")
-    public ResponseEntity<?> deleteFile(@PathVariable("fileId") UUID id) throws IOException {
+    public ResponseEntity<?> deleteFile(@PathVariable("fileId") UUID id) throws IOException, FileServiceException {
         fileService.delete(id);
 
         return new ResponseEntity<>(new ApiResponse(true, "Файл удалён"), HttpStatus.OK);
