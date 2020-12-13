@@ -58,6 +58,11 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public List<Question> getQuestionsOfPurchaseByAuthor(Purchase purchase, User author) {
 
-        return questionRepository.findByPurchaseAndAuthorOrPublicity(purchase, author, QuestionStatus.PUBLIC);
+	    List<Question> result = questionRepository.findByPurchaseAndAuthor(purchase, author);
+
+	    result.addAll(questionRepository.findByPurchaseAndPublicity(purchase, QuestionStatus.PUBLIC));
+
+	    return result;
+        //return questionRepository.findByPurchaseAndAuthorOrPublicity(purchase, author, QuestionStatus.PUBLIC);
     }
 }

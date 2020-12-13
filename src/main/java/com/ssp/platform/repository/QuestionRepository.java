@@ -11,6 +11,13 @@ import java.util.*;
 public interface QuestionRepository extends JpaRepository<Question, UUID>, JpaSpecificationExecutor<Question> {
 
     List<Question> findByPurchase(Purchase purchase);
+
+    //Выдает все публичные вопросы даже если они не принадлежат закупке
+    //Возможно придется писать кастомный HQL запрос
     List<Question> findByPurchaseAndAuthorOrPublicity(Purchase purchase, User author, QuestionStatus publicity);
+
+    List<Question> findByPurchaseAndAuthor(Purchase purchase, User author);
+
+    List<Question> findByPurchaseAndPublicity(Purchase purchase, QuestionStatus publicity);
 
 }

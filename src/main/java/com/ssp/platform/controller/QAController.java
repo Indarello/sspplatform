@@ -223,18 +223,33 @@ public class QAController {
 	}
 
 	/**
-	 * Метод удаления вопроса. Доступен только для сотрудников
+	 * Метод удаления вопроса.
 	 * @param id
 	 * @return
 	 */
-	@DeleteMapping(value = "/question/{id}", produces = "application/json") //?Давать ли возможность поставщикам удалять свой вопрос?
-	@PreAuthorize("hasAuthority('employee')")
-	public ResponseEntity<Object> deleteQuestion(@PathVariable(name = "id") UUID id)
+	@DeleteMapping(value = "/question/{id}", produces = "application/json")
+	@PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
+	public ResponseEntity<Object> deleteQuestion(@RequestHeader("Authorization") String token, @PathVariable(name = "id") UUID id)
 	{
+
 		if (id == null)
 		{
 			return new ResponseEntity<>(new ApiResponse(false, "Пустое поле id"), HttpStatus.NOT_ACCEPTABLE);
 		}
+
+        User user = userDetailsService.loadUserByToken(token);
+
+		Question question = questionService.findById(id).orElse(null);
+
+		if(question == null){
+		    return new ResponseEntity<>(new ApiResponse(false, "Вопрос не найден"), HttpStatus.NOT_FOUND);
+        }
+
+		//Если пользователь - не является сотрудником или автором вопроса - ошибка
+		if( (!question.getAuthor().equals(user)) && (!user.getRole().equals("employee")) ){
+		    return new ResponseEntity<>(new ApiResponse(false, "Вопрос может удалить только его автор или сотрудник ресурса"), HttpStatus.NOT_ACCEPTABLE);
+        }
+
 
 		try
 		{

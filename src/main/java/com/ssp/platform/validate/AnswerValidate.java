@@ -17,7 +17,7 @@ public class AnswerValidate extends Validator{
         }
 
         if (description.length()< MIN_SIZE_DESCRIPTION || description.length()>MAX_SIZE_DESCRIPTION) {
-            String message = String.format("Поле Текст ответа должно содержать от %d до %d символов");
+            String message = String.format("Поле Текст ответа должно содержать от %d до %d символов", MIN_SIZE_DESCRIPTION, MAX_SIZE_DESCRIPTION);
             return new ValidateResponse(false, "description", message);
         }
 

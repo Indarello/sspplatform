@@ -79,6 +79,8 @@ public class SupplyController {
         User user = userDetailsService.loadUserByToken(token);
         supplyService.delete(user, id);
 
+
+
         return new ResponseEntity<>(new ApiResponse(true, "Предложение удалено"), HttpStatus.OK);
     }
 
