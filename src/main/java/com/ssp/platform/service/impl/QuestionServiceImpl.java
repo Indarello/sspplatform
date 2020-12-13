@@ -5,7 +5,6 @@ import com.ssp.platform.entity.enums.QuestionStatus;
 import com.ssp.platform.repository.QuestionRepository;
 import com.ssp.platform.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -47,7 +46,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> getQuestionsOfPurchase(Purchase purchase) {
-	    return questionRepository.findByPurchase(purchase);
+	    List<Question> questions = questionRepository.findByPurchase(purchase);
+        //сортировка по дате
+        questions.sort(Comparator.comparing(Question::getCreateDate).reversed());
+	    return questions;
     }
 
     @Override
@@ -58,11 +60,24 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public List<Question> getQuestionsOfPurchaseByAuthor(Purchase purchase, User author) {
 
-	    List<Question> result = questionRepository.findByPurchaseAndAuthor(purchase, author);
+	    //план Б если будут проблемы с чудовищем ниже
 
-	    result.addAll(questionRepository.findByPurchaseAndPublicity(purchase, QuestionStatus.PUBLIC));
+	    /*List<Question> questions = questionRepository.findByPurchaseAndAuthor(purchase, author);
+	    questions.addAll(questionRepository.findByPurchaseAndPublicity(purchase, QuestionStatus.PUBLIC));
 
-	    return result;
-        //return questionRepository.findByPurchaseAndAuthorOrPublicity(purchase, author, QuestionStatus.PUBLIC);
+	    //удаляем повторы
+	    Set<Question> set = new LinkedHashSet<>(questions);
+
+	    //возвращаем обратно в List
+	    questions = new ArrayList<>(set);
+
+	    return questions;*/
+
+        List<Question> questions = questionRepository.findByPurchaseAndAuthorOrPurchaseAndPublicity(purchase, author, purchase, QuestionStatus.PUBLIC);
+
+        //сортировка по дате
+        questions.sort(Comparator.comparing(Question::getCreateDate).reversed());
+
+	    return questions;
     }
 }

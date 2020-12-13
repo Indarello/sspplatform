@@ -12,10 +12,10 @@ public interface QuestionRepository extends JpaRepository<Question, UUID>, JpaSp
 
     List<Question> findByPurchase(Purchase purchase);
 
-    //Выдает все публичные вопросы даже если они не принадлежат закупке
-    //Возможно придется писать кастомный HQL запрос
-    List<Question> findByPurchaseAndAuthorOrPublicity(Purchase purchase, User author, QuestionStatus publicity);
+    //страшный запрос, но вроде работает
+    List<Question> findByPurchaseAndAuthorOrPurchaseAndPublicity(Purchase p1, User author, Purchase p2, QuestionStatus publicity);
 
+    //план Б
     List<Question> findByPurchaseAndAuthor(Purchase purchase, User author);
 
     List<Question> findByPurchaseAndPublicity(Purchase purchase, QuestionStatus publicity);

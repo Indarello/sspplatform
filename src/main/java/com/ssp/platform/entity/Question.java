@@ -2,12 +2,12 @@ package com.ssp.platform.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import com.ssp.platform.entity.enums.QuestionStatus;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Entity
@@ -41,9 +41,6 @@ public class Question {
     @ManyToOne
     @JoinColumn(name = "author_username", nullable = false)
     @NotNull
-    //Добавляем игнор, чтобы не вывести личные данные автора
-    //фронту нужные данные автора вопроса
-    //@JsonIgnore
     private User author;
 
     /**
@@ -88,13 +85,19 @@ public class Question {
         this.publicity = QuestionStatus.PRIVATE;
     }
 
-    public Question(String name, String description, User author, Purchase purchase, String publicity, Answer answer){
-        this.name = name;
-        this.description = description;
-        this.author = author;
-        this.purchase = purchase;
-        this.createDate = System.currentTimeMillis()/1000;
-        this.publicity = QuestionStatus.PRIVATE;
-        this.answer = answer;
+    //Нужно для LinkedHashSet - удаления повторов
+    //Если не сработает выборка spring data jpa
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Question question = (Question)o;
+        return id.equals(question.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
