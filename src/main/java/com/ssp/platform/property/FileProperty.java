@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 @Data
 @ConfigurationProperties(prefix = "file")
 public class FileProperty {
-    private String uploadDirectory;
+    public String uploadDirectory;
     private String[] restrictedTypes;
+
+    private String logDirectory;
 }
