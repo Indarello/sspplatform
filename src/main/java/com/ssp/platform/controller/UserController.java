@@ -25,7 +25,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Optional;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 
 @RestController
@@ -39,19 +44,25 @@ public class UserController
     private final UserValidate userValidate;
     private boolean existsFirstUser = false;
 
+    private static final Logger log = Logger.getLogger(UserController.class.getName());
+
 
     @Autowired
     public UserController(
             AuthenticationManager authenticationManager, UserService userService, UserDetailsServiceImpl userDetailsService,
             PasswordEncoder encoder, JwtUtils jwtUtils, UserValidate userValidate
-    )
-    {
+    ) throws IOException {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.userDetailsService = userDetailsService;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
         this.userValidate = userValidate;
+
+        FileHandler fh = new FileHandler("./log/UserController/users.log");
+        fh.setFormatter(new SimpleFormatter());
+        fh.setLevel(Level.FINE);
+        log.addHandler(fh);
     }
 
     @GetMapping("/login")
@@ -97,6 +108,7 @@ public class UserController
         }
         catch (Exception e)
         {
+            log.warning("Сохранить данные поставщика не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -125,6 +137,7 @@ public class UserController
         }
         catch (Exception e)
         {
+            log.warning("Сохранить данные сотрудника не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -158,6 +171,7 @@ public class UserController
         }
         catch (Exception e)
         {
+            log.warning("Сохранить данные админа (первого сотрудника) не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -271,6 +285,7 @@ public class UserController
         }
         catch (Exception e)
         {
+            log.warning("Изменить данные пользователя не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
