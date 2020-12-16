@@ -52,7 +52,7 @@ public class PurchaseController
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
 
-        FileHandler fh = new FileHandler("./log/PurchaseController/purchases.log");
+        FileHandler fh = new FileHandler("./log/PurchaseController/purchases.txt");
         fh.setFormatter(new SimpleFormatter());
         fh.setLevel(Level.FINE);
         log.addHandler(fh);
