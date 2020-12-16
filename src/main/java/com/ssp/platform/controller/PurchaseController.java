@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.logging.Logger;
+import java.util.logging.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,12 +43,10 @@ public class PurchaseController
     private final FileService fileService;
     private final Log log;
 
-    private static final Logger log = Logger.getLogger(UserController.class.getName());
+    private static final Logger logger = Logger.getLogger(UserController.class.getName());
 
     @Autowired
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, Log log)
-    {
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService) throws IOException {
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, Log log) throws IOException {
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
@@ -57,7 +55,7 @@ public class PurchaseController
         FileHandler fh = new FileHandler("./log/PurchaseController/purchases.log");
         fh.setFormatter(new SimpleFormatter());
         fh.setLevel(Level.FINE);
-        log.addHandler(fh);
+        logger.addHandler(fh);
     }
 
 
@@ -80,10 +78,8 @@ public class PurchaseController
             @RequestParam(value = "demands", required = false) String demands,
             @RequestParam(value = "team", required = false) String team,
             @RequestParam(value = "workCondition", required = false) String workCondition,
-            @RequestParam(value = "files", required = false) MultipartFile[] files) throws FileValidationException
-    {
-        if (files != null && files.length > 20)
-        {
+            @RequestParam(value = "files", required = false) MultipartFile[] files) throws FileValidationException {
+        if (files != null && files.length > 20) {
             return new ResponseEntity<>(new ValidateResponse(false, "files", FileMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
         }
 
@@ -93,42 +89,42 @@ public class PurchaseController
         PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
 
         ValidateResponse validateResponse = purchaseValidate.validatePurchaseCreate();
-        if (!validateResponse.isSuccess())
-        {
+        if (!validateResponse.isSuccess()) {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
         fileService.validateFiles(files);
         Purchase validatedPurchase = purchaseValidate.getPurchase();
 
-        try
-        {
+        try {
             Purchase savedPurchase = purchaseService.save(validatedPurchase);
-            List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
-            savedPurchase.setFiles(savedFiles);
-        //TODO: разобраться с exceptions, поместить в try
-        //TODO: закупка все равно сохранится если файлы не прошли валидацию, Александр сначала должен это исправить
-        Purchase savedPurchase = purchaseService.save(validatedPurchase);
-        fileService.validateFiles(files);
-        fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+            //List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+            //savedPurchase.setFiles(savedFiles);
+            //TODO: разобраться с exceptions, поместить в try
+            //TODO: закупка все равно сохранится если файлы не прошли валидацию, Александр сначала должен это исправить
+            //Purchase savedPurchase = purchaseService.save(validatedPurchase);
+            fileService.validateFiles(files);
+            fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
 
-        log.info(author, Log.CONTROLLER_PURCHASE, "Закупка создана", name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition);
+            log.info(author, Log.CONTROLLER_PURCHASE, "Закупка создана", name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition);
 
-        //savedPurchase.setFiles(savedFiles);
+            //savedPurchase.setFiles(savedFiles);
 
-        try
-        {
-            //TODO в отдельный поток
-            purchaseService.sendEmail(savedPurchase);
-            return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
-        }
-        catch (Exception e)
-        {   //в try части почему-то только возвращение ResponseEntity и отпрака соощения, а где покрытие работы с сервисами?
-            //аналогично и в других методах
-            log.warning("Отправка сообщения по email/Добавление сущности закупки не удалось:\n" + e.getMessage());
+            try {
+                //TODO в отдельный поток
+                purchaseService.sendEmail(savedPurchase);
+                return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
+            } catch (Exception e) {
+                //в try части почему-то только возвращение ResponseEntity и отпрака соощения, а где покрытие работы с сервисами?
+                //аналогично и в других методах
+                logger.warning("Отправка сообщения по email/Добавление сущности закупки не удалось:\n" + e.getMessage());
+                return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (NoSuchAlgorithmException e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     /**
@@ -161,7 +157,7 @@ public class PurchaseController
         }
         catch (Exception e)
         {
-            log.warning("Получение страницы с закупками не удалось:\n" + e.getMessage());
+            logger.warning("Получение страницы с закупками не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -273,9 +269,8 @@ public class PurchaseController
         //        .collect(Collectors.toList());
 
         //savedPurchase.setFiles(combinedList);
-        try
-        {
-            Purchase savedPurchase = purchaseService.save(validatedPurchase);
+        try {
+            savedPurchase = purchaseService.save(validatedPurchase);
 
             List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
             List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
@@ -284,15 +279,11 @@ public class PurchaseController
 
             log.info(author, Log.CONTROLLER_PURCHASE, "Закупка изменена", was, became);
 
-        try
-        {
-
-
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
-        catch (Exception e)
-        {   //пример аналогии пустого try блока
-            log.warning("Изменения параметров сущности закупки не удалось:\n" + e.getMessage());
+        catch (Exception e) {
+            //пример аналогии пустого try блока
+            logger.warning("Изменения параметров сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -324,9 +315,8 @@ public class PurchaseController
             log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_PURCHASE, "Закупка удалена");
             return new ResponseEntity<>(new ApiResponse(false, "Закупка успешно удалена"), HttpStatus.NOT_FOUND);
         }
-        catch (Exception e)
-        {
-            log.warning("Удаление сущности закупки не удалось:\n" + e.getMessage());
+        catch (Exception e) {
+            logger.warning("Удаление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
