@@ -13,7 +13,7 @@
                 <constraints nullable="true" foreignKeyName="id" referencedTableName="purchases" referencedColumnNames="id"/>
             </column>
             <column name="supply_id" type="UUID">
-                <constraints nullable="true"/>
+                <constraints nullable="true" foreignKeyName="id" referencedTableName="supply" referencedColumnNames="id"/>
             </column>
             <column name="name" type="text">
                 <constraints nullable="false"/>

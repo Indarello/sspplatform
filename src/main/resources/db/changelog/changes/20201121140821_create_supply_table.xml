@@ -9,7 +9,7 @@
             </column>
 
             <column name="purchase_id" type="UUID">
-                <constraints nullable="false"/>
+                <constraints nullable="false" foreignKeyName="fk_purchase" referencedTableName="purchases" referencedColumnNames="id"/>
             </column>
 
             <column name="description" type="text">
@@ -21,7 +21,7 @@
             </column>
 
             <column name="author" type="text">
-                <constraints nullable="false"/>
+                <constraints nullable="false" foreignKeyName="username" referencedTableName="users" referencedColumnNames="username"/>
             </column>
 
             <column name="budget" type="bigint">
@@ -37,11 +37,11 @@
             </column>
 
             <column name="result_of_consideration" type="text">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
 
             <column name="result_date" type="bigint">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>

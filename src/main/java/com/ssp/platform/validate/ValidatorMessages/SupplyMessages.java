@@ -10,6 +10,8 @@ public class SupplyMessages {
 
     public static final String WRONG_PURCHASE_ID_ERROR = "Закупки с данным ID не существует";
 
+    public static final String WRONG_SUPPLY_ID_ERROR = "Предложения с данным ID не существует";
+
     public static final String SUPPLY_WRONG_DATE_ERROR = "Подача предложений по данной закупке уже завершена";
 
     public static final String EMPTY_SUPPLY_DESCRIPTION_ERROR = "Поле 'Описание предложения' не может быть пустым";

@@ -2,11 +2,7 @@ package com.ssp.platform.service;
 
 import com.ssp.platform.exceptions.*;
 import com.ssp.platform.request.SupplyUpdateRequest;
-import com.ssp.platform.response.SupplyResponse;
 import com.ssp.platform.entity.*;
-import com.ssp.platform.entity.enums.SupplyStatus;
-import com.ssp.platform.exceptions.PageExceptions.*;
-import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -23,7 +19,7 @@ public interface SupplyService {
 
     void delete(User user, UUID id) throws IOException, FileServiceException, SupplyServiceException;
 
-    SupplyEntity get(User user, UUID id);
+    SupplyEntity get(User user, UUID id) throws SupplyServiceException;
 
-    List<SupplyEntity> getList(UUID purchaseId);
+    List<SupplyEntity> getList(UUID purchaseId) throws SupplyServiceException;
 }
