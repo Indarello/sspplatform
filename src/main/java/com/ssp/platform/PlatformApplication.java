@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 @SpringBootApplication
@@ -27,8 +28,8 @@ public class PlatformApplication {
 		try {
 			SpringApplication.run(PlatformApplication.class, args);
 		}catch (Exception ex){
-			String message = ex.getMessage() == null?"Empty message":ex.getMessage();
-			logger.error( message, ex);
+			String message = ex.getMessage() == null?"Application failed... StackTrace:\n":ex.getMessage();
+			logger.error( message + Arrays.toString(ex.getStackTrace()), ex);
 		}
 
 	}
