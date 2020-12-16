@@ -1,18 +1,16 @@
 package com.ssp.platform.controller;
 
 import com.ssp.platform.exceptions.*;
+import com.ssp.platform.logging.*;
 import com.ssp.platform.request.SupplyUpdateRequest;
 import com.ssp.platform.response.*;
 import com.ssp.platform.entity.*;
 import com.ssp.platform.entity.enums.SupplyStatus;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.SupplyService;
-import com.ssp.platform.service.impl.*;
-import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,12 +24,13 @@ public class SupplyController {
     private final SupplyService supplyService;
     private final UserDetailsServiceImpl userDetailsService;
 
-    Logger logger = LoggerFactory.getLogger(SupplyController.class);
+    private final Log log;
 
     @Autowired
-    public SupplyController(SupplyService supplyService, UserDetailsServiceImpl userDetailsService) {
+    public SupplyController(SupplyService supplyService, UserDetailsServiceImpl userDetailsService, Log log) {
         this.supplyService = supplyService;
         this.userDetailsService = userDetailsService;
+        this.log = log;
     }
 
     @PostMapping("/supply")
@@ -47,6 +46,8 @@ public class SupplyController {
 
         User author = userDetailsService.loadUserByToken(token);
         supplyService.create(purchaseId, description, author, budget, comment, files);
+
+        log.info(author, Log.CONTROLLER_SUPPLY, "Предложение создано");
 
         return new ResponseEntity<>(new ApiResponse(true, "Предложение создано"), HttpStatus.OK);
     }
@@ -69,6 +70,8 @@ public class SupplyController {
         User user = userDetailsService.loadUserByToken(token);
         supplyService.update(user, id, updateRequest);
 
+        log.info(user, Log.CONTROLLER_SUPPLY, "Предложение обновлено");
+
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
     }
 
@@ -79,22 +82,29 @@ public class SupplyController {
         User user = userDetailsService.loadUserByToken(token);
         supplyService.delete(user, id);
 
-
+        log.info(user, Log.CONTROLLER_SUPPLY, "Предложение удалено");
 
         return new ResponseEntity<>(new ApiResponse(true, "Предложение удалено"), HttpStatus.OK);
     }
 
     @GetMapping("/supply/{id}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) {
+    public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) throws IOException {
         User user = userDetailsService.loadUserByToken(token);
+
+        log.info(user, Log.CONTROLLER_SUPPLY, "Получение предложения");
 
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
     }
 
     @GetMapping("/supplies")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getPageOfSupplies(@RequestParam UUID purchaseId) {
-        return new ResponseEntity<>(supplyService.getList(purchaseId), HttpStatus.OK);
+    public ResponseEntity<Object> getPageOfSupplies(@RequestHeader("Authorization") String token, @RequestParam UUID purchaseId) throws IOException {
+        User user = userDetailsService.loadUserByToken(token);
+        List<SupplyEntity> list = supplyService.getList(purchaseId);
+
+        log.info(user, Log.CONTROLLER_SUPPLY, "Получение списка предложений");
+
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }

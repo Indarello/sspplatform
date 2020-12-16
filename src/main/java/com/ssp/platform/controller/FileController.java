@@ -1,38 +1,39 @@
 package com.ssp.platform.controller;
 
+import com.ssp.platform.entity.User;
 import com.ssp.platform.exceptions.FileServiceException;
+import com.ssp.platform.logging.Log;
 import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.response.FileResponse;
+import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.FileService;
-import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 @RestController
 public class FileController {
+    private final UserDetailsServiceImpl userDetailsService;
     private final FileService fileService;
-
-    Logger logger = LoggerFactory.getLogger(FileController.class);
+    private final Log log;
 
     @Autowired
-    public FileController(FileService fileService){
+    public FileController(UserDetailsServiceImpl userDetailsService, FileService fileService, Log log){
+        this.userDetailsService = userDetailsService;
         this.fileService = fileService;
+        this.log = log;
     }
 
     @GetMapping("/file/{fileId}")
-    public ResponseEntity<?> getFile(@PathVariable("fileId") UUID id) throws IOException {
+    public ResponseEntity<?> getFile(@RequestHeader("Authorization") String token, @PathVariable("fileId") UUID id) throws IOException {
+        User user = userDetailsService.loadUserByToken(token);
+
         if (id == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Параметр id не предоставлен"), HttpStatus.NOT_ACCEPTABLE);
         }
@@ -43,6 +44,8 @@ public class FileController {
         } else {
             Resource resource = fileResponse.getResource();
 
+            log.info(user, Log.CONTROLLER_FILE, "Получение файла");
+
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
@@ -50,8 +53,11 @@ public class FileController {
     }
 
     @DeleteMapping("/file/{fileId}")
-    public ResponseEntity<?> deleteFile(@PathVariable("fileId") UUID id) throws IOException, FileServiceException {
+    public ResponseEntity<?> deleteFile(@RequestHeader("Authorization") String token, @PathVariable("fileId") UUID id) throws IOException, FileServiceException {
+        User user = userDetailsService.loadUserByToken(token);
         fileService.delete(id);
+
+        log.info(user, Log.CONTROLLER_FILE, "Удаление файла");
 
         return new ResponseEntity<>(new ApiResponse(true, "Файл удалён"), HttpStatus.OK);
     }
