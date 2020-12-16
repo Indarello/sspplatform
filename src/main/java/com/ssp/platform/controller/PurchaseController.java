@@ -41,12 +41,18 @@ public class PurchaseController
     private final UserDetailsServiceImpl userDetailsService;
     private final FileService fileService;
 
+    private static final Logger log = Logger.getLogger(UserController.class.getName());
+
     @Autowired
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService)
-    {
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService) throws IOException {
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
+
+        FileHandler fh = new FileHandler("./log/PurchaseController/purchases.log");
+        fh.setFormatter(new SimpleFormatter());
+        fh.setLevel(Level.FINE);
+        log.addHandler(fh);
     }
 
 
@@ -101,7 +107,9 @@ public class PurchaseController
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
         catch (Exception e)
-        {
+        {   //в try части почему-то только возвращение ResponseEntity и отпрака соощения, а где покрытие работы с сервисами?
+            //аналогично и в других методах
+            log.warning("Отправка сообщения по email/Добавление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -137,6 +145,7 @@ public class PurchaseController
         }
         catch (Exception e)
         {
+            log.warning("Получение страницы с закупками не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -229,7 +238,8 @@ public class PurchaseController
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
         catch (Exception e)
-        {
+        {   //пример аналогии пустого try блока
+            log.warning("Изменения параметров сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -262,6 +272,7 @@ public class PurchaseController
         }
         catch (Exception e)
         {
+            log.warning("Удаление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
