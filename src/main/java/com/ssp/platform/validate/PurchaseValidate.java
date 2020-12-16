@@ -1,15 +1,12 @@
 package com.ssp.platform.validate;
 
 import com.ssp.platform.entity.Purchase;
-import com.ssp.platform.entity.User;
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import com.ssp.platform.response.ValidateResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.math.BigInteger;
-
-@EqualsAndHashCode(callSuper = true) //Временно
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class PurchaseValidate extends Validator
 {

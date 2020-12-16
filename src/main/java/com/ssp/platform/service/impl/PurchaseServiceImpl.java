@@ -5,7 +5,8 @@ import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.SupplyEntity;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.entity.enums.PurchaseStatus;
-import com.ssp.platform.exceptions.*;
+import com.ssp.platform.exceptions.FileServiceException;
+import com.ssp.platform.exceptions.SupplyServiceException;
 import com.ssp.platform.property.EmailAnnouncementProperty;
 import com.ssp.platform.repository.PurchaseRepository;
 import com.ssp.platform.service.FileService;
@@ -43,8 +44,6 @@ public class PurchaseServiceImpl implements PurchaseService
     private final int emailDescription;
     private final int emailBudget;
 
-
-//TODO UTF-8 в properties сделать
     @Autowired
     PurchaseServiceImpl(FileService fileService, PurchaseRepository purchaseRepository, SupplyService supplyService,
                         UserService userService, EmailAnnouncementProperty emailAnnouncementProperty, MailServiceImpl mailServiceImpl)
@@ -81,7 +80,8 @@ public class PurchaseServiceImpl implements PurchaseService
     }
 
     @Override
-    public boolean deletePurchase(Purchase purchase) throws IOException, FileServiceException, SupplyServiceException {
+    public boolean deletePurchase(Purchase purchase) throws IOException, FileServiceException, SupplyServiceException
+    {
         List<SupplyEntity> supplies = purchase.getSupplies();
         for (SupplyEntity supply : supplies)
         {
@@ -135,15 +135,15 @@ public class PurchaseServiceImpl implements PurchaseService
     @Override
     public void sendEmail(Purchase purchase)
     {
-        if(emailStatus == 0) return;
+        if (emailStatus == 0) return;
 
         String message = emailFirstLine + "<br>";
         message = message + "Название закупки: " + purchase.getName() + "<br>";
-        if(emailDescription == 1)
+        if (emailDescription == 1)
         {
             message = message + "Описание закупки: " + purchase.getDescription() + "<br>";
         }
-        if(emailBudget == 1)
+        if (emailBudget == 1)
         {
             Long budget = purchase.getBudget();
             if (budget > 0) message = message + "Бюджет закупки: " + budget + "<br>";
@@ -155,21 +155,14 @@ public class PurchaseServiceImpl implements PurchaseService
 
         Date nowDate = new Date();
 
-        for (User user : users)
+        try
         {
-            try
-            {
-                mailServiceImpl.sendMail(emailHeading, message, user.getEmail(), nowDate);
-            }
-            catch (MessagingException e)
-            {
-                e.printStackTrace();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-                //TODO логирование в обоих exceptions
-            }
+            mailServiceImpl.sendMailPurchase(emailHeading, message, users, nowDate);
+        }
+        catch (MessagingException | IOException e)
+        {
+            //TODO логирование в
+            e.printStackTrace();
         }
     }
 }

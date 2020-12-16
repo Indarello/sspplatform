@@ -1,6 +1,7 @@
 package com.ssp.platform.validate;
 
 import com.ssp.platform.entity.User;
+import com.ssp.platform.repository.UserRepository;
 import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.service.UserService;
 import com.ssp.platform.validate.ValidatorMessages.UserMessages;
@@ -18,7 +19,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
     private String checkResult = "ok";
     private boolean foundInvalid = false;
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     private final int MIN_LOGIN_SIZE = 2;
     private final int MAX_LOGIN_SIZE = 30;
@@ -32,9 +33,9 @@ public class UserValidate extends com.ssp.platform.validate.Validator
     }
 
     @Autowired
-    public UserValidate(UserService userService)
+    public UserValidate(UserRepository userRepository)
     {
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -361,7 +362,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (userService.existsByUsername(checkString))
+        if (userRepository.existsByUsername(checkString))
         {
             setCheckResult(UserMessages.LOGIN_ALREADY_EXIST_ERROR);
             return;
@@ -682,7 +683,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (userService.existsByInn(checkString))
+        if (userRepository.existsByInn(checkString))
         {
             setCheckResult(UserMessages.TIN_ALREADY_EXIST_ERROR);
             return;
@@ -714,7 +715,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (userService.existsByPhoneNumber(checkString))
+        if (userRepository.existsByTelephone(checkString))
         {
             setCheckResult(UserMessages.PHONE_NUMBER_ALREADY_EXIST_ERROR);
             return;
@@ -774,7 +775,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
             return;
         }
 
-        if (userService.existsByEmail(checkString))
+        if (userRepository.existsByEmail(checkString))
         {
             setCheckResult(UserMessages.EMAIL_ALREADY_EXIST_ERROR);
             return;

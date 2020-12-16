@@ -1,10 +1,10 @@
 package com.ssp.platform.controller;
 
 import com.ssp.platform.entity.FileEntity;
-import com.ssp.platform.entity.*;
+import com.ssp.platform.entity.Purchase;
+import com.ssp.platform.entity.User;
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import com.ssp.platform.exceptions.FileValidationException;
-import com.ssp.platform.logging.Log;
 import com.ssp.platform.request.PurchasesPageRequest;
 import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.response.ValidateResponse;
@@ -26,12 +26,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.logging.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,21 +43,19 @@ public class PurchaseController
     private final PurchaseService purchaseService;
     private final UserDetailsServiceImpl userDetailsService;
     private final FileService fileService;
-    private final Log log;
 
-    private static final Logger logger = Logger.getLogger(UserController.class.getName());
+    private static final Logger log = Logger.getLogger(UserController.class.getName());
 
     @Autowired
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, Log log) throws IOException {
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService) throws IOException {
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
-        this.log = log;
 
         FileHandler fh = new FileHandler("./log/PurchaseController/purchases.txt");
         fh.setFormatter(new SimpleFormatter());
         fh.setLevel(Level.FINE);
-        logger.addHandler(fh);
+        log.addHandler(fh);
     }
 
 
@@ -82,8 +78,10 @@ public class PurchaseController
             @RequestParam(value = "demands", required = false) String demands,
             @RequestParam(value = "team", required = false) String team,
             @RequestParam(value = "workCondition", required = false) String workCondition,
-            @RequestParam(value = "files", required = false) MultipartFile[] files) throws FileValidationException {
-        if (files != null && files.length > 20) {
+            @RequestParam(value = "files", required = false) MultipartFile[] files) throws FileValidationException
+    {
+        if (files != null && files.length > 20)
+        {
             return new ResponseEntity<>(new ValidateResponse(false, "files", FileMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
         }
 
@@ -93,42 +91,29 @@ public class PurchaseController
         PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
 
         ValidateResponse validateResponse = purchaseValidate.validatePurchaseCreate();
-        if (!validateResponse.isSuccess()) {
+        if (!validateResponse.isSuccess())
+        {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
         fileService.validateFiles(files);
         Purchase validatedPurchase = purchaseValidate.getPurchase();
 
-        try {
+        try
+        {
             Purchase savedPurchase = purchaseService.save(validatedPurchase);
-            //List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
-            //savedPurchase.setFiles(savedFiles);
-            //TODO: разобраться с exceptions, поместить в try
-            //TODO: закупка все равно сохранится если файлы не прошли валидацию, Александр сначала должен это исправить
-            //Purchase savedPurchase = purchaseService.save(validatedPurchase);
-            fileService.validateFiles(files);
-            fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+            List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+            savedPurchase.setFiles(savedFiles);
 
-            log.info(author, Log.CONTROLLER_PURCHASE, "Закупка создана", name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition);
-
-            //savedPurchase.setFiles(savedFiles);
-
-            try {
-                //TODO в отдельный поток
-                purchaseService.sendEmail(savedPurchase);
-                return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
-            } catch (Exception e) {
-                //в try части почему-то только возвращение ResponseEntity и отпрака соощения, а где покрытие работы с сервисами?
-                //аналогично и в других методах
-                logger.warning("Отправка сообщения по email/Добавление сущности закупки не удалось:\n" + e.getMessage());
-                return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (NoSuchAlgorithmException e) {
-            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (IOException e) {
+            purchaseService.sendEmail(savedPurchase);
+            return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
+        }
+        catch (Exception e)
+        {
+            log.warning("Отправка сообщения по email/Добавление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
     /**
@@ -161,7 +146,7 @@ public class PurchaseController
         }
         catch (Exception e)
         {
-            logger.warning("Получение страницы с закупками не удалось:\n" + e.getMessage());
+            log.warning("Получение страницы с закупками не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -209,7 +194,7 @@ public class PurchaseController
             @RequestParam(value = "workCondition", required = false) String workCondition,
             @RequestParam(value = "status", required = false) PurchaseStatus status,
             @RequestParam(value = "cancelReason", required = false) String cancelReason,
-            @RequestParam(value = "files", required = false) MultipartFile[] files) throws NoSuchAlgorithmException, IOException, FileValidationException
+            @RequestParam(value = "files", required = false) MultipartFile[] files) throws FileValidationException
     {
         if(id == null)
         {
@@ -224,17 +209,6 @@ public class PurchaseController
             return new ResponseEntity<>(new ApiResponse(false, "Закупка не найдна по id"), HttpStatus.NOT_ACCEPTABLE);
         }
         Purchase oldPurchase = searchResult.get();
-        Object[] was = {
-                oldPurchase.getName(),
-                oldPurchase.getDescription(),
-                oldPurchase.getProposalDeadLine(),
-                oldPurchase.getFinishDeadLine(),
-                oldPurchase.getBudget(),
-                oldPurchase.getDemands(),
-                oldPurchase.getTeam(),
-                oldPurchase.getWorkCondition(),
-                oldPurchase.getStatus(),
-                oldPurchase.getCancelReason()};
 
         Purchase objPurchase = new Purchase(id, author, name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition, status, cancelReason);
         PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
@@ -253,41 +227,20 @@ public class PurchaseController
         }
         fileService.validateFiles(files);
 
-        //TODO: разобраться с exceptions, поместить в try
-        Purchase savedPurchase = purchaseService.save(validatedPurchase);
-
-        Object[] became = {
-                savedPurchase.getName(),
-                savedPurchase.getDescription(),
-                savedPurchase.getProposalDeadLine(),
-                savedPurchase.getFinishDeadLine(),
-                savedPurchase.getBudget(),
-                savedPurchase.getDemands(),
-                savedPurchase.getTeam(),
-                savedPurchase.getWorkCondition(),
-                savedPurchase.getStatus(),
-                savedPurchase.getCancelReason()};
-
-        fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
-        //List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
-        //        .collect(Collectors.toList());
-
-        //savedPurchase.setFiles(combinedList);
-        try {
-            savedPurchase = purchaseService.save(validatedPurchase);
+        try
+        {
+            Purchase savedPurchase = purchaseService.save(validatedPurchase);
 
             List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
             List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
                     .collect(Collectors.toList());
             savedPurchase.setFiles(combinedList);
 
-            log.info(author, Log.CONTROLLER_PURCHASE, "Закупка изменена", was, became);
-
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
-        catch (Exception e) {
-            //пример аналогии пустого try блока
-            logger.warning("Изменения параметров сущности закупки не удалось:\n" + e.getMessage());
+        catch (Exception e)
+        {
+            log.warning("Изменения параметров сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -299,7 +252,7 @@ public class PurchaseController
      */
     @DeleteMapping(value = "/purchase/{id}", produces = "application/json")
     @PreAuthorize("hasAuthority('employee')")
-    public ResponseEntity<Object> deletePurchase(@RequestHeader("Authorization") String token, @PathVariable(name = "id") UUID id)
+    public ResponseEntity<Object> deletePurchase(@PathVariable(name = "id") UUID id)
     {
         if (id == null)
         {
@@ -316,11 +269,11 @@ public class PurchaseController
         try
         {
             purchaseService.deletePurchase(searchResult.get());
-            log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_PURCHASE, "Закупка удалена");
             return new ResponseEntity<>(new ApiResponse(false, "Закупка успешно удалена"), HttpStatus.NOT_FOUND);
         }
-        catch (Exception e) {
-            logger.warning("Удаление сущности закупки не удалось:\n" + e.getMessage());
+        catch (Exception e)
+        {
+            log.warning("Удаление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
