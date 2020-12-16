@@ -59,7 +59,7 @@ public class UserController
         this.jwtUtils = jwtUtils;
         this.userValidate = userValidate;
 
-        FileHandler fh = new FileHandler("./log/UserController/users.log");
+        FileHandler fh = new FileHandler("./log/UserController/users.txt");
         fh.setFormatter(new SimpleFormatter());
         fh.setLevel(Level.FINE);
         log.addHandler(fh);

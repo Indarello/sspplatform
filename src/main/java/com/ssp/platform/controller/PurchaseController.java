@@ -26,12 +26,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,7 +55,7 @@ public class PurchaseController
         this.fileService = fileService;
         this.log = log;
 
-        FileHandler fh = new FileHandler("./log/PurchaseController/purchases.log");
+        FileHandler fh = new FileHandler("./log/PurchaseController/purchases.txt");
         fh.setFormatter(new SimpleFormatter());
         fh.setLevel(Level.FINE);
         logger.addHandler(fh);
