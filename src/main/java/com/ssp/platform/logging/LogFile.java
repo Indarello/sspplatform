@@ -12,11 +12,14 @@ import java.util.Date;
 
 @Component
 public class LogFile {
+    public static final String FIRM_LOG = "firm";
+    public static final String EMPLOYEE_LOG = "employee";
+
     private static final String LOG_TYPE = "log";
     private static final String BACKUP_TYPE = "backup";
 
     private static final String fileDateMask = "yyyyMMdd";
-    private static final String fileNameMask = "log-%s.%s";
+    private static final String fileNameMask = "log-%s-%s.%s";
 
     private FileProperty fileProperty;
     private final Path logStorageLocation;
@@ -35,12 +38,12 @@ public class LogFile {
         }
     }
 
-    public void put(String line) throws IOException {
+    public void put(String line, String role) throws IOException {
         line += "\n";
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(fileDateMask);
-        String fileName = String.format(fileNameMask, dateFormat.format(new Date()), LOG_TYPE);
-        String backupFileName = String.format(fileNameMask, dateFormat.format(new Date()), BACKUP_TYPE);
+        String fileName = String.format(fileNameMask, dateFormat.format(new Date()), role, LOG_TYPE);
+        String backupFileName = String.format(fileNameMask, dateFormat.format(new Date()), role, BACKUP_TYPE);
 
         String logPath = fileProperty.getLogDirectory() + "\\" + fileName;
         String backupPath = fileProperty.getLogDirectory() + "\\" + backupFileName;

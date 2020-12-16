@@ -32,8 +32,6 @@ public class FileController {
 
     @GetMapping("/file/{fileId}")
     public ResponseEntity<?> getFile(@RequestHeader("Authorization") String token, @PathVariable("fileId") UUID id) throws IOException {
-        User user = userDetailsService.loadUserByToken(token);
-
         if (id == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Параметр id не предоставлен"), HttpStatus.NOT_ACCEPTABLE);
         }
@@ -43,8 +41,6 @@ public class FileController {
             return new ResponseEntity<>(new ApiResponse(false, "Файл не найден"), HttpStatus.NOT_FOUND);
         } else {
             Resource resource = fileResponse.getResource();
-
-            log.info(user, Log.CONTROLLER_FILE, "Получение файла");
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
@@ -57,7 +53,7 @@ public class FileController {
         User user = userDetailsService.loadUserByToken(token);
         fileService.delete(id);
 
-        log.info(user, Log.CONTROLLER_FILE, "Удаление файла");
+        log.info(user, Log.CONTROLLER_FILE, "Удаление файла", id);
 
         return new ResponseEntity<>(new ApiResponse(true, "Файл удалён"), HttpStatus.OK);
     }

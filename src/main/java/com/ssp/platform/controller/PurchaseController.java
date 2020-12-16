@@ -4,6 +4,7 @@ import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import com.ssp.platform.exceptions.FileValidationException;
+import com.ssp.platform.logging.Log;
 import com.ssp.platform.request.PurchasesPageRequest;
 import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.response.ValidateResponse;
@@ -35,13 +36,15 @@ public class PurchaseController
     private final PurchaseService purchaseService;
     private final UserDetailsServiceImpl userDetailsService;
     private final FileService fileService;
+    private final Log log;
 
     @Autowired
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService)
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, Log log)
     {
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
+        this.log = log;
     }
 
 
@@ -87,7 +90,10 @@ public class PurchaseController
         //TODO: разобраться с exceptions, поместить в try
         //TODO: закупка все равно сохранится если файлы не прошли валидацию, Александр сначала должен это исправить
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
+        fileService.validateFiles(files);
         fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+
+        log.info(author, Log.CONTROLLER_PURCHASE, "Закупка создана", name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition);
 
         //savedPurchase.setFiles(savedFiles);
 
@@ -197,6 +203,17 @@ public class PurchaseController
             return new ResponseEntity<>(new ApiResponse(false, "Закупка не найдна по id"), HttpStatus.NOT_ACCEPTABLE);
         }
         Purchase oldPurchase = searchResult.get();
+        Object[] was = {
+                oldPurchase.getName(),
+                oldPurchase.getDescription(),
+                oldPurchase.getProposalDeadLine(),
+                oldPurchase.getFinishDeadLine(),
+                oldPurchase.getBudget(),
+                oldPurchase.getDemands(),
+                oldPurchase.getTeam(),
+                oldPurchase.getWorkCondition(),
+                oldPurchase.getStatus(),
+                oldPurchase.getCancelReason()};
 
         Purchase objPurchase = new Purchase(id, author, name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition, status, cancelReason);
         PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
@@ -216,11 +233,26 @@ public class PurchaseController
 
         //TODO: разобраться с exceptions, поместить в try
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
+
+        Object[] became = {
+                savedPurchase.getName(),
+                savedPurchase.getDescription(),
+                savedPurchase.getProposalDeadLine(),
+                savedPurchase.getFinishDeadLine(),
+                savedPurchase.getBudget(),
+                savedPurchase.getDemands(),
+                savedPurchase.getTeam(),
+                savedPurchase.getWorkCondition(),
+                savedPurchase.getStatus(),
+                savedPurchase.getCancelReason()};
+
         fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
         //List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
         //        .collect(Collectors.toList());
 
         //savedPurchase.setFiles(combinedList);
+
+        log.info(author, Log.CONTROLLER_PURCHASE, "Закупка изменена", was, became);
 
         try
         {
@@ -241,7 +273,7 @@ public class PurchaseController
      */
     @DeleteMapping(value = "/purchase/{id}", produces = "application/json")
     @PreAuthorize("hasAuthority('employee')")
-    public ResponseEntity<Object> deletePurchase(@PathVariable(name = "id") UUID id)
+    public ResponseEntity<Object> deletePurchase(@RequestHeader("Authorization") String token, @PathVariable(name = "id") UUID id)
     {
         if (id == null)
         {
@@ -258,6 +290,7 @@ public class PurchaseController
         try
         {
             purchaseService.deletePurchase(searchResult.get());
+            log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_PURCHASE, "Закупка удалена");
             return new ResponseEntity<>(new ApiResponse(false, "Закупка успешно удалена"), HttpStatus.NOT_FOUND);
         }
         catch (Exception e)

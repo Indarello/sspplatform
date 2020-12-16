@@ -27,6 +27,9 @@ public class LogEntity {
     @Column(name = "action_type")
     private String actionType;
 
+    @Column(name = "action_params")
+    private String actionParams;
+
     @Column(name = "action_succeed")
     private boolean actionSucceed;
 
