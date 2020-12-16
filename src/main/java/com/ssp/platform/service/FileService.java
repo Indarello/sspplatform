@@ -18,7 +18,7 @@ public interface FileService {
 
     void validateFiles(MultipartFile[] files) throws FileValidationException;
 
-    void addFiles(MultipartFile[] files, UUID id, int location) throws NoSuchAlgorithmException, IOException, FileValidationException;
+    List<FileEntity> addFiles(MultipartFile[] files, UUID id, int location) throws NoSuchAlgorithmException, IOException, FileValidationException;
 
     FileResponse getFile(UUID id) throws MalformedURLException;
 

@@ -1,7 +1,7 @@
 package com.ssp.platform.controller;
 
-import com.ssp.platform.entity.Purchase;
-import com.ssp.platform.entity.User;
+import com.ssp.platform.entity.FileEntity;
+import com.ssp.platform.entity.*;
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import com.ssp.platform.exceptions.FileValidationException;
 import com.ssp.platform.logging.Log;
@@ -27,8 +27,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 public class PurchaseController
@@ -38,13 +43,21 @@ public class PurchaseController
     private final FileService fileService;
     private final Log log;
 
+    private static final Logger log = Logger.getLogger(UserController.class.getName());
+
     @Autowired
     PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, Log log)
     {
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService) throws IOException {
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
         this.log = log;
+
+        FileHandler fh = new FileHandler("./log/PurchaseController/purchases.log");
+        fh.setFormatter(new SimpleFormatter());
+        fh.setLevel(Level.FINE);
+        log.addHandler(fh);
     }
 
 
@@ -67,7 +80,7 @@ public class PurchaseController
             @RequestParam(value = "demands", required = false) String demands,
             @RequestParam(value = "team", required = false) String team,
             @RequestParam(value = "workCondition", required = false) String workCondition,
-            @RequestParam(value = "files", required = false) MultipartFile[] files) throws NoSuchAlgorithmException, IOException, FileValidationException
+            @RequestParam(value = "files", required = false) MultipartFile[] files) throws FileValidationException
     {
         if (files != null && files.length > 20)
         {
@@ -85,8 +98,14 @@ public class PurchaseController
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
+        fileService.validateFiles(files);
         Purchase validatedPurchase = purchaseValidate.getPurchase();
 
+        try
+        {
+            Purchase savedPurchase = purchaseService.save(validatedPurchase);
+            List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+            savedPurchase.setFiles(savedFiles);
         //TODO: разобраться с exceptions, поместить в try
         //TODO: закупка все равно сохранится если файлы не прошли валидацию, Александр сначала должен это исправить
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
@@ -101,11 +120,12 @@ public class PurchaseController
         {
             //TODO в отдельный поток
             purchaseService.sendEmail(savedPurchase);
-            //savedPurchase.setFiles(savedFiles);
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
         catch (Exception e)
-        {
+        {   //в try части почему-то только возвращение ResponseEntity и отпрака соощения, а где покрытие работы с сервисами?
+            //аналогично и в других методах
+            log.warning("Отправка сообщения по email/Добавление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -141,6 +161,7 @@ public class PurchaseController
         }
         catch (Exception e)
         {
+            log.warning("Получение страницы с закупками не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -230,6 +251,7 @@ public class PurchaseController
         {
             return new ResponseEntity<>(new ValidateResponse(false, "files", FileMessages.TOO_MUCH_FILES), HttpStatus.NOT_ACCEPTABLE);
         }
+        fileService.validateFiles(files);
 
         //TODO: разобраться с exceptions, поместить в try
         Purchase savedPurchase = purchaseService.save(validatedPurchase);
@@ -251,8 +273,16 @@ public class PurchaseController
         //        .collect(Collectors.toList());
 
         //savedPurchase.setFiles(combinedList);
+        try
+        {
+            Purchase savedPurchase = purchaseService.save(validatedPurchase);
 
-        log.info(author, Log.CONTROLLER_PURCHASE, "Закупка изменена", was, became);
+            List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
+            List<FileEntity> combinedList = Stream.of(savedFiles, savedPurchase.getFiles()).flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+            savedPurchase.setFiles(combinedList);
+
+            log.info(author, Log.CONTROLLER_PURCHASE, "Закупка изменена", was, became);
 
         try
         {
@@ -261,7 +291,8 @@ public class PurchaseController
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
         catch (Exception e)
-        {
+        {   //пример аналогии пустого try блока
+            log.warning("Изменения параметров сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -295,6 +326,7 @@ public class PurchaseController
         }
         catch (Exception e)
         {
+            log.warning("Удаление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

@@ -59,7 +59,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void addFiles(MultipartFile[] files, UUID id, int location) throws NoSuchAlgorithmException, IOException {
+    public List<FileEntity> addFiles(MultipartFile[] files, UUID id, int location) throws NoSuchAlgorithmException, IOException {
         List<FileEntity> fileEntities = new ArrayList<>();
 
         if (files != null && files.length > 0){
@@ -77,8 +77,9 @@ public class FileServiceImpl implements FileService {
             }
 
             storeFiles(fileEntities, files);
-            fileRepository.saveAll(fileEntities);
+            return fileRepository.saveAll(fileEntities);
         }
+        return fileEntities;
     }
 
     @Override
