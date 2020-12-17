@@ -16,10 +16,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Сервис для выполнения операций с данными пользователя.
@@ -32,20 +28,13 @@ public class UserServiceImpl implements UserService
     private final UserValidate userValidate;
     private final PasswordEncoder encoder;
 
-    private static final Logger log = Logger.getLogger(UserController.class.getName());
-
     @Autowired
     public UserServiceImpl(UserCreateProperty userCreateProperty, UserRepository userRepository,
-                           UserValidate userValidate, PasswordEncoder encoder) throws IOException
+                           UserValidate userValidate, PasswordEncoder encoder)
     {
         this.userRepository = userRepository;
         this.userValidate = userValidate;
         this.encoder = encoder;
-
-        FileHandler fh = new FileHandler("./log/UserController/users.txt");
-        fh.setFormatter(new SimpleFormatter());
-        fh.setLevel(Level.FINE);
-        log.addHandler(fh);
 
         User newUser = new User(userCreateProperty.getUsername(), userCreateProperty.getPassword());
         newUser.setFirstName(userCreateProperty.getFirstName());
@@ -88,8 +77,6 @@ public class UserServiceImpl implements UserService
         ValidateResponse validateResponse = userValidate.validateEmployeeUser();
         if (!validateResponse.isSuccess())
         {
-            log.warning("Данные сотрудника в конфигурации заполнены некорректно:\n  " + validateResponse.getMessage());
-            log.warning("[" +newUser.getFirstName());
             return;
         }
 
@@ -102,7 +89,6 @@ public class UserServiceImpl implements UserService
         }
         catch (Exception e)
         {
-            log.warning("Сохранить данные сотрудника из конфигурации не удалось:\n  " + e.getMessage());
         }
     }
 }

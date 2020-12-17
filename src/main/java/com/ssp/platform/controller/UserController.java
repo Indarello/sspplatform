@@ -26,10 +26,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 
 @RestController
@@ -40,8 +36,6 @@ public class UserController
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtils jwtUtils;
     private final UserValidate userValidate;
-
-    private static final Logger log = Logger.getLogger(UserController.class.getName());
 
 
     @Autowired
@@ -54,11 +48,6 @@ public class UserController
         this.userDetailsService = userDetailsService;
         this.jwtUtils = jwtUtils;
         this.userValidate = userValidate;
-
-        FileHandler fh = new FileHandler("./log/UserController/users.txt");
-        fh.setFormatter(new SimpleFormatter());
-        fh.setLevel(Level.FINE);
-        log.addHandler(fh);
     }
 
     @GetMapping("/login")
@@ -101,7 +90,6 @@ public class UserController
         }
         catch (Exception e)
         {
-            log.warning("Сохранить данные поставщика не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -127,7 +115,6 @@ public class UserController
         }
         catch (Exception e)
         {
-            log.warning("Сохранить данные сотрудника не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -242,7 +229,6 @@ public class UserController
         }
         catch (Exception e)
         {
-            log.warning("Изменить данные пользователя не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
