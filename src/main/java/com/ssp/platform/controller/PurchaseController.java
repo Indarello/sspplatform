@@ -202,8 +202,8 @@ public class PurchaseController
         Purchase oldPurchase = searchResult.get();
 
         Purchase objPurchase = new Purchase(id, author, name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition, status, cancelReason);
-        PurchaseValidate purchaseValidate = new PurchaseValidate(objPurchase);
-        ValidateResponse validateResponse = purchaseValidate.validatePurchaseEdit(oldPurchase);
+        PurchaseValidate purchaseValidate = new PurchaseValidate(oldPurchase);
+        ValidateResponse validateResponse = purchaseValidate.validatePurchaseEdit(objPurchase);
 
         if (!validateResponse.isSuccess())
         {

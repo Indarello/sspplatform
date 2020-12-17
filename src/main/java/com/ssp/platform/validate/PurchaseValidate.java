@@ -53,98 +53,91 @@ public class PurchaseValidate extends Validator
         return new ValidateResponse(true, "", checkResult);
     }
 
-    public ValidateResponse validatePurchaseEdit(Purchase oldPurchase)
+    public ValidateResponse validatePurchaseEdit(Purchase newPurchase)
     {
-        purchase.setCreateDate(oldPurchase.getCreateDate());
-        purchase.setFiles(oldPurchase.getFiles());
-        purchase.setSupplies(oldPurchase.getSupplies());
-
-        String newStringParam = purchase.getName();
-        String oldStringParam = oldPurchase.getName();
-        if (newStringParam == null) purchase.setName(oldStringParam);
-        else if (!newStringParam.equals(oldStringParam))
+        String newStringParam = newPurchase.getName();
+        String oldStringParam = purchase.getName();
+        if (newStringParam != null && !newStringParam.equals(oldStringParam))
         {
+            purchase.setName(newStringParam);
             validateName();
             if (foundInvalid) return new ValidateResponse(false, "name", checkResult);
         }
 
-        newStringParam = purchase.getDescription();
-        oldStringParam = oldPurchase.getDescription();
-        if (newStringParam == null) purchase.setDescription(oldStringParam);
-        else if (!newStringParam.equals(oldStringParam))
+        newStringParam = newPurchase.getDescription();
+        oldStringParam = purchase.getDescription();
+        if (newStringParam != null && !newStringParam.equals(oldStringParam))
         {
+            purchase.setDescription(newStringParam);
             validateDescription();
             if (foundInvalid) return new ValidateResponse(false, "description", checkResult);
         }
 
-        Long newLongParam = purchase.getProposalDeadLine();
-        Long oldLongParam = oldPurchase.getProposalDeadLine();
-        if (newStringParam == null) purchase.setProposalDeadLine(oldLongParam);
-        else if (!oldLongParam.equals(newLongParam))
+        Long newLongParam = newPurchase.getProposalDeadLine();
+        Long oldLongParam = purchase.getProposalDeadLine();
+        if (newLongParam != null && !oldLongParam.equals(newLongParam))
         {
+            purchase.setProposalDeadLine(newLongParam);
             validateProposalDeadLine();
             if (foundInvalid) return new ValidateResponse(false, "proposalDeadLine", checkResult);
         }
 
-        newLongParam = purchase.getFinishDeadLine();
-        oldLongParam = oldPurchase.getFinishDeadLine();
-        if (newStringParam == null) purchase.setFinishDeadLine(oldLongParam);
-        else if (!oldLongParam.equals(newLongParam))
-        {
-            validateFinishDeadLine();
-            if (foundInvalid) return new ValidateResponse(false, "finishDeadLine", checkResult);
-        }
+        newLongParam = newPurchase.getFinishDeadLine();
+        if (newLongParam != null) { purchase.setFinishDeadLine(newLongParam); }
+        //несмотря на то что этот параметр не изменился, все еще надо выполнить проверку, т.к. дата предложений могла изменится
+        validateFinishDeadLine();
+        if (foundInvalid) return new ValidateResponse(false, "finishDeadLine", checkResult);
 
-        newLongParam = purchase.getBudget();
-        oldLongParam = oldPurchase.getBudget();
-        if (newStringParam == null) purchase.setBudget(oldLongParam);
-        else if (!oldLongParam.equals(newLongParam))
+        newLongParam = newPurchase.getBudget();
+        oldLongParam = purchase.getBudget();
+        if (newLongParam != null && !oldLongParam.equals(newLongParam))
         {
+            purchase.setBudget(newLongParam);
             validateBudget();
             if (foundInvalid) return new ValidateResponse(false, "budget", checkResult);
         }
 
-        newStringParam = purchase.getDemands();
-        oldStringParam = oldPurchase.getDemands();
-        if (newStringParam == null) purchase.setDemands(oldStringParam);
-        else if (!newStringParam.equals(oldStringParam))
+        newStringParam = newPurchase.getDemands();
+        oldStringParam = purchase.getDemands();
+        if (newStringParam != null && !newStringParam.equals(oldStringParam))
         {
+            purchase.setDemands(newStringParam);
             validateDemands();
             if (foundInvalid) return new ValidateResponse(false, "demands", checkResult);
         }
 
-        newStringParam = purchase.getTeam();
-        oldStringParam = oldPurchase.getTeam();
-        if (newStringParam == null) purchase.setTeam(oldStringParam);
-        else if (!newStringParam.equals(oldStringParam))
+        newStringParam = newPurchase.getTeam();
+        oldStringParam = purchase.getTeam();
+        if (newStringParam != null && !newStringParam.equals(oldStringParam))
         {
+            purchase.setTeam(newStringParam);
             validateTeam();
             if (foundInvalid) return new ValidateResponse(false, "team", checkResult);
         }
 
-        newStringParam = purchase.getWorkCondition();
-        oldStringParam = oldPurchase.getWorkCondition();
-        if (newStringParam == null) purchase.setWorkCondition(oldStringParam);
-        else if (!newStringParam.equals(oldStringParam))
+        newStringParam = newPurchase.getWorkCondition();
+        oldStringParam = purchase.getWorkCondition();
+        if (newStringParam != null && !newStringParam.equals(oldStringParam))
         {
+            purchase.setWorkCondition(newStringParam);
             validateWorkCondition();
             if (foundInvalid) return new ValidateResponse(false, "workCondition", checkResult);
         }
 
-        PurchaseStatus newStatus = purchase.getStatus();
-        PurchaseStatus oldStatus = oldPurchase.getStatus();
-        if (newStringParam == null) purchase.setStatus(oldStatus);
-        else if (!newStatus.equals(oldStatus))
+        PurchaseStatus newStatus = newPurchase.getStatus();
+        PurchaseStatus oldStatus = purchase.getStatus();
+        if (newStatus != null && !newStatus.equals(oldStatus))
         {
+            purchase.setStatus(newStatus);
             validateStatus();
             if (foundInvalid) return new ValidateResponse(false, "status", checkResult);
         }
 
-        newStringParam = purchase.getCancelReason();
-        oldStringParam = oldPurchase.getCancelReason();
-        if (newStringParam == null) purchase.setCancelReason(oldStringParam);
-        else if (!newStringParam.equals(oldStringParam))
+        newStringParam = newPurchase.getCancelReason();
+        oldStringParam = purchase.getCancelReason();
+        if (newStringParam != null && !newStringParam.equals(oldStringParam))
         {
+            purchase.setCancelReason(newStringParam);
             validateCancelReason();
             if (foundInvalid) return new ValidateResponse(false, "cancelReason", checkResult);
         }
@@ -161,12 +154,6 @@ public class PurchaseValidate extends Validator
             return;
         }
 
-        if (onlySpaces(checkString))
-        {
-            setCheckResult("Наименование закупки не может состоять из одних пробелов");
-            return;
-        }
-
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 100)
         {
@@ -174,6 +161,11 @@ public class PurchaseValidate extends Validator
             return;
         }
 
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Наименование закупки не может состоять из одних пробелов");
+            return;
+        }
     }
 
     private void validateDescription()
@@ -185,12 +177,6 @@ public class PurchaseValidate extends Validator
             return;
         }
 
-        if (onlySpaces(checkString))
-        {
-            setCheckResult("Описание закупки не может состоять из одних пробелов");
-            return;
-        }
-
         int checkLength = checkString.length();
         if (checkLength < 1 || checkLength > 1000)
         {
@@ -198,6 +184,11 @@ public class PurchaseValidate extends Validator
             return;
         }
 
+        if (onlySpaces(checkString))
+        {
+            setCheckResult("Описание закупки не может состоять из одних пробелов");
+            return;
+        }
     }
 
     private void validateProposalDeadLine()
