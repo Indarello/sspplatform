@@ -96,7 +96,8 @@ public class SupplyController {
 
     @GetMapping("/supply/{id}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) throws IOException {
+    public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) throws SupplyServiceException
+    {
         User user = userDetailsService.loadUserByToken(token);
 
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
@@ -104,7 +105,8 @@ public class SupplyController {
 
     @GetMapping("/supplies")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getPageOfSupplies(@RequestParam UUID purchaseId) throws IOException {
+    public ResponseEntity<Object> getPageOfSupplies(@RequestParam UUID purchaseId) throws SupplyServiceException
+    {
         List<SupplyEntity> list = supplyService.getList(purchaseId);
 
         return new ResponseEntity<>(list, HttpStatus.OK);

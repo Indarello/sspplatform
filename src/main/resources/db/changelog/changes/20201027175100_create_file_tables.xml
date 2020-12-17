@@ -10,10 +10,10 @@
                 <constraints primaryKey="true" unique="true" nullable="false"/>
             </column>
             <column name="purchase_file" type="UUID">
-                <constraints nullable="true" foreignKeyName="id" referencedTableName="purchases" referencedColumnNames="id"/>
+                <constraints nullable="true" foreignKeyName="fk_purchase_id" referencedTableName="purchases" referencedColumnNames="id"/>
             </column>
             <column name="supply_id" type="UUID">
-                <constraints nullable="true" foreignKeyName="id" referencedTableName="supply" referencedColumnNames="id"/>
+                <constraints nullable="true" foreignKeyName="fk_supply_id" referencedTableName="supply" referencedColumnNames="id"/>
             </column>
             <column name="name" type="text">
                 <constraints nullable="false"/>
