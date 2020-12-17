@@ -25,7 +25,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
     private final int MAX_LOGIN_SIZE = 30;
 
 
-    public void UserValidateReset(User user)
+    public void UserValidateBegin(User user)
     {
         this.checkResult = "ok";
         this.foundInvalid = false;
@@ -139,133 +139,132 @@ public class UserValidate extends com.ssp.platform.validate.Validator
     /**
      * Валидация при изменении пользователя поставщика
      */
-    public ValidateResponse validateEditFirmUser(User oldUser)
+    public ValidateResponse validateEditFirmUser(User newUser)
     {
         /*
           Валидация параметров только если они предоставлены и отличны от прошлых
           username, role изменить нельзя
          */
-        String checkParameter = user.getPassword();
-        String oldParameter = oldUser.getPassword();
-        user.setPassword(oldParameter);
+
+        String checkParameter = newUser.getPassword();
+        String oldParameter = user.getPassword();
         /*
-        if(checkParameter == null) user.setPassword(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setPassword(checkParameter);
             checkPassword();
             if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
-        }*/
+            //encodePassword
+        }
+        */
 
-        checkParameter = user.getFirstName();
-        oldParameter = oldUser.getFirstName();
-        if(checkParameter == null) user.setFirstName(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getFirstName();
+        oldParameter = user.getFirstName();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setFirstName(checkParameter);
             checkFirstName();
             if(foundInvalid) return new ValidateResponse(false, "firstName", checkResult);
         }
 
-        checkParameter = user.getLastName();
-        oldParameter = oldUser.getLastName();
-        if(checkParameter == null) user.setLastName(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getLastName();
+        oldParameter = user.getLastName();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setLastName(checkParameter);
             checkLastName();
             if(foundInvalid) return new ValidateResponse(false, "lastName", checkResult);
         }
 
-        checkParameter = user.getPatronymic();
-        oldParameter = oldUser.getPatronymic();
-        if(checkParameter == null) user.setPatronymic(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getPatronymic();
+        oldParameter = user.getPatronymic();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setPatronymic(checkParameter);
             checkPatronymic();
             if(foundInvalid) return new ValidateResponse(false, "patronymic", checkResult);
         }
 
-        checkParameter = user.getFirmName();
-        oldParameter = oldUser.getFirmName();
-        if(checkParameter == null) user.setFirmName(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getFirmName();
+        oldParameter = user.getFirmName();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setFirmName(checkParameter);
             checkFirmName();
             if(foundInvalid) return new ValidateResponse(false, "companyName", checkResult);
         }
 
-        checkParameter = user.getDescription();
-        oldParameter = oldUser.getDescription();
-        if(checkParameter == null) user.setDescription(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getDescription();
+        oldParameter = user.getDescription();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setDescription(checkParameter);
             checkDescription();
             if(foundInvalid) return new ValidateResponse(false, "companyDescription", checkResult);
         }
 
-        checkParameter = user.getAddress();
-        oldParameter = oldUser.getAddress();
-        if(checkParameter == null) user.setAddress(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getAddress();
+        oldParameter = user.getAddress();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setAddress(checkParameter);
             checkAddress();
             if(foundInvalid) return new ValidateResponse(false, "companyAddress", checkResult);
         }
 
-        checkParameter = user.getActivity();
-        oldParameter = oldUser.getActivity();
-        if(checkParameter == null) user.setActivity(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getActivity();
+        oldParameter = user.getActivity();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setActivity(checkParameter);
             checkActivity();
             if(foundInvalid) return new ValidateResponse(false, "companyKindOfActivity", checkResult);
         }
 
-        checkParameter = user.getTechnology();
-        oldParameter = oldUser.getTechnology();
-        if(checkParameter == null) user.setTechnology(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getTechnology();
+        oldParameter = user.getTechnology();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setTechnology(checkParameter);
             checkTechnology();
             if(foundInvalid) return new ValidateResponse(false, "companyTechnologyStack", checkResult);
         }
 
-        checkParameter = user.getInn();
-        oldParameter = oldUser.getInn();
-        if(checkParameter == null) user.setInn(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getInn();
+        oldParameter = user.getInn();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setInn(checkParameter);
             checkInn();
             if(foundInvalid) return new ValidateResponse(false, "TIN", checkResult);
         }
 
-        checkParameter = user.getTelephone();
-        oldParameter = oldUser.getTelephone();
-        if(checkParameter == null) user.setTelephone(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getTelephone();
+        oldParameter = user.getTelephone();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setTelephone(checkParameter);
             checkTelephone();
             if(foundInvalid) return new ValidateResponse(false, "phoneNumber", checkResult);
         }
 
-        checkParameter = user.getEmail();
-        oldParameter = oldUser.getEmail();
-        if(checkParameter == null) user.setEmail(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getEmail();
+        oldParameter = user.getEmail();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setEmail(checkParameter);
             checkEmail();
             if(foundInvalid) return new ValidateResponse(false, "email", checkResult);
         }
 
-        checkParameter = user.getStatus();
-        oldParameter = oldUser.getStatus();
-        if(checkParameter == null) user.setStatus(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getStatus();
+        oldParameter = user.getStatus();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setStatus(checkParameter);
             checkStatus();
             if(foundInvalid) return new ValidateResponse(false, "status", checkResult);
         }
-
-        //TODO: user.setSupplies(oldUser.getPurchases());
-        user.setRole("firm");
 
         return new ValidateResponse(true, "", checkResult);
     }
@@ -273,7 +272,7 @@ public class UserValidate extends com.ssp.platform.validate.Validator
     /**
      * Валидация при изменении пользователя сотрудника
      */
-    public ValidateResponse validateEditEmployeeUser(User oldUser)
+    public ValidateResponse validateEditEmployeeUser(User newUser)
     {
         /*
           Валидация параметров только если они предоставлены и отличны от прошлых
@@ -281,56 +280,44 @@ public class UserValidate extends com.ssp.platform.validate.Validator
          */
 
 
-        String checkParameter = user.getPassword();
-        String oldParameter = oldUser.getPassword();
-        user.setPassword(oldParameter);
+        String checkParameter = newUser.getPassword();
+        String oldParameter = user.getPassword();
         /*
-        if(checkParameter == null) user.setPassword(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setPassword(checkParameter);
             checkPassword();
             if(foundInvalid) return new ValidateResponse(false, "password", checkResult);
-        }*/
+            //encodePassword
+        }
+        */
 
-        checkParameter = user.getFirstName();
-        oldParameter = oldUser.getFirstName();
-        if(checkParameter == null) user.setFirstName(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getFirstName();
+        oldParameter = user.getFirstName();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setFirstName(checkParameter);
             checkFirstName();
             if(foundInvalid) return new ValidateResponse(false, "firstName", checkResult);
         }
 
-        checkParameter = user.getLastName();
-        oldParameter = oldUser.getLastName();
-        if(checkParameter == null) user.setLastName(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getLastName();
+        oldParameter = user.getLastName();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setLastName(checkParameter);
             checkLastName();
             if(foundInvalid) return new ValidateResponse(false, "lastName", checkResult);
         }
 
-        checkParameter = user.getPatronymic();
-        oldParameter = oldUser.getPatronymic();
-        if(checkParameter == null) user.setPatronymic(oldParameter);
-        else if(!checkParameter.equals(oldParameter))
+        checkParameter = newUser.getPatronymic();
+        oldParameter = user.getPatronymic();
+        if(checkParameter != null && !checkParameter.equals(oldParameter))
         {
+            user.setPatronymic(checkParameter);
             checkPatronymic();
             if(foundInvalid) return new ValidateResponse(false, "patronymic", checkResult);
         }
-
-        user.setFirmName("");
-        user.setDescription("");
-        user.setAddress("");
-        user.setActivity("");
-        user.setTechnology("");
-        user.setInn("");
-        user.setTelephone("");
-        user.setEmail("");
-        user.setRole("employee");
-        user.setStatus("Approved");
-        user.setPurchases(oldUser.getPurchases());
-
 
         return new ValidateResponse(true, "", checkResult);
     }

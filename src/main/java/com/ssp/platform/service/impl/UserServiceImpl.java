@@ -52,6 +52,12 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    public User update(User user)
+    {
+        return userRepository.save(user);
+    }
+
+    @Override
     public Page<User> findAllByRole(Pageable pageable, String role)
     {
         return userRepository.findAllByRole(pageable, role);
@@ -73,10 +79,11 @@ public class UserServiceImpl implements UserService
     {
         if(userRepository.existsByUsername(newUser.getUsername())) return;
 
-        userValidate.UserValidateReset(newUser);
+        userValidate.UserValidateBegin(newUser);
         ValidateResponse validateResponse = userValidate.validateEmployeeUser();
         if (!validateResponse.isSuccess())
         {
+            //TODO log.warning("Данные сотрудника в конфигурации заполнены некорректно:\n  " + validateResponse.getMessage());
             return;
         }
 
@@ -89,6 +96,7 @@ public class UserServiceImpl implements UserService
         }
         catch (Exception e)
         {
+            //TODO log.warning("Сохранить данные сотрудника из конфигурации не удалось:\n  " + e.getMessage());
         }
     }
 }

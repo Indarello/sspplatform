@@ -54,7 +54,7 @@ public class UserController
     public ResponseEntity<?> authenticateUser(@RequestHeader("username") String username, @RequestHeader("password") String password)
     {
         User ObjUser = new User(username, password);
-        userValidate.UserValidateReset(ObjUser);
+        userValidate.UserValidateBegin(ObjUser);
         ValidateResponse validateResponse = userValidate.validateLogin();
         if (!validateResponse.isSuccess())
         {
@@ -76,7 +76,7 @@ public class UserController
     @PostMapping("/registration")
     public ResponseEntity<?> registerFirm(@RequestBody User ObjUser)
     {
-        userValidate.UserValidateReset(ObjUser);
+        userValidate.UserValidateBegin(ObjUser);
         ValidateResponse validateResponse = userValidate.validateFirmUser();
         if (!validateResponse.isSuccess())
         {
@@ -101,7 +101,7 @@ public class UserController
     @PreAuthorize("hasAuthority('employee')")
     public ResponseEntity<?> registerEmployee(@RequestBody User ObjUser)
     {
-        userValidate.UserValidateReset(ObjUser);
+        userValidate.UserValidateBegin(ObjUser);
         ValidateResponse validateResponse = userValidate.validateEmployeeUser();
         if (!validateResponse.isSuccess())
         {
@@ -184,16 +184,16 @@ public class UserController
 
     @PutMapping(value = "/user")
     @PreAuthorize("hasAuthority('employee')")
-    public ResponseEntity<Object> editUser(@RequestBody User ObjUser, @RequestHeader("Authorization") String token)
+    public ResponseEntity<Object> editUser(@RequestBody User objUser, @RequestHeader("Authorization") String token)
     {
-        ValidateResponse validateResponse = userValidate.validateUsernameLogin(ObjUser.getUsername());
+        ValidateResponse validateResponse = userValidate.validateUsernameLogin(objUser.getUsername());
 
         if (!validateResponse.isSuccess())
         {
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
-        Optional<User> searchResult = userService.findByUsername(ObjUser.getUsername());
+        Optional<User> searchResult = userService.findByUsername(objUser.getUsername());
 
         if (!searchResult.isPresent())
         {
@@ -201,17 +201,17 @@ public class UserController
         }
 
         User oldUser = searchResult.get();
-        userValidate.UserValidateReset(ObjUser);
+        userValidate.UserValidateBegin(oldUser);
 
         if (oldUser.getRole().equals("firm"))
         {
-            validateResponse = userValidate.validateEditFirmUser(oldUser);
+            validateResponse = userValidate.validateEditFirmUser(objUser);
         }
         else
         {
             User user = userDetailsService.loadUserByToken(token);
             if (oldUser.getUsername().equals(user.getUsername()))
-                validateResponse = userValidate.validateEditEmployeeUser(oldUser);
+                validateResponse = userValidate.validateEditEmployeeUser(objUser);
             else return new ResponseEntity<>(new ApiResponse(false, "Вы не можете менять" +
                     "информацию по аккаунту другого сотрудника"), HttpStatus.FORBIDDEN);
         }
@@ -225,7 +225,7 @@ public class UserController
 
         try
         {
-            return new ResponseEntity<>(userService.save(validUser), HttpStatus.OK);
+            return new ResponseEntity<>(userService.update(validUser), HttpStatus.OK);
         }
         catch (Exception e)
         {

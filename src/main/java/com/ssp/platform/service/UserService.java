@@ -19,4 +19,6 @@ public interface UserService
     Optional<User> findByUsername(String username);
 
     List<User> findByRoleAndStatus(String role, String status);
+
+    public User update(User user);
 }
