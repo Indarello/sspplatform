@@ -25,7 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -44,18 +44,11 @@ public class PurchaseController
     private final UserDetailsServiceImpl userDetailsService;
     private final FileService fileService;
 
-    private static final Logger log = Logger.getLogger(UserController.class.getName());
-
     @Autowired
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService) throws IOException {
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService){
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
-
-        FileHandler fh = new FileHandler("./log/PurchaseController/purchases.txt");
-        fh.setFormatter(new SimpleFormatter());
-        fh.setLevel(Level.FINE);
-        log.addHandler(fh);
     }
 
 
@@ -110,7 +103,6 @@ public class PurchaseController
         }
         catch (Exception e)
         {
-            log.warning("Отправка сообщения по email/Добавление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -146,7 +138,6 @@ public class PurchaseController
         }
         catch (Exception e)
         {
-            log.warning("Получение страницы с закупками не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -240,7 +231,6 @@ public class PurchaseController
         }
         catch (Exception e)
         {
-            log.warning("Изменения параметров сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -273,7 +263,6 @@ public class PurchaseController
         }
         catch (Exception e)
         {
-            log.warning("Удаление сущности закупки не удалось:\n" + e.getMessage());
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
