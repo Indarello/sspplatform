@@ -105,10 +105,12 @@ public class FileServiceImpl implements FileService {
             deleteFile(fileEntity.getHash(), fileEntity.getType());
             fileRepository.delete(fileEntity);
         } catch (EntityNotFoundException e) {
-            throw new FileServiceException(new ApiResponse(false, "Запрашиваемый файл не найден"));
+            System.out.println("Запрашиваемый файл не найден");
+            //throw new FileServiceException(new ApiResponse(false, "Запрашиваемый файл не найден"));
         } catch (NoSuchFileException e){
             fileRepository.delete(fileEntity);
-            throw new FileServiceException(new ApiResponse(false, "Запрашиваемый файл не найден"));
+            System.out.println("Запрашиваемый файл не найден");
+            //throw new FileServiceException(new ApiResponse(false, "Запрашиваемый файл не найден"));
         }
     }
 

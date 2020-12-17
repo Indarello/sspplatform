@@ -22,7 +22,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -39,10 +38,8 @@ public class UserController
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final UserDetailsServiceImpl userDetailsService;
-    private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
     private final UserValidate userValidate;
-    private boolean existsFirstUser = false;
 
     private static final Logger log = Logger.getLogger(UserController.class.getName());
 
@@ -50,16 +47,15 @@ public class UserController
     @Autowired
     public UserController(
             AuthenticationManager authenticationManager, UserService userService, UserDetailsServiceImpl userDetailsService,
-            PasswordEncoder encoder, JwtUtils jwtUtils, UserValidate userValidate
+            JwtUtils jwtUtils, UserValidate userValidate
     ) throws IOException {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.userDetailsService = userDetailsService;
-        this.encoder = encoder;
         this.jwtUtils = jwtUtils;
         this.userValidate = userValidate;
 
-        FileHandler fh = new FileHandler("./log/UserController/users.log");
+        FileHandler fh = new FileHandler("./log/UserController/users.txt");
         fh.setFormatter(new SimpleFormatter());
         fh.setLevel(Level.FINE);
         log.addHandler(fh);
@@ -98,12 +94,9 @@ public class UserController
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
-        User validUser = userValidate.getUser();
-        validUser.setPassword(encoder.encode(ObjUser.getPassword()));
-
         try
         {
-            userService.save(validUser);
+            userService.save(userValidate.getUser());
             return new ResponseEntity<>(new ApiResponse(true, "Вы успешно зарегестрировались, ожидайте аккредитации от сотрудника"), HttpStatus.CREATED);
         }
         catch (Exception e)
@@ -127,12 +120,9 @@ public class UserController
             return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
         }
 
-        User validUser = userValidate.getUser();
-        validUser.setPassword(encoder.encode(ObjUser.getPassword()));
-
         try
         {
-            userService.save(validUser);
+            userService.save(userValidate.getUser());
             return new ResponseEntity<>(new ApiResponse(true, "Сотрудник успешно зарегестрирован!"), HttpStatus.CREATED);
         }
         catch (Exception e)
@@ -142,39 +132,6 @@ public class UserController
         }
     }
 
-    /**
-     * Метод регистрации первого админа
-     */
-    @PostMapping("/regfirstadmin")
-    public ResponseEntity<?> registerFirstAdmin(@RequestBody User ObjUser)
-    {
-        if (existsFirstUser || userService.existsByRole("employee"))
-        {
-            existsFirstUser = true;
-            return new ResponseEntity<>(new ApiResponse(false, "В системе уже есть первый сотрудник"), HttpStatus.NOT_ACCEPTABLE);
-        }
-
-        userValidate.UserValidateReset(ObjUser);
-        ValidateResponse validateResponse = userValidate.validateEmployeeUser();
-        if (!validateResponse.isSuccess())
-        {
-            return new ResponseEntity<>(validateResponse, HttpStatus.NOT_ACCEPTABLE);
-        }
-
-        User validUser = userValidate.getUser();
-        validUser.setPassword(encoder.encode(ObjUser.getPassword()));
-
-        try
-        {
-            userService.save(validUser);
-            return new ResponseEntity<>(new ApiResponse(true, "Первый сотрудник успешно зарегестрирован!"), HttpStatus.CREATED);
-        }
-        catch (Exception e)
-        {
-            log.warning("Сохранить данные админа (первого сотрудника) не удалось:\n" + e.getMessage());
-            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
     @GetMapping(value = "/users/{type}")
     @PreAuthorize("hasAuthority('employee')")

@@ -1,18 +1,21 @@
 package com.ssp.platform.service.impl;
 
+import com.ssp.platform.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import javax.mail.*;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 @Component
+@EnableAsync
 public class MailServiceImpl
 {
     private final MimeMessage message;
@@ -37,17 +40,20 @@ public class MailServiceImpl
         });
 
         message = new MimeMessage(session);
-        MimeMessageHelper utfMessage = new MimeMessageHelper(message, true, "UTF-8");
         message.setFrom(new InternetAddress("bfgbfashtyndspgdfg@gmail.com", false));
     }
 
-    public void sendMail(String subject, String text, String address, Date date) throws AddressException, MessagingException, IOException
+    @Async
+    public void sendMailPurchase(String subject, String text, List<User> users, Date date) throws MessagingException, IOException
     {
-        message.setSubject(subject,"UTF-8");
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(address));
-        message.setContent(text, "text/html; charset=UTF-8");
-        message.setSentDate(date);
-        Transport.send(message);
+        for (User user : users)
+        {
+            message.setSubject(subject, "UTF-8");
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
+            message.setContent(text, "text/html; charset=UTF-8");
+            message.setSentDate(date);
+            Transport.send(message);
+        }
     }
 
 }

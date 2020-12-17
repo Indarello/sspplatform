@@ -104,6 +104,10 @@ public class User
     @JsonIgnore
     private List<Purchase> purchases;
 
+    @OneToMany(mappedBy="author", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Purchase> supplies;
+
     public User()
     {
     }

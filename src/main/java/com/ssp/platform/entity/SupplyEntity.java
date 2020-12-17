@@ -29,7 +29,6 @@ public class SupplyEntity {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Purchase.class)
     @JoinColumn(name = "purchase_id")
-    @NotFound(action = NotFoundAction.IGNORE)
     private Purchase purchase;
 
     @Column(name = "description")
@@ -40,7 +39,6 @@ public class SupplyEntity {
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = User.class)
     @JoinColumn(name = "author")
-    @NotFound(action = NotFoundAction.IGNORE)
     private User author;
 
     @Column(name = "budget")

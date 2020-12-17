@@ -47,7 +47,7 @@ public class SupplyController {
         User author = userDetailsService.loadUserByToken(token);
         supplyService.create(purchaseId, description, author, budget, comment, files);
 
-        log.info(author, Log.CONTROLLER_SUPPLY, "Предложение создано");
+        log.info(author, Log.CONTROLLER_SUPPLY, "Предложение создано", purchaseId, description, budget, comment);
 
         return new ResponseEntity<>(new ApiResponse(true, "Предложение создано"), HttpStatus.OK);
     }
@@ -68,9 +68,16 @@ public class SupplyController {
         SupplyUpdateRequest updateRequest = new SupplyUpdateRequest(description, budget, comment, status, result, files);
 
         User user = userDetailsService.loadUserByToken(token);
+
+        SupplyEntity wasEntity = supplyService.get(user, id);
+        Object[] was = {wasEntity.getDescription(), wasEntity.getBudget(), wasEntity.getComment(), wasEntity.getStatus(), wasEntity.getResult()};
+
         supplyService.update(user, id, updateRequest);
 
-        log.info(user, Log.CONTROLLER_SUPPLY, "Предложение обновлено");
+        SupplyEntity becameEntity = supplyService.get(user, id);
+        Object[] became = {becameEntity.getDescription(), becameEntity.getBudget(), becameEntity.getComment(), becameEntity.getStatus(), becameEntity.getResult()};
+
+        log.info(user, Log.CONTROLLER_SUPPLY, "Предложение обновлено", was, became);
 
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
     }
@@ -82,28 +89,25 @@ public class SupplyController {
         User user = userDetailsService.loadUserByToken(token);
         supplyService.delete(user, id);
 
-        log.info(user, Log.CONTROLLER_SUPPLY, "Предложение удалено");
+        log.info(user, Log.CONTROLLER_SUPPLY, "Предложение удалено", id);
 
         return new ResponseEntity<>(new ApiResponse(true, "Предложение удалено"), HttpStatus.OK);
     }
 
     @GetMapping("/supply/{id}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) throws IOException {
+    public ResponseEntity<Object> getSupply(@RequestHeader("Authorization") String token, @PathVariable("id") UUID id) throws SupplyServiceException
+    {
         User user = userDetailsService.loadUserByToken(token);
-
-        log.info(user, Log.CONTROLLER_SUPPLY, "Получение предложения");
 
         return new ResponseEntity<>(supplyService.get(user, id), HttpStatus.OK);
     }
 
     @GetMapping("/supplies")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getPageOfSupplies(@RequestHeader("Authorization") String token, @RequestParam UUID purchaseId) throws IOException {
-        User user = userDetailsService.loadUserByToken(token);
+    public ResponseEntity<Object> getPageOfSupplies(@RequestParam UUID purchaseId) throws SupplyServiceException
+    {
         List<SupplyEntity> list = supplyService.getList(purchaseId);
-
-        log.info(user, Log.CONTROLLER_SUPPLY, "Получение списка предложений");
 
         return new ResponseEntity<>(list, HttpStatus.OK);
     }

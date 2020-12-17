@@ -24,6 +24,11 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="action_params" type="text">
+                <constraints nullable="true"/>
+            </column>
+
+
             <column name="action_succeed" type="boolean">
                 <constraints nullable="false"/>
             </column>

@@ -25,10 +25,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -93,13 +98,11 @@ public class PurchaseController
             List<FileEntity> savedFiles = fileService.addFiles(files, savedPurchase.getId(), FileServiceImpl.LOCATION_PURCHASE);
             savedPurchase.setFiles(savedFiles);
 
-            //TODO в отдельный поток
             purchaseService.sendEmail(savedPurchase);
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
         catch (Exception e)
-        {   //в try части почему-то только возвращение ResponseEntity и отпрака соощения, а где покрытие работы с сервисами?
-            //аналогично и в других методах
+        {
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -227,7 +230,7 @@ public class PurchaseController
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);
         }
         catch (Exception e)
-        {   //пример аналогии пустого try блока
+        {
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

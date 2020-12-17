@@ -14,16 +14,6 @@ public interface UserService
 {
     User save(User user);
 
-    boolean existsByRole(String role);
-
-    boolean existsByUsername(String username);
-
-    boolean existsByEmail(String email);
-
-    boolean existsByPhoneNumber(String phoneNumber);
-
-    boolean existsByInn(String tIN);
-
     Page<User> findAllByRole(Pageable pageable, String role);
 
     Optional<User> findByUsername(String username);

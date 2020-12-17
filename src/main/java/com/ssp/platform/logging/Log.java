@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 //Формат лога:
-//время [роль/username] контроллер: тип_действия [успешно выполнено ? : ошибка]
+//время [роль/username] контроллер: тип_действия параметры: [параметры]
 @Component
 public class Log {
     public static final String USER_GUEST = "guest";
@@ -23,7 +23,8 @@ public class Log {
     public static final String CONTROLLER_SUPPLY = "Supply";
     public static final String CONTROLLER_USER = "User";
 
-    private static final String mask = "%s [%s/%s] %s: %s";
+    private static final String infoMask = "%s [%s] %s: %s %s";
+    private static final String infoUpdateMask = "%s [%s] %s: %s, было: %s, стало: %s";
     private static final String dateMask = "yyyy-MM-dd HH:mm:ss:S";
 
     private final LogFile logFile;
@@ -35,14 +36,37 @@ public class Log {
         this.logService = logService;
     }
 
-    public void info(User user, String controller, String action) throws IOException {
+    public void info(String controller, String action, Object ... params) throws IOException {
         SimpleDateFormat dateFormat = new SimpleDateFormat(dateMask);
         Date infoDate = new Date();
 
-        String line = String.format(mask, dateFormat.format(infoDate), user.getRole(), user.getUsername(), controller, action);
+        String line = String.format(infoMask, dateFormat.format(infoDate), USER_GUEST, controller, action, Arrays.toString(params));
 
         System.out.println(line);
-        logFile.put(line);
+
+        logFile.put(line, USER_GUEST);
+
+        LogEntity logEntity = new LogEntity();
+        logEntity.setDate(Timestamp.from(infoDate.toInstant()));
+        logEntity.setUsername(USER_GUEST);
+        logEntity.setRole(USER_GUEST);
+        logEntity.setActionController(controller);
+        logEntity.setActionType(action);
+        logEntity.setActionParams(Arrays.toString(params));
+        logEntity.setActionSucceed(true);
+
+        logService.put(logEntity);
+    }
+
+    public void info(User user, String controller, String action, Object ... params) throws IOException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(dateMask);
+        Date infoDate = new Date();
+
+        String line = String.format(infoMask, dateFormat.format(infoDate), user.getUsername(), controller, action, Arrays.toString(params));
+
+        System.out.println(line);
+
+        logFile.put(line, user.getRole().equals("firm") ? LogFile.FIRM_LOG : LogFile.EMPLOYEE_LOG);
 
         LogEntity logEntity = new LogEntity();
         logEntity.setDate(Timestamp.from(infoDate.toInstant()));
@@ -50,6 +74,29 @@ public class Log {
         logEntity.setRole(user.getRole());
         logEntity.setActionController(controller);
         logEntity.setActionType(action);
+        logEntity.setActionParams(Arrays.toString(params));
+        logEntity.setActionSucceed(true);
+
+        logService.put(logEntity);
+    }
+
+    public void info(User user, String controller, String action, Object[] was, Object[] became) throws IOException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(dateMask);
+        Date infoDate = new Date();
+
+        String line = String.format(infoUpdateMask, dateFormat.format(infoDate), user.getUsername(), controller, action, Arrays.toString(was), Arrays.toString(became));
+
+        System.out.println(line);
+
+        logFile.put(line, user.getRole().equals("firm") ? LogFile.FIRM_LOG : LogFile.EMPLOYEE_LOG);
+
+        LogEntity logEntity = new LogEntity();
+        logEntity.setDate(Timestamp.from(infoDate.toInstant()));
+        logEntity.setUsername(user.getUsername());
+        logEntity.setRole(user.getRole());
+        logEntity.setActionController(controller);
+        logEntity.setActionType(action);
+        logEntity.setActionParams("было: " + Arrays.toString(was) + ", стало: " + Arrays.toString(became));
         logEntity.setActionSucceed(true);
 
         logService.put(logEntity);

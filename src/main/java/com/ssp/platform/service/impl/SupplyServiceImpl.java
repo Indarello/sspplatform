@@ -15,8 +15,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-import static com.ssp.platform.validate.ValidatorMessages.SupplyMessages.WRONG_ROLE_FOR_DELETING;
-import static com.ssp.platform.validate.ValidatorMessages.SupplyMessages.WRONG_ROLE_FOR_UPDATING;
+import static com.ssp.platform.validate.ValidatorMessages.SupplyMessages.*;
 
 @Service
 public class SupplyServiceImpl implements SupplyService {
@@ -116,6 +115,7 @@ public class SupplyServiceImpl implements SupplyService {
 
     @Override
     public void delete(User user, UUID id) throws IOException, FileServiceException, SupplyServiceException {
+        if (!supplyRepository.existsById(id)) throw new SupplyServiceException(new ApiResponse(false, WRONG_SUPPLY_ID_ERROR));
         SupplyEntity supplyEntity = supplyRepository.getOne(id);
 
         switch (user.getRole()) {
@@ -143,7 +143,8 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     @Override
-    public SupplyEntity get(User user, UUID id) {
+    public SupplyEntity get(User user, UUID id) throws SupplyServiceException {
+        if (!supplyRepository.existsById(id)) throw new SupplyServiceException(new ApiResponse(false, WRONG_SUPPLY_ID_ERROR));
         SupplyEntity supplyEntity = supplyRepository.getOne(id);
 
         switch (user.getRole()){
@@ -157,11 +158,12 @@ public class SupplyServiceImpl implements SupplyService {
                 return supplyEntity;
         }
 
-        return null;
+        throw new SupplyServiceException(new ApiResponse(false, WRONG_ROLE_FOR_UPDATING));
     }
 
     @Override
-    public List<SupplyEntity> getList(UUID purchaseId) {
+    public List<SupplyEntity> getList(UUID purchaseId) throws SupplyServiceException {
+        if (!purchaseRepository.existsById(purchaseId)) throw new SupplyServiceException(new ApiResponse(false, WRONG_PURCHASE_ID_ERROR));
         List<SupplyEntity> list = supplyRepository.findAllByPurchase(purchaseRepository.getOne(purchaseId));
         list.sort((o1, o2) -> {
             if (o2.getStatus() == o1.getStatus()) {
