@@ -2,6 +2,7 @@ package com.ssp.platform.controller;
 
 import com.ssp.platform.entity.*;
 import com.ssp.platform.entity.enums.QuestionStatus;
+import com.ssp.platform.logging.Log;
 import com.ssp.platform.request.QuestionUpdateRequest;
 import com.ssp.platform.response.*;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
@@ -24,18 +25,21 @@ public class QAController {
 	private final UserDetailsServiceImpl userDetailsService;
 	private final PurchaseService purchaseService;
 	private final QuestionValidate questionValidate;
+	private final Log log;
 
 	@Autowired
     public QAController(
             QuestionService questionService, AnswerService answerService, UserDetailsServiceImpl userDetailsService,
             PurchaseService purchaseService,
-            QuestionValidate questionValidate
+            QuestionValidate questionValidate,
+            Log log
     ) {
         this.questionService = questionService;
         this.answerService = answerService;
         this.userDetailsService = userDetailsService;
         this.purchaseService = purchaseService;
         this.questionValidate = questionValidate;
+        this.log = log;
     }
 
     /**
@@ -78,6 +82,7 @@ public class QAController {
 
 		try
 		{
+		    log.info(author, Log.CONTROLLER_QA, "Вопрос создан", name, description, purchaseId);
 			return new ResponseEntity<>(questionService.save(question), HttpStatus.CREATED);
 		}
 		catch (Exception e)
@@ -97,7 +102,7 @@ public class QAController {
 	 */
 	@PutMapping(value = "/question", produces = "application/json", consumes = "application/json")
 	@PreAuthorize("hasAuthority('employee')")
-	public ResponseEntity<Object> changeQuestion(@RequestBody QuestionUpdateRequest questionUpdateRequest)
+	public ResponseEntity<Object> changeQuestion(@RequestHeader("Authorization") String token, @RequestBody QuestionUpdateRequest questionUpdateRequest)
 			throws IOException, NoSuchAlgorithmException {
 
         //валидация
@@ -112,6 +117,12 @@ public class QAController {
                 return new ResponseEntity<>(new ApiResponse(false, "Вопрос не найден"), HttpStatus.NOT_FOUND);
 			}
 
+			Object[] was = {
+			        question.getId(),
+                    question.getName(),
+                    question.getDescription(),
+                    question.getPublicity()};
+
 			question.setName(questionUpdateRequest.getName());
 			question.setDescription(questionUpdateRequest.getDescription());
 
@@ -121,6 +132,14 @@ public class QAController {
 			Optional<Question> optionalQuestion = questionService.update(question);
 			if (optionalQuestion.isPresent())
 			{
+			    Object[] became = {
+			            optionalQuestion.get().getId(),
+                        optionalQuestion.get().getName(),
+                        optionalQuestion.get().getDescription(),
+                        optionalQuestion.get().getPublicity()};
+
+			    log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_QA, "Вопрос изменён", was, became);
+
 				return new ResponseEntity<>(optionalQuestion.get(), HttpStatus.OK);
 			}
 
@@ -255,6 +274,7 @@ public class QAController {
 		{
 			if (questionService.delete(id))
 			{
+			    log.info(user, Log.CONTROLLER_QA, "Вопрос удалён", id);
 				return new ResponseEntity<>(new ApiResponse(true, "Вопрос удалён"), HttpStatus.OK);
 			}
 			return new ResponseEntity<>(new ApiResponse(false, "Вопрос не найден"), HttpStatus.NOT_FOUND);
@@ -283,7 +303,8 @@ public class QAController {
 	@PreAuthorize("hasAuthority('employee')")
 	public ResponseEntity<Object> addAnswer
 			(
-					@RequestParam(value = "description") String description,
+                    @RequestHeader("Authorization") String token,
+                    @RequestParam(value = "description") String description,
 					@RequestParam(value = "questionId") String questionId,
 					@RequestParam(value = "publicity") String publicity
 			)throws IOException, NoSuchAlgorithmException {
@@ -318,6 +339,9 @@ public class QAController {
 		    //сначала сохраняем ответ, потом обновляем вопрос иначе ошибка
 		    answer = answerService.save(answer);
 			questionService.update(question);
+
+			log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_QA, "Ответ создан", description, questionId, publicity);
+
 			return new ResponseEntity<>(answer, HttpStatus.CREATED);
 		}
 		catch (Exception e)
@@ -339,6 +363,7 @@ public class QAController {
 	@PutMapping(value = "/answer", produces = "application/json")
 	@PreAuthorize("hasAuthority('employee')")
 	public ResponseEntity<Object> changeAnswer(
+	                @RequestHeader("Authorization") String token,
                     @RequestParam(value = "id") UUID id,
                     @RequestParam(value = "description") String description,
                     @RequestParam(value = "publicity", defaultValue = "false") Boolean publicity)
@@ -353,6 +378,8 @@ public class QAController {
         if (answer == null){
             return new ResponseEntity<>(new ApiResponse(false, "Ответ, который вы хотите изменить, не найден"), HttpStatus.NOT_ACCEPTABLE);
         }
+
+        Object[] was = {answer.getDescription()};
 
         answer.setDescription(description);
 
@@ -377,6 +404,9 @@ public class QAController {
 			Optional<Answer> optionalAnswer = answerService.update(answer);
 			if (optionalAnswer.isPresent() && optionalQuestion.isPresent())
 			{
+                Object[] became = {optionalAnswer.get().getDescription()};
+                log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_QA, "Ответ изменён", was, became);
+
 				return new ResponseEntity<>(optionalAnswer.get(), HttpStatus.OK);
 			}
 			return new ResponseEntity<>(new ApiResponse(false, "Ответ не найден"), HttpStatus.NOT_FOUND);
@@ -420,7 +450,7 @@ public class QAController {
 	 */
 	@DeleteMapping(value = "/answer/{id}", produces = "application/json")
 	@PreAuthorize("hasAuthority('employee')")
-	public ResponseEntity<Object> deleteAnswer(@PathVariable(name = "id") UUID id)
+	public ResponseEntity<Object> deleteAnswer(@RequestHeader("Authorization") String token, @PathVariable(name = "id") UUID id)
 	{
 		if (id == null)
 		{
@@ -441,6 +471,7 @@ public class QAController {
 
 			if (answerService.delete(id))
 			{
+			    log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_QA, "Ответ удалён", id);
 				return new ResponseEntity<>(new ApiResponse(true, "Ответ удалён"), HttpStatus.OK);
 			}
 			return new ResponseEntity<>(new ApiResponse(false, "Ответ не найден"), HttpStatus.NOT_FOUND);

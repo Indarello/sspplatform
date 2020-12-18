@@ -1,6 +1,7 @@
 package com.ssp.platform.controller;
 
 import com.ssp.platform.entity.User;
+import com.ssp.platform.logging.Log;
 import com.ssp.platform.request.UsersPageRequest;
 import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.response.JwtResponse;
@@ -36,18 +37,20 @@ public class UserController
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtils jwtUtils;
     private final UserValidate userValidate;
-
+    private final Log log;
 
     @Autowired
     public UserController(
             AuthenticationManager authenticationManager, UserService userService, UserDetailsServiceImpl userDetailsService,
-            JwtUtils jwtUtils, UserValidate userValidate
+            JwtUtils jwtUtils, UserValidate userValidate,
+            Log log
     ) throws IOException {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.userDetailsService = userDetailsService;
         this.jwtUtils = jwtUtils;
         this.userValidate = userValidate;
+        this.log = log;
     }
 
     @GetMapping("/login")
@@ -86,6 +89,21 @@ public class UserController
         try
         {
             userService.save(userValidate.getUser());
+
+            log.info(Log.CONTROLLER_USER, "Поставщик зарегистрирован",
+                    ObjUser.getUsername(),
+                    ObjUser.getFirmName(),
+                    ObjUser.getLastName(),
+                    ObjUser.getPatronymic(),
+                    ObjUser.getFirmName(),
+                    ObjUser.getDescription(),
+                    ObjUser.getAddress(),
+                    ObjUser.getActivity(),
+                    ObjUser.getTechnology(),
+                    ObjUser.getInn(),
+                    ObjUser.getTelephone(),
+                    ObjUser.getEmail());
+
             return new ResponseEntity<>(new ApiResponse(true, "Вы успешно зарегестрировались, ожидайте аккредитации от сотрудника"), HttpStatus.CREATED);
         }
         catch (Exception e)
@@ -99,7 +117,7 @@ public class UserController
      */
     @PostMapping("/regemployee")
     @PreAuthorize("hasAuthority('employee')")
-    public ResponseEntity<?> registerEmployee(@RequestBody User ObjUser)
+    public ResponseEntity<?> registerEmployee(@RequestHeader("Authorization") String token, @RequestBody User ObjUser)
     {
         userValidate.UserValidateBegin(ObjUser);
         ValidateResponse validateResponse = userValidate.validateEmployeeUser();
@@ -111,6 +129,21 @@ public class UserController
         try
         {
             userService.save(userValidate.getUser());
+
+            log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_USER, "Поставщик зарегистрирован",
+                    ObjUser.getUsername(),
+                    ObjUser.getFirmName(),
+                    ObjUser.getLastName(),
+                    ObjUser.getPatronymic(),
+                    ObjUser.getFirmName(),
+                    ObjUser.getDescription(),
+                    ObjUser.getAddress(),
+                    ObjUser.getActivity(),
+                    ObjUser.getTechnology(),
+                    ObjUser.getInn(),
+                    ObjUser.getTelephone(),
+                    ObjUser.getEmail());
+
             return new ResponseEntity<>(new ApiResponse(true, "Сотрудник успешно зарегестрирован!"), HttpStatus.CREATED);
         }
         catch (Exception e)
@@ -201,6 +234,21 @@ public class UserController
         }
 
         User oldUser = searchResult.get();
+
+        Object[] was = {
+                oldUser.getUsername(),
+                oldUser.getFirmName(),
+                oldUser.getLastName(),
+                oldUser.getPatronymic(),
+                oldUser.getFirmName(),
+                oldUser.getDescription(),
+                oldUser.getAddress(),
+                oldUser.getActivity(),
+                oldUser.getTechnology(),
+                oldUser.getInn(),
+                oldUser.getTelephone(),
+                oldUser.getEmail()};
+
         userValidate.UserValidateBegin(oldUser);
 
         if (oldUser.getRole().equals("firm"))
@@ -225,6 +273,22 @@ public class UserController
 
         try
         {
+            Object[] became = {
+                    validUser.getUsername(),
+                    validUser.getFirmName(),
+                    validUser.getLastName(),
+                    validUser.getPatronymic(),
+                    validUser.getFirmName(),
+                    validUser.getDescription(),
+                    validUser.getAddress(),
+                    validUser.getActivity(),
+                    validUser.getTechnology(),
+                    validUser.getInn(),
+                    validUser.getTelephone(),
+                    validUser.getEmail()};
+
+            log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_USER, "Пользователь изменён", was, became);
+
             return new ResponseEntity<>(userService.update(validUser), HttpStatus.OK);
         }
         catch (Exception e)

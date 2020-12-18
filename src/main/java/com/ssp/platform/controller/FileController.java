@@ -14,7 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +32,7 @@ public class FileController {
     }
 
     @GetMapping("/file/{fileId}")
-    public ResponseEntity<?> getFile(@RequestHeader("Authorization") String token, @PathVariable("fileId") UUID id) throws IOException {
+    public ResponseEntity<?> getFile(@RequestHeader("Authorization") String token, @PathVariable("fileId") UUID id) throws IOException, FileServiceException {
         if (id == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Параметр id не предоставлен"), HttpStatus.NOT_ACCEPTABLE);
         }
@@ -41,9 +42,13 @@ public class FileController {
             return new ResponseEntity<>(new ApiResponse(false, "Файл не найден"), HttpStatus.NOT_FOUND);
         } else {
             Resource resource = fileResponse.getResource();
+            if (!Files.exists(resource.getFile().toPath())){
+                fileService.delete(id);
+                throw new FileServiceException(new ApiResponse(false, "Файл удалён"));
+            }
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + fileResponse.getFile().getType() + "\"")
                     .body(resource);
         }
     }

@@ -17,12 +17,16 @@ public class FileValidator extends Validator{
     private static final String FIELD_NAME = "file";
 
     private static final int MAX_FILENAME_SIZE = 255;
-    private static final long MAX_FILE_SIZE = 10485760L;
+    private static final long DEFAULT_MAX_FILE_SIZE = 10485760L;
+
+    private static long maxFileSize;
 
     private final Pattern restrictedRegex;
 
     @Autowired
     public FileValidator(FileProperty fileProperty) {
+        maxFileSize = fileProperty.getMaxOneFileSize();
+
         String[] restrictedTypes = fileProperty.getRestrictedTypes();
         String regex = ".*(\\.";
 
@@ -50,7 +54,7 @@ public class FileValidator extends Validator{
             throw new FileValidationException(new ValidateResponse(false, FIELD_NAME, "Один из файлов не предоставлен"));
         }
 
-        if (file.getSize() > MAX_FILE_SIZE){
+        if (file.getSize() > maxFileSize){
             throw new FileValidationException(new ValidateResponse(false, FIELD_NAME, FileMessages.WRONG_FILE_SIZE_ERROR));
         }
 

@@ -6,9 +6,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Data
-@ConfigurationProperties(prefix = "file")
-public class FileProperty {
-    public String uploadDirectory;
-    public long maxOneFileSize;
-    private String[] restrictedTypes;
+@ConfigurationProperties(prefix = "log")
+public class LogProperty {
+    private boolean enabled;
+    private String directory;
 }

@@ -1,6 +1,6 @@
 package com.ssp.platform.logging;
 
-import com.ssp.platform.property.FileProperty;
+import com.ssp.platform.property.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +14,7 @@ import java.util.Date;
 public class LogFile {
     public static final String FIRM_LOG = "firm";
     public static final String EMPLOYEE_LOG = "employee";
+    public static final String GUEST_LOG = "guest";
 
     private static final String LOG_TYPE = "log";
     private static final String BACKUP_TYPE = "backup";
@@ -21,16 +22,16 @@ public class LogFile {
     private static final String fileDateMask = "yyyyMMdd";
     private static final String fileNameMask = "log-%s-%s.%s";
 
-    private FileProperty fileProperty;
+    private LogProperty logProperty;
     private final Path logStorageLocation;
     private Path logLocation;
     private Path backupLocation;
 
     @Autowired
-    public LogFile(FileProperty fileProperty) throws IOException {
-        this.fileProperty = fileProperty;
+    public LogFile(LogProperty logProperty) throws IOException {
+        this.logProperty = logProperty;
 
-        String directory = fileProperty.getLogDirectory();
+        String directory = logProperty.getDirectory();
         if(directory.contains(":")) logStorageLocation = Paths.get(directory);
         else logStorageLocation = Paths.get(directory).toAbsolutePath().normalize();
         if (!Files.exists(logStorageLocation)) {
@@ -45,8 +46,8 @@ public class LogFile {
         String fileName = String.format(fileNameMask, dateFormat.format(new Date()), role, LOG_TYPE);
         String backupFileName = String.format(fileNameMask, dateFormat.format(new Date()), role, BACKUP_TYPE);
 
-        String logPath = fileProperty.getLogDirectory() + "\\" + fileName;
-        String backupPath = fileProperty.getLogDirectory() + "\\" + backupFileName;
+        String logPath = logProperty.getDirectory() + "\\" + fileName;
+        String backupPath = logProperty.getDirectory() + "\\" + backupFileName;
         if(logPath.contains(":")) {
             logLocation = Paths.get(logPath);
             backupLocation = Paths.get(backupPath);

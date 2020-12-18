@@ -88,8 +88,7 @@ public class FileServiceImpl implements FileService {
 
         if (searchResult.isPresent()) {
             FileEntity fileEntity = searchResult.get();
-            String extension = fileEntity.getName().substring(fileEntity.getName().lastIndexOf("."));
-            Path filePath = fileStorageLocation.resolve(fileEntity.getHash() + extension).normalize();
+            Path filePath = fileStorageLocation.resolve(fileEntity.getHash()).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             return new FileResponse(true, resource, fileEntity);
@@ -105,11 +104,9 @@ public class FileServiceImpl implements FileService {
             deleteFile(fileEntity.getHash(), fileEntity.getType());
             fileRepository.delete(fileEntity);
         } catch (EntityNotFoundException e) {
-            System.out.println("Запрашиваемый файл не найден");
             //throw new FileServiceException(new ApiResponse(false, "Запрашиваемый файл не найден"));
         } catch (NoSuchFileException e){
             fileRepository.delete(fileEntity);
-            System.out.println("Запрашиваемый файл не найден");
             //throw new FileServiceException(new ApiResponse(false, "Запрашиваемый файл не найден"));
         }
     }
@@ -137,7 +134,7 @@ public class FileServiceImpl implements FileService {
 
     private void storeFiles(List<FileEntity> fileEntities, MultipartFile[] files) throws IOException {
         for (int i = 0; i < files.length; ++i) {
-            Path targetLocation = fileStorageLocation.resolve(fileEntities.get(i).getHash() + fileEntities.get(i).getType());
+            Path targetLocation = fileStorageLocation.resolve(fileEntities.get(i).getHash());
             Files.copy(files[i].getInputStream(), targetLocation);
         }
     }

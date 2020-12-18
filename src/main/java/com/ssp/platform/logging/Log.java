@@ -2,7 +2,7 @@ package com.ssp.platform.logging;
 
 import com.ssp.platform.entity.User;
 import com.ssp.platform.logging.Service.LogService;
-import com.ssp.platform.property.FileProperty;
+import com.ssp.platform.property.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,13 +30,18 @@ public class Log {
     private final LogFile logFile;
     private final LogService logService;
 
+    private final LogProperty logProperty;
+
     @Autowired
-    public Log(LogFile logFile, LogService logService) {
+    public Log(LogFile logFile, LogService logService, LogProperty logProperty) {
         this.logFile = logFile;
         this.logService = logService;
+        this.logProperty = logProperty;
     }
 
     public void info(String controller, String action, Object ... params) throws IOException {
+        if (!logProperty.isEnabled()) return;
+
         SimpleDateFormat dateFormat = new SimpleDateFormat(dateMask);
         Date infoDate = new Date();
 
@@ -44,7 +49,7 @@ public class Log {
 
         System.out.println(line);
 
-        logFile.put(line, USER_GUEST);
+        logFile.put(line, LogFile.GUEST_LOG);
 
         LogEntity logEntity = new LogEntity();
         logEntity.setDate(Timestamp.from(infoDate.toInstant()));
@@ -59,6 +64,8 @@ public class Log {
     }
 
     public void info(User user, String controller, String action, Object ... params) throws IOException {
+        if (!logProperty.isEnabled()) return;
+
         SimpleDateFormat dateFormat = new SimpleDateFormat(dateMask);
         Date infoDate = new Date();
 
@@ -81,6 +88,8 @@ public class Log {
     }
 
     public void info(User user, String controller, String action, Object[] was, Object[] became) throws IOException {
+        if (!logProperty.isEnabled()) return;
+
         SimpleDateFormat dateFormat = new SimpleDateFormat(dateMask);
         Date infoDate = new Date();
 

@@ -1,7 +1,6 @@
 package com.ssp.platform;
 
 import com.ssp.platform.service.PurchaseService;
-import com.ssp.platform.telegram.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +20,11 @@ public class PlatformApplication {
 
 	private static final Logger logger = Logger.getLogger(PlatformApplication.class);
 
-	private static PurchaseService purchaseService;
+	/**private static PurchaseService purchaseService;
 
     public PlatformApplication(PurchaseService purchaseService) {
         this.purchaseService = purchaseService;
-    }
+    }*/
 
     public static void main(String[] args) throws IOException {
         //Загрузка настроек логера из log4j.properties
@@ -43,12 +42,12 @@ public class PlatformApplication {
 			logger.error( message + Arrays.toString(ex.getStackTrace()), ex);
 		}
 
-        try{
+        /**try{
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(new SSPPlatformBot(purchaseService));
         } catch (TelegramApiException e) {
             e.printStackTrace();
-        }
+        }*/
 
 	}
 	//System.out.println("123");  для копирования
