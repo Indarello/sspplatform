@@ -1,18 +1,19 @@
 package com.ssp.platform.property;
 
-        import lombok.Data;
-        import org.springframework.boot.context.properties.ConfigurationProperties;
-        import org.springframework.stereotype.Component;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-        import java.nio.charset.StandardCharsets;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @Data
 @ConfigurationProperties(prefix = "email-announcement")
-public class EmailAnnouncementProperty {
+public class EmailAnnouncementProperty
+{
     private int status;
     private String host;
-    private String heading;
+    private String subject;
     private String firstLine;
     private int description;
     private int budget;
@@ -22,9 +23,9 @@ public class EmailAnnouncementProperty {
         return new String(host.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String getHeading()
+    public String getSubject()
     {
-        return new String(heading.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        return new String(subject.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     public String getFirstLine()

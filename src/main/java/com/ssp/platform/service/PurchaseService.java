@@ -20,7 +20,5 @@ public interface PurchaseService {
 
 	Optional<Purchase> findById(UUID id);
 
-	boolean existById(UUID id);
-
-	public void sendEmail(Purchase purchase);
+	void sendEmail(Purchase purchase);
 }
