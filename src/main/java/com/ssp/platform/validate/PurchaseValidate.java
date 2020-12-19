@@ -342,7 +342,7 @@ public class PurchaseValidate extends Validator
             long nowSec = System.currentTimeMillis() / 1000;
             if (nowSec >= purchase.getProposalDeadLine())
             {
-                setCheckResult("Время приема предложений закончено");
+                setCheckResult("Срок приема предложений закончен, измените статус или срок");
                 return;
             }
         }
@@ -351,7 +351,12 @@ public class PurchaseValidate extends Validator
             long nowSec = System.currentTimeMillis() / 1000;
             if (nowSec < purchase.getProposalDeadLine())
             {
-                setCheckResult("Установите срок подачи предложения меньший текущего времени");
+                setCheckResult("Срок приема предложений еще не окончен, измените статус или срок");
+                return;
+            }
+            else if (nowSec > purchase.getFinishDeadLine())
+            {
+                setCheckResult("Срок рассмотрения предложений закончен, измените статус или срок");
                 return;
             }
         }

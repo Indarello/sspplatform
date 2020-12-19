@@ -25,7 +25,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Optional;
 
 
@@ -44,7 +43,8 @@ public class UserController
             AuthenticationManager authenticationManager, UserService userService, UserDetailsServiceImpl userDetailsService,
             JwtUtils jwtUtils, UserValidate userValidate,
             Log log
-    ) throws IOException {
+    )
+    {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.userDetailsService = userDetailsService;
@@ -257,11 +257,14 @@ public class UserController
         }
         else
         {
+            validateResponse = userValidate.validateEditEmployeeUser(objUser);
+            /*
             User user = userDetailsService.loadUserByToken(token);
             if (oldUser.getUsername().equals(user.getUsername()))
                 validateResponse = userValidate.validateEditEmployeeUser(objUser);
             else return new ResponseEntity<>(new ApiResponse(false, "Вы не можете менять" +
-                    "информацию по аккаунту другого сотрудника"), HttpStatus.FORBIDDEN);
+                    " информацию по аккаунту другого сотрудника"), HttpStatus.FORBIDDEN);
+             */
         }
 
         if (!validateResponse.isSuccess())
