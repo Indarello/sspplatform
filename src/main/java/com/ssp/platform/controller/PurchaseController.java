@@ -13,6 +13,7 @@ import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
 import com.ssp.platform.service.impl.FileServiceImpl;
+import com.ssp.platform.telegram.SSPPlatformBot;
 import com.ssp.platform.validate.PurchaseValidate;
 import com.ssp.platform.validate.PurchasesPageValidate;
 import com.ssp.platform.validate.ValidatorMessages.FileMessages;
@@ -41,6 +42,9 @@ public class PurchaseController
     private final UserDetailsServiceImpl userDetailsService;
     private final FileService fileService;
     private final Log log;
+
+    @Autowired
+    private SSPPlatformBot sspPlatformBot;
 
     @Autowired
     PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, Log log){
@@ -98,6 +102,8 @@ public class PurchaseController
             savedPurchase.setFiles(savedFiles);
 
             log.info(author, Log.CONTROLLER_PURCHASE, "Закупка создана", name, description, proposalDeadLine, finishDeadLine, budget, demands, team, workCondition);
+
+            sspPlatformBot.notifyAllAboutPurchase(savedPurchase);
 
             purchaseService.sendEmail(savedPurchase);
             return new ResponseEntity<>(savedPurchase, HttpStatus.CREATED);

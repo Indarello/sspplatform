@@ -40,6 +40,7 @@ public class UserServiceImpl implements UserService
         newUser.setFirstName(userCreateProperty.getFirstName());
         newUser.setLastName(userCreateProperty.getLastName());
         newUser.setPatronymic(userCreateProperty.getPatronymic());
+        newUser.setTgConnected(false);
 
         createUserFromProperties(newUser);
     }
@@ -48,6 +49,7 @@ public class UserServiceImpl implements UserService
     public User save(User user)
     {
         user.setPassword(encoder.encode(user.getPassword()));
+        user.setTgConnected(false);
         return userRepository.save(user);
     }
 

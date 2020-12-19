@@ -45,6 +45,8 @@ public class SupplyController {
             throws IOException, NoSuchAlgorithmException, SupplyValidationException, FileValidationException, SupplyServiceException {
 
         User author = userDetailsService.loadUserByToken(token);
+        //if (author.getStatus().equals("NotApproved")) return new ResponseEntity<>(new ApiResponse(false, "Пользователь не аккредитован!"), HttpStatus.BAD_REQUEST);
+
         supplyService.create(purchaseId, description, author, budget, comment, files);
 
         log.info(author, Log.CONTROLLER_SUPPLY, "Предложение создано", purchaseId, description, budget, comment);

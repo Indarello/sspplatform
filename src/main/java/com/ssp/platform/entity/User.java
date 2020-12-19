@@ -100,13 +100,17 @@ public class User
     @NotBlank
     private String status;
 
+    @NotNull
+    @Column(name = "tg_connected")
+    private Boolean tgConnected;
+
     @OneToMany(mappedBy="author", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Purchase> purchases;
 
     @OneToMany(mappedBy="author", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Purchase> supplies;
+    private List<SupplyEntity> supplies;
 
     public User()
     {

@@ -101,14 +101,14 @@ public class Purchase
     @NotNull
     private String workCondition;
 
-    @OneToMany(mappedBy = "purchase", targetEntity = FileEntity.class, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "purchase", targetEntity = FileEntity.class)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<FileEntity> files;
 
     /**
      * Массив сущностей предложений
      */
-    @OneToMany(mappedBy = "purchase", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "purchase")
     @Fetch(value = FetchMode.SUBSELECT)
     @JsonIgnore
     private List<SupplyEntity> supplies;

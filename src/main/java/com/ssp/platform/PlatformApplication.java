@@ -4,6 +4,11 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,12 +20,6 @@ public class PlatformApplication {
 
 	private static final Logger logger = Logger.getLogger(PlatformApplication.class);
 
-	/**private static PurchaseService purchaseService;
-
-    public PlatformApplication(PurchaseService purchaseService) {
-        this.purchaseService = purchaseService;
-    }*/
-
     public static void main(String[] args) throws IOException {
         //Загрузка настроек логера из log4j.properties
 		Properties props = new Properties();
@@ -30,20 +29,11 @@ public class PlatformApplication {
 		logger.info("Starting application..");
 
 		try {
-
 			SpringApplication.run(PlatformApplication.class, args);
-		}catch (Exception ex){
+        } catch (Exception ex){
 			String message = ex.getMessage() == null?"Application failed... StackTrace:\n":ex.getMessage();
 			logger.error( message + Arrays.toString(ex.getStackTrace()), ex);
 		}
-
-        /**try{
-            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-            telegramBotsApi.registerBot(new SSPPlatformBot(purchaseService));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }*/
-
-	}
+    }
 	//System.out.println("123");  для копирования
 }

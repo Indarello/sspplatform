@@ -21,4 +21,5 @@ public interface UserService
     List<User> findByRoleAndStatus(String role, String status);
 
     public User update(User user);
+
 }

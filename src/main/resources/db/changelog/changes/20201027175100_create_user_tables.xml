@@ -51,6 +51,9 @@
 			<column name="status" type="varchar(50)">
 				<constraints nullable="false"/>
 			</column>
+            <column name="tg_connected" type="boolean">
+                <constraints nullable="false"/>
+            </column>
 		</createTable>
 	</changeSet>
 </databaseChangeLog>

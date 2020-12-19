@@ -7,6 +7,7 @@ import com.ssp.platform.request.QuestionUpdateRequest;
 import com.ssp.platform.response.*;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.*;
+import com.ssp.platform.telegram.SSPPlatformBot;
 import com.ssp.platform.validate.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -26,13 +27,15 @@ public class QAController {
 	private final PurchaseService purchaseService;
 	private final QuestionValidate questionValidate;
 	private final Log log;
+	private final SSPPlatformBot sspPlatformBot;
 
 	@Autowired
     public QAController(
             QuestionService questionService, AnswerService answerService, UserDetailsServiceImpl userDetailsService,
             PurchaseService purchaseService,
             QuestionValidate questionValidate,
-            Log log
+            Log log,
+            SSPPlatformBot sspPlatformBot
     ) {
         this.questionService = questionService;
         this.answerService = answerService;
@@ -40,6 +43,7 @@ public class QAController {
         this.purchaseService = purchaseService;
         this.questionValidate = questionValidate;
         this.log = log;
+        this.sspPlatformBot = sspPlatformBot;
     }
 
     /**
@@ -339,6 +343,8 @@ public class QAController {
 		    //сначала сохраняем ответ, потом обновляем вопрос иначе ошибка
 		    answer = answerService.save(answer);
 			questionService.update(question);
+
+			sspPlatformBot.notifyAboutAnswer(question);
 
 			log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_QA, "Ответ создан", description, questionId, publicity);
 

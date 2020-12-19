@@ -27,7 +27,7 @@ public class SupplyEntity {
     private UUID id;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = Purchase.class)
+    @ManyToOne(targetEntity = Purchase.class)
     @JoinColumn(name = "purchase_id")
     private Purchase purchase;
 
@@ -37,7 +37,7 @@ public class SupplyEntity {
     @Column(name = "create_date")
     private Long createDate;
 
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = User.class)
+    @ManyToOne(targetEntity = User.class)
     @JoinColumn(name = "author")
     private User author;
 
@@ -57,7 +57,7 @@ public class SupplyEntity {
     @Column(name = "result_date")
     private Long resultDate;
 
-    @OneToMany(mappedBy = "supply", targetEntity = FileEntity.class, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "supply", targetEntity = FileEntity.class)
     private List<FileEntity> files;
     
     public SupplyEntity(){
