@@ -1,4 +1,4 @@
-package com.ssp.platform.utl;
+package com.ssp.platform.email;
 
 import lombok.Data;
 

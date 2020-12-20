@@ -20,6 +20,11 @@ public class EmailAnnouncementProperty
     private String purchaseCFirstLine;
     private int purchaseCDescription;
     private int purchaseCBudget;
+    private String supplyESubject;
+    private String supplyEFirstLine;
+    private String answerSubject;
+    private String answerCFirstLine;
+    private String answerEFirstLine;
 
     public String getHost()
     {
@@ -30,23 +35,28 @@ public class EmailAnnouncementProperty
     {
         return new String(purchaseCSubject.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
-
     public String getPurchaseCFirstLine()
     {
         return new String(purchaseCFirstLine.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
-
-/*
-        # ---------------------------  Оповещение при изменении статуса предложения
-# Заголовк письма
-    email-announcement.supplyESubject=Изменение статуса предложения
-# Первая строка в письме
-    email-announcement.supplyEFirstLine=Здравствуйте, вашему предложению был присвоен статус
-# ---------------------------  Оповещение при ответе на вопрос и изменении ответа
-# Заголовк письма
-    email-announcement.answerCSubject=Новый ответ на вопрос
-# Первая строка в письме
-    email-announcement.answerCFirstLine=Здравствуйте, по вашему вопросу был дан ответ:
-    */
-
+    public String getSupplyESubject()
+    {
+        return new String(supplyESubject.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+    public String getSupplyEFirstLine()
+    {
+        return new String(supplyEFirstLine.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+    public String getAnswerSubject()
+    {
+        return new String(answerSubject.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+    public String getAnswerCFirstLine()
+    {
+        return new String(answerCFirstLine.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+    public String getAnswerEFirstLine()
+    {
+        return new String(answerEFirstLine.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
 }

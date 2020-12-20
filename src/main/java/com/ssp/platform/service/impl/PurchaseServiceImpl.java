@@ -12,7 +12,7 @@ import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
 import com.ssp.platform.service.SupplyService;
 import com.ssp.platform.service.UserService;
-import com.ssp.platform.utl.EmailSender;
+import com.ssp.platform.email.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -117,14 +117,6 @@ public class PurchaseServiceImpl implements PurchaseService
     {
         List<User> users = userService.findByRoleAndStatus("firm", "Approved");
 
-        try
-        {
-            emailSender.sendMailPurchaseCreate(purchase, users);
-        }
-        catch (MessagingException | InterruptedException e)
-        {
-            //TODO логирование в
-            e.printStackTrace();
-        }
+        emailSender.sendMailPurchaseCreate(purchase, users);
     }
 }

@@ -1,5 +1,6 @@
 package com.ssp.platform.service.impl;
 
+import com.ssp.platform.email.EmailSender;
 import com.ssp.platform.entity.*;
 import com.ssp.platform.exceptions.*;
 import com.ssp.platform.repository.*;
@@ -8,6 +9,7 @@ import com.ssp.platform.response.*;
 import com.ssp.platform.service.*;
 import com.ssp.platform.validate.*;
 import com.ssp.platform.validate.ValidatorMessages.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,14 +29,17 @@ public class SupplyServiceImpl implements SupplyService {
     private final PurchaseRepository purchaseRepository;
     private final FileServiceImpl fileService;
     private final SupplyValidator supplyValidator;
+    private final EmailSender emailSender;
 
+    @Autowired
     public SupplyServiceImpl(
             SupplyRepository supplyRepository, FileServiceImpl fileService, SupplyValidator supplyValidator, FileValidator fileValidator,
-            PurchaseRepository purchaseRepository) {
+            PurchaseRepository purchaseRepository, EmailSender emailSender) {
         this.supplyRepository = supplyRepository;
         this.fileService = fileService;
         this.supplyValidator = supplyValidator;
         this.purchaseRepository = purchaseRepository;
+        this.emailSender = emailSender;
     }
 
     @Override
@@ -58,6 +63,7 @@ public class SupplyServiceImpl implements SupplyService {
     public void update(User user, UUID id, SupplyUpdateRequest updateRequest)
             throws IOException, NoSuchAlgorithmException, SupplyValidationException, SupplyServiceException, FileValidationException {
         SupplyEntity supplyEntity = supplyRepository.getOne(id);
+        boolean statusChanged = false;
 
         switch (user.getRole()){
             case "firm":
@@ -99,6 +105,7 @@ public class SupplyServiceImpl implements SupplyService {
                 supplyValidator.validateSupplyUpdating(updateRequest, supplyEntity, SupplyValidator.ROLE_EMPLOYEE);
 
                 if (updateRequest.getStatus() != null){
+                    if(!updateRequest.getStatus().equals(supplyEntity.getStatus())) statusChanged = true;
                     supplyEntity.setStatus(updateRequest.getStatus());
                 }
 
@@ -109,7 +116,7 @@ public class SupplyServiceImpl implements SupplyService {
                 supplyEntity.setResultDate(System.currentTimeMillis() / DATE_DIVIDER);
                 break;
         }
-
+        if(statusChanged) emailSender.sendMailSupplyEdit(supplyEntity.getPurchase(), supplyEntity, supplyEntity.getAuthor());
         supplyRepository.saveAndFlush(supplyEntity);
     }
 

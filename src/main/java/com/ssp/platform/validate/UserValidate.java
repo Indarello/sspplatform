@@ -3,11 +3,11 @@ package com.ssp.platform.validate;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.repository.UserRepository;
 import com.ssp.platform.response.ValidateResponse;
-import com.ssp.platform.service.UserService;
 import com.ssp.platform.validate.ValidatorMessages.UserMessages;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.util.regex.Pattern;
 
 //TODO:В будущем если будет время сделать так что бы название полей ValidateResponse совпадало с названием поля user
