@@ -130,8 +130,13 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
                 question.getDescription(),
                 question.getAnswer().getDescription()));
         logger.info("Подключение ID чата");
-        answerNotify.setChatId(String.valueOf(telegramUsersService.getChatIdByUser(question.getAuthor())));
-        answerNotify.setParseMode("Markdown");
+        try {
+            answerNotify.setChatId(String.valueOf(telegramUsersService.getChatIdByUser(question.getAuthor())));
+            answerNotify.setParseMode("Markdown");
+        } catch (Exception e){
+            logger.info(e.getMessage());
+            e.printStackTrace();
+        }
 
         logger.info("Отправка");
         try {
