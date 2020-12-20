@@ -5,6 +5,7 @@ import com.ssp.platform.response.ApiResponse;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.UserService;
 import com.ssp.platform.telegram.*;
+import org.slf4j.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,6 +15,8 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
 
     private final TelegramUsersRepository telegramUsersRepository;
     private final UserService userService;
+
+    Logger logger = LoggerFactory.getLogger(TelegramUsersServiceImpl.class);
 
     public TelegramUsersServiceImpl(TelegramUsersRepository telegramUsersRepository, UserService userService) {
         this.telegramUsersRepository = telegramUsersRepository;
@@ -43,6 +46,8 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
 
     @Override
     public Long getChatIdByUser(User user) {
+        logger.info(user.getUsername());
+
         TelegramUsersEntity telegramUsersEntity = telegramUsersRepository.getTelegramUsersEntityByUsername(user.getUsername());
         return telegramUsersEntity.getChatId();
     }
