@@ -9,6 +9,7 @@ import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.*;
 import com.ssp.platform.telegram.SSPPlatformBot;
 import com.ssp.platform.validate.*;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,8 @@ public class QAController {
 	private final QuestionValidate questionValidate;
 	private final Log log;
 	private final SSPPlatformBot sspPlatformBot;
+
+	Logger logger = LoggerFactory.getLogger(QAController.class);
 
 	@Autowired
     public QAController(
@@ -342,10 +345,11 @@ public class QAController {
 		{
 		    //сначала сохраняем ответ, потом обновляем вопрос иначе ошибка
 		    answer = answerService.save(answer);
+		    logger.info("Ответ сохранён");
 			questionService.update(question);
-
+            logger.info("Вопрос обновлён");
 			sspPlatformBot.notifyAboutAnswer(question);
-
+            logger.info("Оповещение отправлено");
 			log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_QA, "Ответ создан", description, questionId, publicity);
 
 			return new ResponseEntity<>(answer, HttpStatus.CREATED);
