@@ -47,8 +47,9 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
     @Override
     public Long getChatIdByUser(User user) {
         logger.info(user.getUsername());
-
         TelegramUsersEntity telegramUsersEntity = telegramUsersRepository.getTelegramUsersEntityByUsername(user.getUsername());
+        logger.info(telegramUsersEntity.getUsername());
+        logger.info(telegramUsersEntity.toString());
         return telegramUsersEntity.getChatId();
     }
 
