@@ -345,9 +345,8 @@ public class QAController {
 		{
 		    //сначала сохраняем ответ, потом обновляем вопрос иначе ошибка
 		    answer = answerService.save(answer);
-		    logger.info("Ответ сохранён");
 			questionService.update(question);
-            logger.info("Вопрос обновлён");
+
 			sspPlatformBot.notifyAboutAnswer(question);
             logger.info("Оповещение отправлено");
 			log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_QA, "Ответ создан", description, questionId, publicity);
