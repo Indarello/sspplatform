@@ -121,6 +121,7 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
     }
 
     public void notifyAboutAnswer(Question question){
+        logger.info("Создание оповещение");
         SendMessage answerNotify = new SendMessage();
         answerNotify.setText(String.format(
                 MASK_ANSWER_NOTIFY,
@@ -128,9 +129,11 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
                 question.getName(),
                 question.getDescription(),
                 question.getAnswer().getDescription()));
+        logger.info("Подключение ID чата");
         answerNotify.setChatId(String.valueOf(telegramUsersService.getChatIdByUser(question.getAuthor())));
         answerNotify.setParseMode("Markdown");
 
+        logger.info("Отправка");
         try {
             execute(answerNotify);
         } catch (TelegramApiException e) {
