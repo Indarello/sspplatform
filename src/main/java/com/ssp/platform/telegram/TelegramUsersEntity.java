@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Table(name = "telegram_users")
 @AllArgsConstructor
 @NoArgsConstructor
-//@Proxy(lazy = false)
+@Proxy(lazy = false)
 public class TelegramUsersEntity {
 
     @Id

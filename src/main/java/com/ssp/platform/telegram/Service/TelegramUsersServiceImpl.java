@@ -16,8 +16,6 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
     private final TelegramUsersRepository telegramUsersRepository;
     private final UserService userService;
 
-    Logger logger = LoggerFactory.getLogger(TelegramUsersServiceImpl.class);
-
     public TelegramUsersServiceImpl(TelegramUsersRepository telegramUsersRepository, UserService userService) {
         this.telegramUsersRepository = telegramUsersRepository;
         this.userService = userService;
@@ -46,10 +44,7 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
 
     @Override
     public Long getChatIdByUser(User user) {
-        logger.info(user.getUsername());
         TelegramUsersEntity telegramUsersEntity = telegramUsersRepository.getTelegramUsersEntityByUsername(user.getUsername());
-        logger.info(telegramUsersEntity.getUsername());
-        logger.info(telegramUsersEntity.toString());
         return telegramUsersEntity.getChatId();
     }
 
@@ -69,6 +64,11 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
     @Override
     public boolean existsByChatId(Long chatId) {
         return telegramUsersRepository.existsById(chatId);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return telegramUsersRepository.existsByUsername(username);
     }
 
     @Override

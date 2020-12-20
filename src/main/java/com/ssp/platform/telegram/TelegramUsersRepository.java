@@ -13,4 +13,6 @@ public interface TelegramUsersRepository extends JpaRepository<TelegramUsersEnti
     List<TelegramUsersEntity> getTelegramUsersEntitiesByUsernameNotNull();
 
     boolean existsByTempCode(int tempCode);
+
+    boolean existsByUsername(String username);
 }

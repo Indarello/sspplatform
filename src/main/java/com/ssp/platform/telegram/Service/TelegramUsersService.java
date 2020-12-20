@@ -19,5 +19,7 @@ public interface TelegramUsersService {
 
     boolean existsByChatId(Long chatId);
 
+    boolean existsByUsername(String username);
+
     void deleteChat(long chatId);
 }

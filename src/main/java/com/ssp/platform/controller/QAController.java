@@ -348,7 +348,7 @@ public class QAController {
 			questionService.update(question);
 
 			sspPlatformBot.notifyAboutAnswer(question);
-            logger.info("Оповещение отправлено");
+
 			log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_QA, "Ответ создан", description, questionId, publicity);
 
 			return new ResponseEntity<>(answer, HttpStatus.CREATED);
