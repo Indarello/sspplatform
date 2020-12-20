@@ -1,5 +1,6 @@
 package com.ssp.platform.service.impl;
 
+import com.ssp.platform.email.EmailSender;
 import com.ssp.platform.entity.FileEntity;
 import com.ssp.platform.entity.Purchase;
 import com.ssp.platform.entity.SupplyEntity;
@@ -8,19 +9,20 @@ import com.ssp.platform.entity.enums.PurchaseStatus;
 import com.ssp.platform.exceptions.FileServiceException;
 import com.ssp.platform.exceptions.SupplyServiceException;
 import com.ssp.platform.repository.PurchaseRepository;
+import com.ssp.platform.request.PurchasesPageRequest;
 import com.ssp.platform.service.FileService;
 import com.ssp.platform.service.PurchaseService;
 import com.ssp.platform.service.SupplyService;
 import com.ssp.platform.service.UserService;
-import com.ssp.platform.email.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -60,9 +62,25 @@ public class PurchaseServiceImpl implements PurchaseService
     }
 
     @Override
-    public Page<Purchase> getAll(Pageable pageable)
+    public Page<Purchase> getAll(PurchasesPageRequest purchasesPageRequest)
     {
-        return purchaseRepository.findAll(pageable);
+        Pageable pageable = PageRequest.of(purchasesPageRequest.getRequestPage(), purchasesPageRequest.getNumberOfElements(),
+                Sort.by("createDate").descending());
+
+        //в будущем через criteria когда будет больше параметров фильтрации
+        String name = purchasesPageRequest.getFilterName();
+        PurchaseStatus status = purchasesPageRequest.getFilterStatus();
+        if (status == null)
+        {
+            if(name.equals("")) return purchaseRepository.findAll(pageable);
+            else return purchaseRepository.findAllByNameContaining(name, pageable);
+        }
+        else
+        {
+            if(name.equals("")) return purchaseRepository.findAllByStatus(status, pageable);
+            else return purchaseRepository.findAllByNameContainingAndStatus(name, status, pageable);
+        }
+
     }
 
     @Override

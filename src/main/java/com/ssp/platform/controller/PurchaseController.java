@@ -47,7 +47,8 @@ public class PurchaseController
     private SSPPlatformBot sspPlatformBot;
 
     @Autowired
-    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, Log log){
+    PurchaseController(PurchaseService purchaseService, UserDetailsServiceImpl userDetailsService, FileService fileService, Log log)
+    {
         this.purchaseService = purchaseService;
         this.userDetailsService = userDetailsService;
         this.fileService = fileService;
@@ -122,10 +123,14 @@ public class PurchaseController
      */
     @GetMapping(value = "/purchases", produces = "application/json")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
-    public ResponseEntity<Object> getPurchases(@RequestParam(value = "requestPage", required = false) Integer requestPage,
-                                               @RequestParam(value = "numberOfElements", required = false) Integer numberOfElements)
+    public ResponseEntity<Object> getPurchases
+    (@RequestParam(value = "requestPage", required = false) Integer requestPage,
+     @RequestParam(value = "numberOfElements", required = false) Integer numberOfElements,
+     @RequestParam(value = "filterName", required = false) String filterName,
+     @RequestParam(value = "filterStatus", required = false) PurchaseStatus filterStatus)
     {
-        PurchasesPageRequest purchasesPageRequest = new PurchasesPageRequest(requestPage, numberOfElements);
+        PurchasesPageRequest purchasesPageRequest = new PurchasesPageRequest(
+                requestPage, numberOfElements, filterName, filterStatus);
         PurchasesPageValidate purchasesPageValidate = new PurchasesPageValidate(purchasesPageRequest);
         ValidateResponse validateResponse = purchasesPageValidate.validatePurchasePage();
 
@@ -136,12 +141,9 @@ public class PurchaseController
 
         PurchasesPageRequest validPageRequest = purchasesPageValidate.getPurchasePageRequest();
 
-        Pageable pageable = PageRequest.of(validPageRequest.getRequestPage(), validPageRequest.getNumberOfElements(),
-                Sort.by("createDate").descending());
-
         try
         {
-            return new ResponseEntity<>(purchaseService.getAll(pageable), HttpStatus.OK);
+            return new ResponseEntity<>(purchaseService.getAll(validPageRequest), HttpStatus.OK);
         }
         catch (Exception e)
         {
@@ -194,7 +196,7 @@ public class PurchaseController
             @RequestParam(value = "cancelReason", required = false) String cancelReason,
             @RequestParam(value = "files", required = false) MultipartFile[] files) throws FileValidationException
     {
-        if(id == null)
+        if (id == null)
         {
             return new ResponseEntity<>(new ApiResponse(false, "Параметр id не предоставлен"), HttpStatus.NOT_ACCEPTABLE);
         }
