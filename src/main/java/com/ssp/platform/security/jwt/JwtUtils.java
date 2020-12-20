@@ -8,7 +8,6 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +18,8 @@ import java.util.Date;
 public class JwtUtils
 {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-    Key key;
+    private final Key key;
+    private final long jwtTokenTime;
 
     @Autowired
     public JwtUtils(SecurityJwtProperty securityJwtProperty)
@@ -27,18 +27,17 @@ public class JwtUtils
         String jwtSecret = securityJwtProperty.getJwtSecret();
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.jwtTokenTime = securityJwtProperty.getJwtTokenTime() * 1000;
     }
 
     public String generateJwtToken(Authentication authentication)
     {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
-        int jwtExpirationMs = 86400000; //1 Day
-
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .setExpiration(new Date((new Date()).getTime() + jwtTokenTime))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }

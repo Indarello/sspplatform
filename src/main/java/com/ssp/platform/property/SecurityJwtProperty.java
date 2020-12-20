@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
 public class SecurityJwtProperty
 {
     private String jwtSecret;
+    private Long jwtTokenTime;
 }

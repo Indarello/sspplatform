@@ -32,6 +32,7 @@ public class EmailSender
     private volatile boolean busyAnswerCE = false;
     int SleepTime = 100;
 
+    private final int sendCoolDown;
     private final String host;
     private final int purchaseCreate;
     private final int supplyEdit;
@@ -43,7 +44,6 @@ public class EmailSender
     private final String supplyEFirstLine;
     private final String answerCFirstLine;
     private final String answerEFirstLine;
-
 
     @Autowired
     EmailSender(JavaMailSender emailSender, EmailConnectionProperty emailConnectionProperty, EmailAnnouncementProperty emailAnnouncementProperty) throws MessagingException
@@ -63,6 +63,7 @@ public class EmailSender
         this.answerCFirstLine = emailAnnouncementProperty.getAnswerCFirstLine();
         this.answerEFirstLine = emailAnnouncementProperty.getAnswerEFirstLine();
 
+        this.sendCoolDown = emailAnnouncementProperty.getSendCoolDown()*1000;
         this.host = emailAnnouncementProperty.getHost();
         InternetAddress from = new InternetAddress(emailConnectionProperty.getUsername(), false);
 
@@ -95,17 +96,17 @@ public class EmailSender
         busyPurchaseCreate = true;
 
         String content = purchaseCFirstLine + "<br>";
-        content = content + "Название закупки: " + purchase.getName() + "<br>";
+        content = content + "<b>Название закупки:</b> " + purchase.getName() + "<br>";
         if (purchaseCDescription == 1)
         {
-            content = content + "Описание закупки: " + purchase.getDescription() + "<br>";
+            content = content + "<b>Описание закупки:</b> " + purchase.getDescription() + "<br>";
         }
         if (purchaseCBudget == 1)
         {
             Long budget = purchase.getBudget();
-            if (budget > 0) content = content + "Бюджет закупки: " + budget + "<br>";
+            if (budget > 0) content = content + "<b>Бюджет закупки:</b> " + budget + "<br>";
         }
-        content = content + "Закупка доступна по адресу: " + host + "/purchase/" + purchase.getId();
+        content = content + "<b>Закупка доступна по адресу:</b> " + host + "/purchase/" + purchase.getId();
         Date nowDate = new Date();
 
         try
@@ -150,10 +151,10 @@ public class EmailSender
         busySupplyEdit = true;
 
         String content = supplyEFirstLine + " “" + supplyEntity.getStatus()  + "“<br>";
-        content = content + "Название закупки: " + purchase.getName() + "<br>";
+        content = content + "<b>Название закупки:</b> " + purchase.getName() + "<br>";
         String result = supplyEntity.getResult();
-        if(result.length() > 0) content = content + "Результат рассмотрения: " + result + "<br>";
-        content = content + "Закупка доступна по адресу: " + host + "/purchase/" + purchase.getId();
+        if(result.length() > 0) content = content + "<b>Результат рассмотрения:</b> " + result + "<br>";
+        content = content + "<b>Закупка доступна по адресу:</b> " + host + "/purchase/" + purchase.getId();
         Date nowDate = new Date();
 
         try
@@ -193,11 +194,11 @@ public class EmailSender
         busyAnswerCE = true;
 
         String content = answerCFirstLine + "<br>";
-        content = content + "Название закупки: " + purchase.getName() + "<br>";
-        content = content + "Тема вопроса: " + question.getName() + "<br>";
-        content = content + "Текст вопроса: " + question.getDescription() + "<br>";
-        content = content + "Текст ответа: " + answer.getDescription() + "<br>";
-        content = content + "Закупка доступна по адресу: " + host + "/purchase/" + purchase.getId();
+        content = content + "<b>Название закупки:</b> " + purchase.getName() + "<br>";
+        content = content + "<b>Тема вопроса:</b> " + question.getName() + "<br>";
+        content = content + "<b>Текст вопроса:</b> " + question.getDescription() + "<br>";
+        content = content + "<b>Текст ответа:</b> " + answer.getDescription() + "<br>";
+        content = content + "<b>Закупка доступна по адресу:</b> " + host + "/purchase/" + purchase.getId();
         Date nowDate = new Date();
 
         try
@@ -322,7 +323,7 @@ public class EmailSender
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(params.getEmail()));
 
         emailSender.send(message);
-
+        if(sendCoolDown > 0) Thread.sleep(sendCoolDown);
         beginSendMail();
     }
 

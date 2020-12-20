@@ -15,6 +15,7 @@ public class EmailAnnouncementProperty
     private int supplyEdit;
     private int answerCreate;
     private int answerEdit;
+    private int sendCoolDown;
     private String host;
     private String purchaseCSubject;
     private String purchaseCFirstLine;
