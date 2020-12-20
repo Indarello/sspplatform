@@ -2,10 +2,8 @@ package com.ssp.platform.telegram.Service;
 
 import com.ssp.platform.entity.User;
 import com.ssp.platform.response.ApiResponse;
-import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.UserService;
 import com.ssp.platform.telegram.*;
-import org.slf4j.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,6 +31,7 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
     @Override
     public void connectUserByCode(User user, int securityCode) throws TelegramException {
         if (!telegramUsersRepository.existsByTempCode(securityCode)) throw new TelegramException(new ApiResponse(false, "Неверно введён код"));
+        if (telegramUsersRepository.existsByUsername(user.getUsername())) throw new TelegramException(new ApiResponse(false, "Ваши аккаунты уже связаны"));
         TelegramUsersEntity telegramUsersEntity = telegramUsersRepository.getTelegramUsersEntityByTempCode(securityCode);
         telegramUsersEntity.setUsername(user.getUsername());
         telegramUsersEntity.setTempCode(null);
