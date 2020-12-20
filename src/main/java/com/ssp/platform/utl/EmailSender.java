@@ -30,10 +30,10 @@ public class EmailSender
     int SleepTime = 100;
 
     private final String host;
-    private final int purchaseCreateStatus;
-    private final String purchaseCreateFirstLine;
-    private final int purchaseCreateDescription;
-    private final int purchaseCreateBudget;
+    private final int purchaseCreate;
+    private final String purchaseCFirstLine;
+    private final int purchaseCDescription;
+    private final int purchaseCBudget;
 
 
     @Autowired
@@ -44,20 +44,20 @@ public class EmailSender
         purchaseCreateMessage = emailSender.createMimeMessage();
         purchaseCreateMessage.setFrom(new InternetAddress(emailConnectionProperty.getUsername(), false));
 
-        this.purchaseCreateStatus = emailAnnouncementProperty.getStatus();
+        this.purchaseCreate = emailAnnouncementProperty.getPurchaseCreate();
         this.host = emailAnnouncementProperty.getHost();
-        this.purchaseCreateFirstLine = emailAnnouncementProperty.getFirstLine();
-        this.purchaseCreateDescription = emailAnnouncementProperty.getDescription();
-        this.purchaseCreateBudget = emailAnnouncementProperty.getBudget();
+        this.purchaseCFirstLine = emailAnnouncementProperty.getPurchaseCFirstLine();
+        this.purchaseCDescription = emailAnnouncementProperty.getPurchaseCDescription();
+        this.purchaseCBudget = emailAnnouncementProperty.getPurchaseCBudget();
 
-        purchaseCreateMessage.setSubject(emailAnnouncementProperty.getSubject(), "UTF-8");
+        purchaseCreateMessage.setSubject(emailAnnouncementProperty.getPurchaseCSubject(), "UTF-8");
 
     }
 
     @Async
     public void sendMailPurchaseCreate(Purchase purchase, List<User> users) throws MessagingException, InterruptedException
     {
-        if (purchaseCreateStatus == 0 || users.size() == 0) return;
+        if (purchaseCreate == 0 || users.size() == 0) return;
 
         while(busyPurchaseCreate)
         {
@@ -65,14 +65,14 @@ public class EmailSender
         }
         busyPurchaseCreate = true;
 
-        String content = purchaseCreateFirstLine + "<br>";
+        String content = purchaseCFirstLine + "<br>";
         content = content + "Название закупки: " + purchase.getName() + "<br>";
 
-        if (purchaseCreateDescription == 1)
+        if (purchaseCDescription == 1)
         {
             content = content + "Описание закупки: " + purchase.getDescription() + "<br>";
         }
-        if (purchaseCreateBudget == 1)
+        if (purchaseCBudget == 1)
         {
             Long budget = purchase.getBudget();
             if (budget > 0) content = content + "Бюджет закупки: " + budget + "<br>";
@@ -112,20 +112,17 @@ public class EmailSender
     @Async
     public void addToQueue(List<EmailParams> emailParamsList) throws InterruptedException, MessagingException
     {
-        System.out.println("-Приступаем к добавлению в очередь отправки записи");
         while(busyQueue)
         {
-            System.out.println("-Queue занята, ждем");
             Thread.sleep(SleepTime);
         }
+
         busyQueue = true;
-        System.out.println("-Очередь осовободилась, добавляем записи");
         EmailSendQueue.addAll(emailParamsList);
         busyQueue = false;
-        System.out.println("-Закончили добавлять записи");
+
         if(!busySending)
         {
-            System.out.println("-Отправка Email была приостановлена, запускаем вновь");
             beginSendMail();
         }
     }
@@ -134,21 +131,17 @@ public class EmailSender
     public void beginSendMail() throws MessagingException, InterruptedException
     {
         busySending = true;
-        System.out.println("+Приступаем к отправке письма");
 
         while(busyQueue)
         {
-            System.out.println("+Queue занята, ждем");
             Thread.sleep(SleepTime);
         }
 
         busyQueue = true;
-        System.out.println("+Очередь осовободилась, берем записи");
         EmailParams params = EmailSendQueue.poll();
 
         if(params == null)
         {
-            System.out.println("+В очереди больше нет записей, останавливаем отправку на email");
             busySending = false;
             busyQueue = false;
             return;
@@ -156,12 +149,9 @@ public class EmailSender
         busyQueue = false;
 
         MimeMessage message = params.getMessage();
-        System.out.println("+взяли запись из очереди и отправляем email");
 
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(params.getEmail()));
         emailSender.send(message);
-
-        System.out.println("+Отправили email, запуск повторной");
 
         beginSendMail();
     }

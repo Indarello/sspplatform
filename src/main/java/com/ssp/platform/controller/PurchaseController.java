@@ -297,7 +297,7 @@ public class PurchaseController
 
             log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_PURCHASE, "Закупка удалена", id);
 
-            return new ResponseEntity<>(new ApiResponse(false, "Закупка успешно удалена"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ApiResponse(false, "Закупка успешно удалена"), HttpStatus.OK);
         }
         catch (Exception e)
         {
