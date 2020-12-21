@@ -9,6 +9,7 @@ import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.security.jwt.JwtUtils;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
 import com.ssp.platform.service.UserService;
+import com.ssp.platform.telegram.SSPPlatformBot;
 import com.ssp.platform.validate.UserValidate;
 import com.ssp.platform.validate.UsersPageValidate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,14 @@ public class UserController
     private final UserValidate userValidate;
     private final Log log;
 
+    private final SSPPlatformBot sspPlatformBot;
+
     @Autowired
     public UserController(
             AuthenticationManager authenticationManager, UserService userService, UserDetailsServiceImpl userDetailsService,
             JwtUtils jwtUtils, UserValidate userValidate,
-            Log log
+            Log log,
+            SSPPlatformBot sspPlatformBot
     )
     {
         this.authenticationManager = authenticationManager;
@@ -51,6 +55,7 @@ public class UserController
         this.jwtUtils = jwtUtils;
         this.userValidate = userValidate;
         this.log = log;
+        this.sspPlatformBot = sspPlatformBot;
     }
 
     @GetMapping("/login")
@@ -247,7 +252,8 @@ public class UserController
                 oldUser.getTechnology(),
                 oldUser.getInn(),
                 oldUser.getTelephone(),
-                oldUser.getEmail()};
+                oldUser.getEmail(),
+                oldUser.getStatus()};
 
         userValidate.UserValidateBegin(oldUser);
 
@@ -288,7 +294,12 @@ public class UserController
                     validUser.getTechnology(),
                     validUser.getInn(),
                     validUser.getTelephone(),
-                    validUser.getEmail()};
+                    validUser.getEmail(),
+                    validUser.getStatus()};
+
+            if (oldUser.getStatus().equals("NotApproved") && validUser.getStatus().equals("Approved")){
+                sspPlatformBot.notifyAboutStatusChanges(validUser);
+            }
 
             log.info(userDetailsService.loadUserByToken(token), Log.CONTROLLER_USER, "Пользователь изменён", was, became);
 

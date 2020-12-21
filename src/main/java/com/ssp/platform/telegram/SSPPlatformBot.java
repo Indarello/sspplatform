@@ -44,7 +44,7 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
             "До свидания, %s...";
 
     private final String MASK_UNDEFINED_COMMAND =
-            "К сожалению, я не андерстенд, что вы только что сказали";
+            "Извините, команда не распознана";
 
     private final String MASK_ANSWER_NOTIFY =
             "Здравствуйте, %s!\n" +
@@ -53,6 +53,12 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
             "_%s_\n\n" +
             "был добавлен ответ:\n" +
             "_%s_";
+
+    private final String MASK_NOT_APPROVED =
+            "К сожалению, Ваш аккаунт не аккредитован. Чтобы получать уведомления о новых закупках, дождитесь аккредитации";
+
+    private final String MASK_STATUS_CHANGED =
+            "Ваш аккаунт SSP аккредитован! С этого момента Вы будете получать уведомления о новых закупках";
 
     private final TelegramUsersService telegramUsersService;
     private final UserDetailsServiceImpl userDetailsService;
@@ -87,6 +93,18 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
 
+        if (user.getStatus().equals("NotApproved")){
+            SendMessage notApproved = new SendMessage();
+            notApproved.setChatId(String.valueOf(telegramUsersService.getChatIdByUser(user)));
+            notApproved.setText(MASK_NOT_APPROVED);
+
+            try {
+                execute(notApproved);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+        }
+
         return new ResponseEntity<>(new ApiResponse(true, "Аккаунты связаны"), HttpStatus.OK);
     }
 
@@ -108,6 +126,20 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
 
             default:
                 undefined(message.getChatId());
+        }
+    }
+
+    public void notifyAboutStatusChanges(User user){
+        if (!telegramUsersService.existsByUsername(user.getUsername())) return;
+
+        SendMessage statusChanged = new SendMessage();
+        statusChanged.setText(MASK_STATUS_CHANGED);
+        statusChanged.setChatId(String.valueOf(telegramUsersService.getChatIdByUser(user)));
+
+        try {
+            execute(statusChanged);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 
@@ -155,7 +187,9 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
         List<TelegramUsersEntity> users = telegramUsersService.getAllConnectedUsers();
 
         for (TelegramUsersEntity user : users){
-            notify.notifyOne(this, purchaseNotify, purchase, user);
+            if (userService.findByUsername(user.getUsername()).get().getStatus().equals("Approved")){
+                notify.notifyOne(this, purchaseNotify, purchase, user);
+            }
         }
     }
 
