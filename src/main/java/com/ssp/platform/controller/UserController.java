@@ -12,6 +12,7 @@ import com.ssp.platform.service.UserService;
 import com.ssp.platform.telegram.SSPPlatformBot;
 import com.ssp.platform.validate.UserValidate;
 import com.ssp.platform.validate.UsersPageValidate;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,8 @@ public class UserController
     private final Log log;
 
     private final SSPPlatformBot sspPlatformBot;
+
+    Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     public UserController(
@@ -298,6 +301,7 @@ public class UserController
                     validUser.getStatus()};
 
             if (oldUser.getStatus().equals("NotApproved") && validUser.getStatus().equals("Approved")){
+                logger.info("status");
                 sspPlatformBot.notifyAboutStatusChanges(validUser);
             }
 
