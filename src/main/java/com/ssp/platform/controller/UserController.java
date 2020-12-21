@@ -300,15 +300,7 @@ public class UserController
                     validUser.getEmail(),
                     validUser.getStatus()};
 
-            if (oldUser.getStatus().equals("NotApproved")){
-                logger.info("условие 1");
-            }
-
-            if (validUser.getStatus().equals("Approved")){
-                logger.info("условие 2");
-            }
-
-            if (oldUser.getStatus().equals("NotApproved") && validUser.getStatus().equals("Approved")){
+            if (was[was.length - 1].equals("NotApproved") && validUser.getStatus().equals("Approved")){
                 logger.info("status");
                 sspPlatformBot.notifyAboutStatusChanges(validUser);
             }
