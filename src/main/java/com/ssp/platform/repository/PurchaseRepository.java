@@ -16,7 +16,7 @@ import java.util.UUID;
 public interface PurchaseRepository extends JpaRepository<Purchase, UUID>, JpaSpecificationExecutor<Purchase> {
     boolean existsById(UUID id);
     List<Purchase> findByStatusOrStatus(PurchaseStatus purchaseStatus, PurchaseStatus purchaseStatus2);
-    Page<Purchase> findAllByNameContaining(String name, Pageable pageable);
+    Page<Purchase> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
     Page<Purchase> findAllByStatus(PurchaseStatus status, Pageable pageable);
-    Page<Purchase> findAllByNameContainingAndStatus(String name, PurchaseStatus status, Pageable pageable);
+    Page<Purchase> findAllByNameContainingIgnoreCaseAndStatus(String name, PurchaseStatus status, Pageable pageable);
 }

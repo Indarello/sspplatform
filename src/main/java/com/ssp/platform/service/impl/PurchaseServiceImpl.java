@@ -73,12 +73,12 @@ public class PurchaseServiceImpl implements PurchaseService
         if (status == null)
         {
             if(name.equals("")) return purchaseRepository.findAll(pageable);
-            else return purchaseRepository.findAllByNameContaining(name, pageable);
+            else return purchaseRepository.findAllByNameContainingIgnoreCase(name, pageable);
         }
         else
         {
             if(name.equals("")) return purchaseRepository.findAllByStatus(status, pageable);
-            else return purchaseRepository.findAllByNameContainingAndStatus(name, status, pageable);
+            else return purchaseRepository.findAllByNameContainingIgnoreCaseAndStatus(name, status, pageable);
         }
 
     }

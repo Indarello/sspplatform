@@ -11,7 +11,8 @@ import lombok.EqualsAndHashCode;
 public class PurchaseValidate extends Validator
 {
     public static final long ONE_HUNDRED_YEARS = 3155760000L;
-    public static final long ONE_HOUR = 3600L;
+    //TODO на время тестирования изменили с ONE_HOUR = 3600L;
+    public static final long ONE_HOUR = 60L;
     public static final long THREE_THOUSAND_YEARS = 32503741200L;
     private Purchase purchase;
     private String checkResult = "ok";

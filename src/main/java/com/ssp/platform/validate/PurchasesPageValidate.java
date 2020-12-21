@@ -4,7 +4,9 @@ import com.ssp.platform.request.PurchasesPageRequest;
 import com.ssp.platform.response.ValidateResponse;
 import com.ssp.platform.validate.ValidatorMessages.UserMessages;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class PurchasesPageValidate extends Validator
 {
