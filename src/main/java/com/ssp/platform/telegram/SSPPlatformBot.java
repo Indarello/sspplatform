@@ -29,6 +29,7 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
 
     private final String COMMAND_START = "/start";
     private final String COMMAND_STOP = "/stop";
+    private final String COMMAND_HELP = "/help";
 
     private final String MASK_WELCOME_MESSAGE =
             "Здравствуйте!\n" +
@@ -44,7 +45,7 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
             "До свидания, %s...";
 
     private final String MASK_UNDEFINED_COMMAND =
-            "Извините, команда не распознана";
+            "Извините, команда не распознана. Для получения списка доступных команд, введите /help";
 
     private final String MASK_ANSWER_NOTIFY =
             "Здравствуйте, %s!\n" +
@@ -59,6 +60,12 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
 
     private final String MASK_STATUS_CHANGED =
             "Ваш аккаунт SSP аккредитован! С этого момента Вы будете получать уведомления о новых закупках";
+
+    private final String MASK_HELP =
+            "Список доступных команд:\n" +
+            "/start - начать процедуру связывания аккаунтов SSP и Telegram\n" +
+            "/stop - отключить уведомления и отвязать аккаунт SSP от аккаунта Telegram\n" +
+            "/help - список доступных команд";
 
     private final TelegramUsersService telegramUsersService;
     private final UserDetailsServiceImpl userDetailsService;
@@ -115,6 +122,11 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
         Message message = update.getMessage();
         logger.info(message.getText());
 
+        if (message.getText() == null){
+            undefined(message.getChatId());
+            return;
+        }
+
         switch (message.getText()){
             case COMMAND_START:
                 start(message.getChatId());
@@ -122,6 +134,10 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
 
             case COMMAND_STOP:
                 stop(message.getChatId());
+                break;
+
+            case COMMAND_HELP:
+                help(message.getChatId());
                 break;
 
             default:
@@ -190,6 +206,18 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
             if (userService.findByUsername(user.getUsername()).get().getStatus().equals("Approved")){
                 notify.notifyOne(this, purchaseNotify, purchase, user);
             }
+        }
+    }
+
+    private void help(Long chatId){
+        SendMessage helpMessage = new SendMessage();
+        helpMessage.setText(MASK_HELP);
+        helpMessage.setChatId(String.valueOf(chatId));
+
+        try{
+            execute(helpMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 
