@@ -1,10 +1,11 @@
 package com.ssp.platform.validate;
 
-import com.ssp.platform.entity.Question;
 import com.ssp.platform.entity.enums.QuestionStatus;
-import com.ssp.platform.request.QuestionUpdateRequest;
+import com.ssp.platform.request.*;
 import com.ssp.platform.response.ValidateResponse;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class QuestionValidate extends Validator{
@@ -17,25 +18,34 @@ public class QuestionValidate extends Validator{
     private  String field;
     private  String message;
 
-    public  ValidateResponse validateQuestion (Question question){
-
+    public QuestionValidate() {
         success = true;
         field = "";
         message = "ok";
+    }
 
-        validateName(question.getName());
+    public ValidateResponse validateQuestionCreate(QuestionCreateRequest questionCreateRequest){
+
+        validateId(questionCreateRequest.getPurchaseId());
         if(!success){
             return new ValidateResponse(false, field, message);
         }
-        validateDescription(question.getDescription());
+
+        validateName(questionCreateRequest.getName());
+        if(!success){
+            return new ValidateResponse(false, field, message);
+        }
+        validateDescription(questionCreateRequest.getDescription());
 
         return new ValidateResponse(success, field, message);
     }
 
     public ValidateResponse validateQuestionUpdate(QuestionUpdateRequest questionUpdateRequest){
-        success = true;
-        field = "";
-        message = "ok";
+
+        validateId(questionUpdateRequest.getId());
+        if(!success){
+            return new ValidateResponse(false, field, message);
+        }
 
         validateName(questionUpdateRequest.getName());
         if(!success){
@@ -82,7 +92,7 @@ public class QuestionValidate extends Validator{
 
     }
 
-    private  void validateStatus(String status){
+    private void validateStatus(String status){
 
         if (status == null || onlySpaces(status)){
             success = false;
@@ -98,6 +108,14 @@ public class QuestionValidate extends Validator{
             message = "Значение поля Статус вопроса некорректно";
         }
 
+    }
+
+    private void validateId(UUID id){
+        if(id == null){
+            success = false;
+            field = "ID";
+            message = "ID не может быть пустым";
+        }
     }
 
 }

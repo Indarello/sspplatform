@@ -1,15 +1,14 @@
 package com.ssp.platform.service.impl;
 
-import com.ssp.platform.entity.Answer;
-import com.ssp.platform.entity.Question;
-import com.ssp.platform.repository.AnswerRepository;
-import com.ssp.platform.repository.QuestionRepository;
+import com.ssp.platform.entity.*;
+import com.ssp.platform.entity.enums.QuestionStatus;
+import com.ssp.platform.repository.*;
+import com.ssp.platform.request.AnswerRequest;
 import com.ssp.platform.service.AnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -24,41 +23,54 @@ public class AnswerServiceImpl implements AnswerService {
 	}
 
 	@Override
-	public Answer save(Answer answer) {
-		return answerRepository.saveAndFlush(answer);
-	}
+	public Answer save(AnswerRequest request) throws RuntimeException {
 
-	@Override
-	public Optional<Answer> update(Answer answer) {
-		Optional<Answer> optionalAnswer = answerRepository.findById(answer.getId());
-		if (optionalAnswer.isPresent()){
-			return Optional.of(answerRepository.saveAndFlush(answer));
-		}
-		return Optional.empty();
-	}
+        Question question = questionRepository.findById(request.getId()).orElseThrow(()->new RuntimeException("Вопрос по данному id не существует!"));
 
-	@Override
-	public boolean delete(UUID id) {
-		Optional<Answer> optionalAnswer = answerRepository.findById(id);
-		if (optionalAnswer.isPresent()){
-			answerRepository.deleteById(id);
-			return true;
-		}
-		return false;
-	}
+	    if (question.getAnswer()!=null){
+	        throw new RuntimeException("Ответ уже существует, добавить новый невозможно");
+        }
 
-	@Override
-	public Optional<Answer> findByQuestID(UUID id) {
-		Optional<Question> optionalQuestion = questionRepository.findById(id);
-		if (optionalQuestion.isPresent()){
-			Question question = optionalQuestion.get();
-			return Optional.of(question.getAnswer());
-		}
-		return Optional.empty();
-	}
+	    question.setPublicity(QuestionStatus.fromString(request.getPublicity()));
+	    Answer answer = new Answer(request.getDescription(), question);
 
-	@Override
-	public Optional<Answer> findById(UUID id) {
-		return answerRepository.findById(id);
-	}
+        answerRepository.saveAndFlush(answer);
+        questionRepository.saveAndFlush(question);
+
+	    return answer;
+    }
+
+    @Override
+    public Answer update(AnswerRequest request) throws RuntimeException {
+
+        Answer answer = answerRepository.findById(request.getId()).orElseThrow(()->new RuntimeException("Ответа с данным ID не существует"));
+        Question question = answer.getQuestion();
+
+        question.setPublicity(QuestionStatus.fromString(request.getPublicity()));
+        answer.setDescription(request.getDescription());
+
+        answerRepository.saveAndFlush(answer);
+        questionRepository.saveAndFlush(question);
+
+        return answer;
+    }
+
+    @Override
+    public void delete(UUID id) throws RuntimeException{
+
+        Answer answer = answerRepository.findById(id).orElse(null);
+        if(answer == null){
+            throw new RuntimeException("Ответ не найден");
+        }
+
+        Question question = answer.getQuestion();
+        question.setAnswer(null);
+        questionRepository.saveAndFlush(question);
+        answerRepository.delete(answer);
+    }
+
+    @Override
+    public Answer findByID(UUID id) throws RuntimeException{
+        return answerRepository.findById(id).orElseThrow(()-> new RuntimeException("Ответа не существует"));
+    }
 }

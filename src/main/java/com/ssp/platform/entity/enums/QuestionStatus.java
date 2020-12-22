@@ -2,8 +2,10 @@ package com.ssp.platform.entity.enums;
 
 public enum QuestionStatus {
 
-    PRIVATE("private"),
-    PUBLIC("public");
+    //в итоге message оказался не нужен
+    //фронтам удобнее получать и отправлять одинаковые названия
+    PRIVATE("PRIVATE"),
+    PUBLIC("PUBLIC");
 
     public String message;
 

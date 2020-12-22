@@ -1,20 +1,18 @@
 package com.ssp.platform.service;
 
 import com.ssp.platform.entity.Answer;
+import com.ssp.platform.request.AnswerRequest;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface AnswerService {
 
-	Answer save(Answer answer);
+	Answer save(AnswerRequest request) throws RuntimeException;
 
-	Optional<Answer> update(Answer answer);
+	Answer update(AnswerRequest request) throws RuntimeException;
 
-	boolean delete(UUID id);
+	void delete(UUID id) throws RuntimeException;
 
-	Optional<Answer> findByQuestID(UUID id);
-
-	Optional<Answer> findById(UUID id);
+	Answer findByID(UUID id) throws RuntimeException;
 
 }

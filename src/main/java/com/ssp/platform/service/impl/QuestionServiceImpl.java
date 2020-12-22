@@ -2,9 +2,11 @@ package com.ssp.platform.service.impl;
 
 import com.ssp.platform.entity.*;
 import com.ssp.platform.entity.enums.QuestionStatus;
-import com.ssp.platform.repository.QuestionRepository;
+import com.ssp.platform.repository.*;
+import com.ssp.platform.request.*;
 import com.ssp.platform.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,71 +15,95 @@ import java.util.*;
 public class QuestionServiceImpl implements QuestionService {
 
 	private final QuestionRepository questionRepository;
+	private final PurchaseRepository purchaseRepository;
 
-	@Autowired
-	QuestionServiceImpl(QuestionRepository questionRepository){
-		this.questionRepository = questionRepository;
-	}
-
-
-	@Override
-	public Question save(Question question) {
-		return questionRepository.saveAndFlush(question);
-	}
-
-	@Override
-	public Optional<Question> update(Question question) {
-		Optional<Question> optionalQuestion = questionRepository.findById(question.getId());
-		if (optionalQuestion.isPresent()){
-			return Optional.of(questionRepository.saveAndFlush(question));
-		}
-		return Optional.empty();
-	}
-
-	@Override
-	public boolean delete(UUID id) {
-		Optional<Question> optionalQuestion = questionRepository.findById(id);
-		if (optionalQuestion.isPresent()){
-			questionRepository.deleteById(id);
-			return true;
-		}
-		return false;
-	}
-
-    @Override
-    public List<Question> getQuestionsOfPurchase(Purchase purchase) {
-	    List<Question> questions = questionRepository.findByPurchase(purchase);
-        //сортировка по дате
-        questions.sort(Comparator.comparing(Question::getCreateDate).reversed());
-	    return questions;
+    @Autowired
+    public QuestionServiceImpl(QuestionRepository questionRepository, PurchaseRepository purchaseRepository) {
+        this.questionRepository = questionRepository;
+        this.purchaseRepository = purchaseRepository;
     }
 
     @Override
-	public Optional<Question> findById(UUID id) {
-		return questionRepository.findById(id);
-	}
+    public Question create(QuestionCreateRequest request, User author) throws RuntimeException{
+
+        Purchase purchase = purchaseRepository.findById(request.getPurchaseId()).orElseThrow(()-> new RuntimeException("Закупки по данному id не существует"));
+
+        Question question = new Question();
+        question.setPurchase(purchase);
+        question.setAuthor(author);
+        question.setName(request.getName());
+        question.setDescription(request.getDescription());
+
+        questionRepository.saveAndFlush(question);
+
+        return question;
+    }
 
     @Override
-    public List<Question> getQuestionsOfPurchaseByAuthor(Purchase purchase, User author) {
+    public Question update(QuestionUpdateRequest request) throws RuntimeException {
+        Question question = questionRepository.findById(request.getId()).orElseThrow(()-> new RuntimeException("Вопрос не найден"));
 
-	    //план Б если будут проблемы с чудовищем ниже
+        question.setDescription(request.getDescription());
+        question.setName(request.getName());
+        question.setPublicity(QuestionStatus.fromString(request.getPublicity()));
 
-	    /*List<Question> questions = questionRepository.findByPurchaseAndAuthor(purchase, author);
-	    questions.addAll(questionRepository.findByPurchaseAndPublicity(purchase, QuestionStatus.PUBLIC));
+        return questionRepository.saveAndFlush(question);
+    }
 
-	    //удаляем повторы
-	    Set<Question> set = new LinkedHashSet<>(questions);
+    @Override
+    public void delete(UUID id, User user) throws RuntimeException {
+        checkID(id);
+        Question question = questionRepository.findById(id).orElseThrow(()-> new RuntimeException("Вопрос не найден"));
 
-	    //возвращаем обратно в List
-	    questions = new ArrayList<>(set);
+        if( (!question.getAuthor().equals(user)) && (!user.getRole().equals("employee")) ){
+            throw new RuntimeException("Вопрос может удалить только его автор или сотрудник ресурса");
+        }
 
-	    return questions;*/
+        questionRepository.delete(question);
 
-        List<Question> questions = questionRepository.findByPurchaseAndAuthorOrPurchaseAndPublicity(purchase, author, purchase, QuestionStatus.PUBLIC);
+    }
 
-        //сортировка по дате
-        questions.sort(Comparator.comparing(Question::getCreateDate).reversed());
+    @Override
+	public Question findById(UUID id, User user) throws RuntimeException{
 
-	    return questions;
+        checkID(id);
+
+        Question question = questionRepository.findById(id).orElseThrow(()-> new RuntimeException("Вопроса не существует"));
+
+        if (user.getRole().equals("firm")){
+            if (question.getAuthor().equals(user) ||
+                    question.getPublicity().equals(QuestionStatus.PUBLIC)){
+                return question;
+            }
+            throw new RuntimeException("Доступ к чужим приватным вопросам запрещён");
+        }
+        return question;
+	}
+
+
+    @Override
+    public List<Question> getQuestionsOfPurchase(UUID purchaseID, User user) throws RuntimeException {
+
+        checkID(purchaseID);
+
+        Purchase purchase = purchaseRepository.findById(purchaseID).orElseThrow(()->new RuntimeException("Закупки не существует"));
+
+        List<Question> result;
+
+        if(user.getRole().equals("employee")){
+            //получить все вопросы
+            result = questionRepository.findByPurchase(purchase, Sort.by("createDate").descending());
+        } else {
+            //получить только свои и публичные вопросы
+            result = questionRepository.findByPurchaseAndAuthorOrPurchaseAndPublicity(purchase,user,purchase,QuestionStatus.PUBLIC, Sort.by("createDate").descending());
+        }
+
+        return result;
+    }
+
+    private void checkID(UUID id) throws RuntimeException {
+        if (id==null){
+            throw new RuntimeException("Пустое поле ID");
+        }
     }
 }

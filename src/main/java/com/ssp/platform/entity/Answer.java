@@ -3,7 +3,6 @@ package com.ssp.platform.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
@@ -39,7 +38,6 @@ public class Answer {
      * Вопрос
      */
     @OneToOne
-    //@OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="question")
     @JsonIgnore
     private Question question;

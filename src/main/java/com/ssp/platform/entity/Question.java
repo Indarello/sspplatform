@@ -74,6 +74,7 @@ public class Question {
 
     public Question(){
         this.createDate = System.currentTimeMillis()/1000;
+        this.publicity = QuestionStatus.PRIVATE;
     }
 
     public Question(String name, String description, User author, Purchase purchase){
@@ -85,19 +86,4 @@ public class Question {
         this.publicity = QuestionStatus.PRIVATE;
     }
 
-    //Нужно для LinkedHashSet - удаления повторов
-    //Если не сработает выборка spring data jpa
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Question question = (Question)o;
-        return id.equals(question.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }
