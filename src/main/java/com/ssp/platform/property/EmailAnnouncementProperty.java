@@ -16,17 +16,21 @@ public class EmailAnnouncementProperty
     private int answerCreate;
     private int answerEdit;
     private int sendCoolDown;
+    private int queMax;
     private String host;
+    private int purchaseCPriority;
     private String purchaseCSubject;
     private String purchaseCFirstLine;
     private int purchaseCDescription;
     private int purchaseCBudget;
+    private int supplyEPriority;
     private String supplyESubject;
     private String supplyEFirstLine;
+    private int answerPriority;
     private String answerSubject;
     private String answerCFirstLine;
     private String answerEFirstLine;
-
+    
     public String getHost()
     {
         return new String(host.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);

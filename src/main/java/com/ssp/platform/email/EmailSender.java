@@ -19,65 +19,68 @@ import java.util.*;
 @EnableAsync
 public class EmailSender
 {
-    private final MimeMessage purchaseCreateMessage;
-    private final MimeMessage supplyEditMessage;
-    private final MimeMessage answerCEMessage;
     private final JavaMailSender emailSender;
+    private final InternetAddress internetAddress;
 
-    Queue<EmailParams> EmailSendQueue = new PriorityQueue<>(1000, EmailSendComparator);
+    Queue<EmailParams> EmailSendQueue;
     private volatile boolean busyQueue = false;
     private volatile boolean busySending = false;
-    private volatile boolean busyPurchaseCreate = false;
-    private volatile boolean busySupplyEdit = false;
-    private volatile boolean busyAnswerCE = false;
     int SleepTime = 100;
 
-    private final int sendCoolDown;
-    private final String host;
     private final int purchaseCreate;
     private final int supplyEdit;
     private final int answerCreate;
     private final int answerEdit;
+    private final int sendCoolDown;
+    private final int queMax;
+    private final String host;
+
+    private final int purchaseCPriority;
+    private final String purchaseCSubject;
     private final String purchaseCFirstLine;
     private final int purchaseCDescription;
     private final int purchaseCBudget;
+
+    private final int supplyEPriority;
+    private final String supplyESubject;
     private final String supplyEFirstLine;
+
+    private final int answerPriority;
+    private final String answerSubject;
     private final String answerCFirstLine;
     private final String answerEFirstLine;
 
+
     @Autowired
-    EmailSender(JavaMailSender emailSender, EmailConnectionProperty emailConnectionProperty, EmailAnnouncementProperty emailAnnouncementProperty) throws MessagingException
+    EmailSender(JavaMailSender emailSender, EmailConnectionProperty emailConnectionProperty, EmailAnnouncementProperty emailAProperty) throws MessagingException
     {
         this.emailSender = emailSender;
+        this.internetAddress = new InternetAddress(emailConnectionProperty.getUsername(), false);
 
-        this.purchaseCreate = emailAnnouncementProperty.getPurchaseCreate();
-        this.purchaseCFirstLine = emailAnnouncementProperty.getPurchaseCFirstLine();
-        this.purchaseCDescription = emailAnnouncementProperty.getPurchaseCDescription();
-        this.purchaseCBudget = emailAnnouncementProperty.getPurchaseCBudget();
+        this.sendCoolDown = emailAProperty.getSendCoolDown()*1000;
+        this.host = emailAProperty.getHost();
+        this.queMax = emailAProperty.getQueMax();
 
-        this.supplyEdit = emailAnnouncementProperty.getSupplyEdit();
-        this.supplyEFirstLine = emailAnnouncementProperty.getSupplyEFirstLine();
+        this.purchaseCreate = emailAProperty.getPurchaseCreate();
+        this.purchaseCPriority = emailAProperty.getPurchaseCPriority();
+        this.purchaseCSubject = emailAProperty.getPurchaseCSubject();
+        this.purchaseCFirstLine = emailAProperty.getPurchaseCFirstLine();
+        this.purchaseCDescription = emailAProperty.getPurchaseCDescription();
+        this.purchaseCBudget = emailAProperty.getPurchaseCBudget();
 
-        this.answerCreate = emailAnnouncementProperty.getAnswerCreate();
-        this.answerEdit = emailAnnouncementProperty.getAnswerEdit();
-        this.answerCFirstLine = emailAnnouncementProperty.getAnswerCFirstLine();
-        this.answerEFirstLine = emailAnnouncementProperty.getAnswerEFirstLine();
+        this.supplyEdit = emailAProperty.getSupplyEdit();
+        this.supplyEPriority = emailAProperty.getSupplyEPriority();
+        this.supplyESubject = emailAProperty.getSupplyESubject();
+        this.supplyEFirstLine = emailAProperty.getSupplyEFirstLine();
 
-        this.sendCoolDown = emailAnnouncementProperty.getSendCoolDown()*1000;
-        this.host = emailAnnouncementProperty.getHost();
-        InternetAddress from = new InternetAddress(emailConnectionProperty.getUsername(), false);
+        this.answerCreate = emailAProperty.getAnswerCreate();
+        this.answerEdit = emailAProperty.getAnswerEdit();
+        this.answerPriority = emailAProperty.getAnswerPriority();
+        this.answerSubject = emailAProperty.getAnswerSubject();
+        this.answerCFirstLine = emailAProperty.getAnswerCFirstLine();
+        this.answerEFirstLine = emailAProperty.getAnswerEFirstLine();
 
-        purchaseCreateMessage = emailSender.createMimeMessage();
-        purchaseCreateMessage.setFrom(from);
-        purchaseCreateMessage.setSubject(emailAnnouncementProperty.getPurchaseCSubject(), "UTF-8");
-
-        supplyEditMessage = emailSender.createMimeMessage();
-        supplyEditMessage.setFrom(from);
-        supplyEditMessage.setSubject(emailAnnouncementProperty.getSupplyESubject(), "UTF-8");
-
-        answerCEMessage = emailSender.createMimeMessage();
-        answerCEMessage.setFrom(from);
-        answerCEMessage.setSubject(emailAnnouncementProperty.getAnswerSubject(), "UTF-8");
+        this.EmailSendQueue = new PriorityQueue<>(queMax, EmailSendComparator);
     }
 
     @Async
@@ -85,15 +88,7 @@ public class EmailSender
     {
         if (purchaseCreate == 0 || users.size() == 0) return;
 
-        while(busyPurchaseCreate)
-        {
-            try { Thread.sleep(SleepTime); }
-            catch (InterruptedException e)
-            {
-                /*TODO логирование warning*/
-            }
-        }
-        busyPurchaseCreate = true;
+        MimeMessage purchaseCreateMessage = emailSender.createMimeMessage();
 
         String content = purchaseCFirstLine + "<br>";
         content = content + "<b>Название закупки:</b> " + purchase.getName() + "<br>";
@@ -111,22 +106,23 @@ public class EmailSender
 
         try
         {
+            purchaseCreateMessage.setFrom(internetAddress);
+            purchaseCreateMessage.setSubject(purchaseCSubject, "UTF-8");
             purchaseCreateMessage.setContent(content, "text/html; charset=UTF-8");
             purchaseCreateMessage.setSentDate(nowDate);
         }
         catch (MessagingException e)
         {
             /*TODO логирование warning*/
+            return;
         }
 
         List<EmailParams> emailParamsList = new ArrayList<>(users.size());
 
         for (User user : users)
         {
-            emailParamsList.add(new EmailParams(3, purchaseCreateMessage, user.getEmail(), nowDate));
+            emailParamsList.add(new EmailParams(purchaseCPriority, purchaseCreateMessage, user.getEmail(), nowDate));
         }
-
-        busyPurchaseCreate = false;
 
         try { addToQueue(emailParamsList); }
         catch (MessagingException | InterruptedException e)
@@ -138,17 +134,9 @@ public class EmailSender
     @Async
     public void sendMailSupplyEdit(Purchase purchase, SupplyEntity supplyEntity, User user)
     {
-        if (supplyEdit == 0) return;
+        if (supplyEdit == 0 || !user.getStatus().equals("Approved")) return;
 
-        while(busySupplyEdit)
-        {
-            try { Thread.sleep(SleepTime); }
-            catch (InterruptedException e)
-            {
-                /*TODO логирование warning*/
-            }
-        }
-        busySupplyEdit = true;
+        MimeMessage supplyEditMessage = emailSender.createMimeMessage();
 
         String content = supplyEFirstLine + " “" + supplyEntity.getStatus()  + "“<br>";
         content = content + "<b>Название закупки:</b> " + purchase.getName() + "<br>";
@@ -159,17 +147,19 @@ public class EmailSender
 
         try
         {
+            supplyEditMessage.setFrom(internetAddress);
+            supplyEditMessage.setSubject(supplyESubject, "UTF-8");
             supplyEditMessage.setContent(content, "text/html; charset=UTF-8");
             supplyEditMessage.setSentDate(nowDate);
         }
         catch (MessagingException e)
         {
             /*TODO логирование warning*/
+            return;
         }
 
-        EmailParams emailParams = new EmailParams(1, supplyEditMessage, user.getEmail(), nowDate);
+        EmailParams emailParams = new EmailParams(supplyEPriority, supplyEditMessage, user.getEmail(), nowDate);
 
-        busySupplyEdit = false;
 
         try { addToQueue(emailParams); }
         catch (MessagingException | InterruptedException e)
@@ -181,17 +171,9 @@ public class EmailSender
     @Async
     public void sendMailAnswerCreate(Purchase purchase, Question question, Answer answer, User user)
     {
-        if (answerCreate == 0) return;
+        if (answerCreate == 0 || !user.getStatus().equals("Approved")) return;
 
-        while(busyAnswerCE)
-        {
-            try { Thread.sleep(SleepTime); }
-            catch (InterruptedException e)
-            {
-                /*TODO логирование warning*/
-            }
-        }
-        busyAnswerCE = true;
+        MimeMessage answerCEMessage = emailSender.createMimeMessage();
 
         String content = answerCFirstLine + "<br>";
         content = content + "<b>Название закупки:</b> " + purchase.getName() + "<br>";
@@ -203,17 +185,18 @@ public class EmailSender
 
         try
         {
+            answerCEMessage.setFrom(internetAddress);
+            answerCEMessage.setSubject(answerSubject, "UTF-8");
             answerCEMessage.setContent(content, "text/html; charset=UTF-8");
             answerCEMessage.setSentDate(nowDate);
         }
         catch (MessagingException e)
         {
             /*TODO логирование warning*/
+            return;
         }
 
-        EmailParams emailParams = new EmailParams(2, answerCEMessage, user.getEmail(), nowDate);
-
-        busyAnswerCE = false;
+        EmailParams emailParams = new EmailParams(answerPriority, answerCEMessage, user.getEmail(), nowDate);
 
         try { addToQueue(emailParams); }
         catch (MessagingException | InterruptedException e)
@@ -225,17 +208,9 @@ public class EmailSender
     @Async
     public void sendMailAnswerEdit(Purchase purchase, Question question, Answer answer, User user)
     {
-        if (answerEdit == 0) return;
+        if (answerEdit == 0 || !user.getStatus().equals("Approved")) return;
 
-        while(busyAnswerCE)
-        {
-            try { Thread.sleep(SleepTime); }
-            catch (InterruptedException e)
-            {
-                /*TODO логирование warning*/
-            }
-        }
-        busyAnswerCE = true;
+        MimeMessage answerCEMessage = emailSender.createMimeMessage();
 
         String content = answerEFirstLine + "<br>";
         content = content + "Название закупки: " + purchase.getName() + "<br>";
@@ -247,6 +222,8 @@ public class EmailSender
 
         try
         {
+            answerCEMessage.setFrom(internetAddress);
+            answerCEMessage.setSubject(answerSubject, "UTF-8");
             answerCEMessage.setContent(content, "text/html; charset=UTF-8");
             answerCEMessage.setSentDate(nowDate);
         }
@@ -255,9 +232,7 @@ public class EmailSender
             /*TODO логирование warning*/
         }
 
-        EmailParams emailParams = new EmailParams(2, answerCEMessage, user.getEmail(), nowDate);
-
-        busyAnswerCE = false;
+        EmailParams emailParams = new EmailParams(answerPriority, answerCEMessage, user.getEmail(), nowDate);
 
         try { addToQueue(emailParams); }
         catch (MessagingException | InterruptedException e)
@@ -272,8 +247,17 @@ public class EmailSender
         while(busyQueue)
         {
             Thread.sleep(SleepTime);
+            //TODO: wait notify в будущем сделать
         }
         busyQueue = true;
+
+        if(EmailSendQueue.size() + 1 > queMax)
+        {
+            busyQueue = false;
+            /*TODO логирование превышение очереди*/
+            return;
+        }
+
         EmailSendQueue.add(emailParams);
         busyQueue = false;
         if(!busySending) beginSendMail();
@@ -288,7 +272,16 @@ public class EmailSender
         }
 
         busyQueue = true;
+
+        if(EmailSendQueue.size() + emailParamsList.size() > queMax)
+        {
+            busyQueue = false;
+            /*TODO логирование превышение очереди*/
+            return;
+        }
+
         EmailSendQueue.addAll(emailParamsList);
+
         busyQueue = false;
 
         if(!busySending)
