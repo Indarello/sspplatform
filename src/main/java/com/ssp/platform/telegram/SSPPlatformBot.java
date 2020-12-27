@@ -156,6 +156,7 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
         SendMessage supplyUpdate = new SendMessage();
         supplyUpdate.setText(String.format(MASK_SUPPLY_UPDATE, user.getFirstName(), purchaseName, supply.getStatus(), supply.getResult()));
         supplyUpdate.setChatId(String.valueOf(telegramUsersService.getChatIdByUser(user)));
+        supplyUpdate.setParseMode("Markdown");
 
         try {
             execute(supplyUpdate);
