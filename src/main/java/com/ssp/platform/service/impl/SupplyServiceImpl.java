@@ -7,6 +7,7 @@ import com.ssp.platform.repository.*;
 import com.ssp.platform.request.SupplyUpdateRequest;
 import com.ssp.platform.response.*;
 import com.ssp.platform.service.*;
+import com.ssp.platform.telegram.SSPPlatformBot;
 import com.ssp.platform.validate.*;
 import com.ssp.platform.validate.ValidatorMessages.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +32,19 @@ public class SupplyServiceImpl implements SupplyService {
     private final SupplyValidator supplyValidator;
     private final EmailSender emailSender;
 
+    private final SSPPlatformBot sspPlatformBot;
+
     @Autowired
     public SupplyServiceImpl(
             SupplyRepository supplyRepository, FileServiceImpl fileService, SupplyValidator supplyValidator, FileValidator fileValidator,
-            PurchaseRepository purchaseRepository, EmailSender emailSender) {
+            PurchaseRepository purchaseRepository, EmailSender emailSender, SSPPlatformBot sspPlatformBot
+    ) {
         this.supplyRepository = supplyRepository;
         this.fileService = fileService;
         this.supplyValidator = supplyValidator;
         this.purchaseRepository = purchaseRepository;
         this.emailSender = emailSender;
+        this.sspPlatformBot = sspPlatformBot;
     }
 
     @Override
@@ -116,7 +121,10 @@ public class SupplyServiceImpl implements SupplyService {
                 supplyEntity.setResultDate(System.currentTimeMillis() / DATE_DIVIDER);
                 break;
         }
-        if(statusChanged) emailSender.sendMailSupplyEdit(supplyEntity.getPurchase(), supplyEntity, supplyEntity.getAuthor());
+        if(statusChanged) {
+            emailSender.sendMailSupplyEdit(supplyEntity.getPurchase(), supplyEntity, supplyEntity.getAuthor());
+            sspPlatformBot.notifyAboutSupplyChange(supplyEntity.getAuthor(), supplyEntity.getPurchase().getName(), supplyEntity);
+        }
         supplyRepository.saveAndFlush(supplyEntity);
     }
 

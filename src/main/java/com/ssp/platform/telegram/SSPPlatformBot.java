@@ -67,6 +67,11 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
             "/stop - отключить уведомления и отвязать аккаунт SSP от аккаунта Telegram\n" +
             "/help - список доступных команд";
 
+    private final String MASK_SUPPLY_UPDATE =
+            "Здравствуйте, %s!\n" +
+            "У Вашего предложения к закупке \"_%s_\" изменился статус на *%s*\n" +
+            "Результат рассмотрения: _%s_";
+
     private final TelegramUsersService telegramUsersService;
     private final UserDetailsServiceImpl userDetailsService;
     private final UserServiceImpl userService;
@@ -142,6 +147,20 @@ public class SSPPlatformBot extends TelegramLongPollingBot {
 
             default:
                 undefined(message.getChatId());
+        }
+    }
+
+    public void notifyAboutSupplyChange(User user, String purchaseName, SupplyEntity supply){
+        if (!telegramUsersService.existsByUsername(user.getUsername())) return;
+
+        SendMessage supplyUpdate = new SendMessage();
+        supplyUpdate.setText(String.format(MASK_SUPPLY_UPDATE, user.getFirstName(), purchaseName, supply.getStatus(), supply.getResult()));
+        supplyUpdate.setChatId(String.valueOf(telegramUsersService.getChatIdByUser(user)));
+
+        try {
+            execute(supplyUpdate);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 

@@ -22,10 +22,18 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
     @Override
     public void createChat(long chatId, int securityCode) {
         TelegramUsersEntity telegramUsersEntity = new TelegramUsersEntity();
-        telegramUsersEntity.setChatId(chatId);
-        telegramUsersEntity.setTempCode(securityCode);
 
-        telegramUsersRepository.save(telegramUsersEntity);
+        if (telegramUsersRepository.existsById(chatId)){
+            telegramUsersEntity = telegramUsersRepository.getOne(chatId);
+            telegramUsersEntity.setTempCode(securityCode);
+
+            telegramUsersRepository.saveAndFlush(telegramUsersEntity);
+        } else {
+            telegramUsersEntity.setChatId(chatId);
+            telegramUsersEntity.setTempCode(securityCode);
+
+            telegramUsersRepository.save(telegramUsersEntity);
+        }
     }
 
     @Override
@@ -62,6 +70,8 @@ public class TelegramUsersServiceImpl implements TelegramUsersService {
 
     @Override
     public boolean existsByChatId(Long chatId) {
+        if (telegramUsersRepository.existsById(chatId) && telegramUsersRepository.getOne(chatId).getUsername() != null) return true;
+        else if (telegramUsersRepository.existsById(chatId) && telegramUsersRepository.getOne(chatId).getUsername() == null) return false;
         return telegramUsersRepository.existsById(chatId);
     }
 
