@@ -112,6 +112,11 @@ public class Purchase
     @Fetch(value = FetchMode.SUBSELECT)
     @JsonIgnore
     private List<SupplyEntity> supplies;
+    
+    @OneToMany(mappedBy = "purchase", targetEntity = Question.class, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JsonIgnore
+    private List<Question> questions;
 
     public Purchase()
     {
