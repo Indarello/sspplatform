@@ -1,6 +1,5 @@
 package com.ssp.platform.service.impl;
 
-import com.ssp.platform.controller.UserController;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.property.UserCreateProperty;
 import com.ssp.platform.repository.UserRepository;
@@ -13,13 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Сервис для выполнения операций с данными пользователя.
- * Реализация интерфейса
+ * Сервис для работы с пользователями
+ * @author Василий Воробьев
  */
 @Service
 public class UserServiceImpl implements UserService
@@ -45,6 +43,10 @@ public class UserServiceImpl implements UserService
         createUserFromProperties(newUser);
     }
 
+    /**
+     * Сохранение нового пользователя
+     * @param user пользователь
+     */
     @Override
     public User save(User user)
     {
@@ -53,12 +55,21 @@ public class UserServiceImpl implements UserService
         return userRepository.save(user);
     }
 
+    /**
+     * Обновление данных о пользователе
+     * @param user пользователь
+     */
     @Override
     public User update(User user)
     {
         return userRepository.save(user);
     }
 
+    /**
+     * Получение списка пользователей по роли с пагинацией
+     * @param pageable данные по пагинации
+     * @param role роль пользователей
+     */
     @Override
     public Page<User> findAllByRole(Pageable pageable, String role)
     {
@@ -77,6 +88,10 @@ public class UserServiceImpl implements UserService
         return userRepository.findByRoleAndStatus(role, status);
     }
 
+    /**
+     * Создание пользователя сотрудника из данных в application.properties
+     * @param newUser пользователь
+     */
     private void createUserFromProperties(User newUser)
     {
         if(userRepository.existsByUsername(newUser.getUsername())) return;

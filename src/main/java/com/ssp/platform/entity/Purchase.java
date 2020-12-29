@@ -11,6 +11,10 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сущность закупки
+ * @author Изначальный автор Рыжков Дмитрий, доработал Василий Воробьев
+ */
 @Entity
 @Table(name = "purchases")
 @Data
@@ -25,7 +29,9 @@ public class Purchase
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-
+    /**
+     * Автор закупки
+     */
     @ManyToOne
     @JoinColumn(name = "author_username", nullable = false)
     @NotNull
@@ -46,7 +52,7 @@ public class Purchase
 
     /**
      * Дата и время создания закупки
-     * Все даты храним в Long, так удобнее для фронтендера
+     * Все даты храним в Long, так удобнее для frontend
      * это timestamp в секундах
      */
     @NotNull
@@ -101,18 +107,24 @@ public class Purchase
     @NotNull
     private String workCondition;
 
+    /**
+     * Файлы к закупке
+     */
     @OneToMany(mappedBy = "purchase", targetEntity = FileEntity.class)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<FileEntity> files;
 
     /**
-     * Массив сущностей предложений
+     * Предложения к закупке
      */
     @OneToMany(mappedBy = "purchase")
     @Fetch(value = FetchMode.SUBSELECT)
     @JsonIgnore
     private List<SupplyEntity> supplies;
-    
+
+    /**
+     * Вопросы к закупке
+     */
     @OneToMany(mappedBy = "purchase", targetEntity = Question.class, cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)
     @JsonIgnore

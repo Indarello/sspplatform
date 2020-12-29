@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Сервис для работы с закупкой
+ * @author Изначальный автор Рыжков Дмитрий, доработал Василий Воробьев
+ */
 @Service
 @EnableScheduling
 public class PurchaseServiceImpl implements PurchaseService
@@ -49,18 +53,30 @@ public class PurchaseServiceImpl implements PurchaseService
         this.emailSender = emailSender;
     }
 
+    /**
+     * Сохранение закупки
+     * @param purchase закупка
+     */
     @Override
     public Purchase save(Purchase purchase)
     {
         return purchaseRepository.saveAndFlush(purchase);
     }
 
+    /**
+     * Получение одной закупки
+     * @param id id закупки
+     */
     @Override
     public Purchase get(UUID id)
     {
         return purchaseRepository.getOne(id);
     }
 
+    /**
+     * Получение списка закупок
+     * @param purchasesPageRequest сущность с данными по поиску и пагинации
+     */
     @Override
     public Page<Purchase> getAll(PurchasesPageRequest purchasesPageRequest)
     {
@@ -83,6 +99,10 @@ public class PurchaseServiceImpl implements PurchaseService
 
     }
 
+    /**
+     * Удаление закупки
+     * @param purchase закупка
+     */
     @Override
     public boolean deletePurchase(Purchase purchase) throws IOException, FileServiceException, SupplyServiceException
     {
@@ -102,12 +122,19 @@ public class PurchaseServiceImpl implements PurchaseService
         return true;
     }
 
+    /**
+     * Получение закупки по id
+     * @param id id закупки
+     */
     @Override
     public Optional<Purchase> findById(UUID id)
     {
         return purchaseRepository.findById(id);
     }
 
+    /**
+     * Автоматическое обновление статусов закупок, один раз в минуту
+     */
     @Scheduled(fixedDelay = 60000)
     public void updateStatus()
     {
@@ -130,6 +157,10 @@ public class PurchaseServiceImpl implements PurchaseService
         }
     }
 
+    /**
+     * Оповещение при создании закупки
+     * @param purchase закупка
+     */
     @Override
     public void sendEmail(Purchase purchase)
     {

@@ -14,6 +14,11 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
+/**
+ * Конфигурация токена, токен в себе содержит username, дату создания и истечения срока действия и зашифровывается
+ * кодовым словом
+ * @author Василий Воробьев
+ */
 @Component
 public class JwtUtils
 {

@@ -12,6 +12,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Репозиторий для работы с сущностью закупки
+ * @author Изначальный автор Рыжков Дмитрий, доработал Василий Воробьев
+ */
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase, UUID>, JpaSpecificationExecutor<Purchase> {
     boolean existsById(UUID id);

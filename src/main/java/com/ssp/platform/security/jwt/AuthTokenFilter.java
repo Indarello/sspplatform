@@ -17,6 +17,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.ssp.platform.security.service.UserDetailsServiceImpl;
 
+/**
+ * Класс для авторизации пользователя по токену
+ * Проверка на действительность токена
+ * @author Василий Воробьев
+ */
 public class AuthTokenFilter extends OncePerRequestFilter
 {
     @Autowired

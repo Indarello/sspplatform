@@ -2,8 +2,11 @@ package com.ssp.platform.request;
 
 import com.ssp.platform.entity.enums.PurchaseStatus;
 import lombok.Data;
-import org.springframework.data.domain.Pageable;
 
+/**
+ * Промежуточная сущность с данными запроса по получению списка закупки
+ * @author Василий Воробьев
+ */
 @Data
 public class PurchasesPageRequest {
 

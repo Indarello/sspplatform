@@ -18,15 +18,11 @@ import com.ssp.platform.validate.PurchaseValidate;
 import com.ssp.platform.validate.PurchasesPageValidate;
 import com.ssp.platform.validate.ValidatorMessages.FileMessages;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +31,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Контроллер для действий с закупкми
+ * @author Изначальный автор Рыжков Дмитрий, доработал Василий Воробьев
+ */
 @RestController
 public class PurchaseController
 {
@@ -57,10 +57,18 @@ public class PurchaseController
 
 
     /**
-     * Добавление сущности закупки
+     * Создание новой закупки
      * Пришлось разложить на Param, т.к. файл нельзя предоставить в json
-     *
-     * @return ResponseEntity со статусом
+     * @param token токен авторизации
+     * @param name имя закупки
+     * @param description описание закупки
+     * @param proposalDeadLine дата окончания приема предложений
+     * @param finishDeadLine дата завершения закупки
+     * @param budget бюджет закупки
+     * @param demands требования к закупке
+     * @param team состав команды
+     * @param workCondition условия работы
+     * @param files файлы
      */
     @PostMapping(value = "/purchase", produces = "application/json")
     @PreAuthorize("hasAuthority('employee')")
@@ -118,8 +126,10 @@ public class PurchaseController
 
     /**
      * Получение страницы с закупками
-     *
-     * @return ResponseEntity со статусом
+     * @param requestPage номер страницы
+     * @param numberOfElements колличество элементов на странице
+     * @param filterName фильтрация по имени
+     * @param filterStatus фильтрация по статусу
      */
     @GetMapping(value = "/purchases", produces = "application/json")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
@@ -152,9 +162,8 @@ public class PurchaseController
     }
 
     /**
-     * Получение страницы с закупками
-     *
-     * @return ResponseEntity со статусом
+     * Получение информации по одной закупке
+     * @param id id закупки
      */
     @GetMapping(value = "/purchase/{id}", produces = "application/json")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
@@ -177,7 +186,20 @@ public class PurchaseController
     }
 
     /**
-     * Изменения параметров сущности закупки
+     * Изменения параметров закупки
+     * @param token токен авторизации
+     * @param id id закупки
+     * @param name имя закупки
+     * @param description описание закупки
+     * @param proposalDeadLine дата окончания приема предложений
+     * @param finishDeadLine дата завершения закупки
+     * @param budget бюджет закупки
+     * @param demands требования к закупке
+     * @param team состав команды
+     * @param workCondition условия работы
+     * @param status статус закупки
+     * @param cancelReason причина отмены
+     * @param files файлы
      */
     @PutMapping(value = "/purchase", produces = "application/json")
     @PreAuthorize("hasAuthority('employee')")
@@ -273,9 +295,9 @@ public class PurchaseController
     }
 
     /**
-     * Удаление сущности закупки по id
-     *
-     * @return ResponseEntity со статусом
+     * Удаление закупки по id
+     * @param token токен авторизации
+     * @param id id закупки
      */
     @DeleteMapping(value = "/purchase/{id}", produces = "application/json")
     @PreAuthorize("hasAuthority('employee')")

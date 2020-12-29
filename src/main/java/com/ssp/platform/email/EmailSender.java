@@ -15,6 +15,14 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.*;
 
+/**
+ * Класс для отправки писем на email
+ * Формирует письма, добавляет в очередь и переодически отправляет первое в очереди письмо
+ * Формирование и добавление в очередь работает в нескольких потоках
+ * Отправление работает в 1 потоке
+ * все работает асинхронно
+ * @author Василий Воробьев
+ */
 @Component
 @EnableAsync
 public class EmailSender
@@ -83,6 +91,11 @@ public class EmailSender
         this.EmailSendQueue = new PriorityQueue<>(queMax, EmailSendComparator);
     }
 
+    /**
+     * Формирование оповещения аккредитованых поставщиков при создании закупки
+     * @param purchase закупка о которой оповестить
+     * @param users список поставщиков
+     */
     @Async
     public void sendMailPurchaseCreate(Purchase purchase, List<User> users)
     {
@@ -131,6 +144,12 @@ public class EmailSender
         }
     }
 
+    /**
+     * Формирование оповещения поставщика при изменении статуса его предложения к закупке
+     * @param purchase закупка к которой было сделано предложение
+     * @param supplyEntity предложение, статус которого изменилось
+     * @param user поставщик которого надо оповестить
+     */
     @Async
     public void sendMailSupplyEdit(Purchase purchase, SupplyEntity supplyEntity, User user)
     {
@@ -168,6 +187,13 @@ public class EmailSender
         }
     }
 
+    /**
+     * Формирование оповещения поставщика при ответе на его вопрос
+     * @param purchase закупка к которой был дан вопрос
+     * @param question вопрос который был дан
+     * @param answer ответ сотрудника
+     * @param user поставщик которого надо оповестить
+     */
     @Async
     public void sendMailAnswerCreate(Purchase purchase, Question question, Answer answer, User user)
     {
@@ -205,6 +231,13 @@ public class EmailSender
         }
     }
 
+    /**
+     * Формирование оповещения поставщика при изменении ответа на его вопрос
+     * @param purchase закупка к которой был дан вопрос
+     * @param question вопрос который был дан
+     * @param answer ответ сотрудника
+     * @param user поставщик которого надо оповестить
+     */
     @Async
     public void sendMailAnswerEdit(Purchase purchase, Question question, Answer answer, User user)
     {
@@ -241,6 +274,11 @@ public class EmailSender
         }
     }
 
+    /**
+     * Добавление писем в очередь на отправку
+     * @param emailParams параметры для отправки и очереди, такие как приоритет отправки, письмо и адресс куда будет
+     *                   совершена отправки
+     */
     @Async
     private void addToQueue(EmailParams emailParams) throws InterruptedException, MessagingException
     {
@@ -263,6 +301,10 @@ public class EmailSender
         if(!busySending) beginSendMail();
     }
 
+    /**
+     * @param emailParamsList параметры для отправки и очереди, такие как приоритет отправки, письмо и адресс куда будет
+     *                       совершена отправки
+     */
     @Async
     private void addToQueue(List<EmailParams> emailParamsList) throws InterruptedException, MessagingException
     {
@@ -290,6 +332,10 @@ public class EmailSender
         }
     }
 
+    /**
+     * Отправление писем на почту
+     * Отправляет первое в очереди
+     */
     @Async
     private void beginSendMail() throws InterruptedException, MessagingException
     {
@@ -320,6 +366,9 @@ public class EmailSender
         beginSendMail();
     }
 
+    /**
+     * Письма выстраиваются в очередь сначала по приоритету, если приоритет одинаков - по дате
+     */
     private static final Comparator<EmailParams> EmailSendComparator = new Comparator<EmailParams>()
     {
         @Override

@@ -22,6 +22,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+/**
+ * Конфигурация Spring security
+ * @author Василий Воробьев
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
@@ -65,17 +69,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Конфигурация сервиса: CORS и CSRF отключены, CSRF не нужен т.к. система использует jwt токен авторизации
+     * методы регистрации и авторизации доступны анонимным пользователям
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception
     {
-        // регистрация и получение список закупок доступны даже анонимным посетителям; временно /testall для теста тоже доступна всем
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/registration").permitAll()
-                //.antMatchers("/purchase").permitAll()
-                .antMatchers("/regfirstadmin").permitAll()
                 .antMatchers("/login").permitAll()
                 .anyRequest().authenticated();
 

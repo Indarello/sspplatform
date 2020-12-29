@@ -11,6 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ssp.platform.entity.User;
 import com.ssp.platform.repository.UserRepository;
 
+/**
+ * Получение информации о пользователе по токену
+ * @author Василий Воробьев
+ */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService
 {

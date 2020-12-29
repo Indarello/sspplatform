@@ -29,7 +29,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-
+/**
+ * Контроллер для действий с пользователями
+ * @author Василий Воробьев
+ */
 @RestController
 public class UserController
 {
@@ -61,6 +64,11 @@ public class UserController
         this.sspPlatformBot = sspPlatformBot;
     }
 
+    /**
+     * Авторизация пользователя
+     * @param username логин
+     * @param password пароль
+     */
     @GetMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestHeader("username") String username, @RequestHeader("password") String password)
     {
@@ -82,7 +90,8 @@ public class UserController
     }
 
     /**
-     * Метод регистрации для поставщиков
+     * Регистрация для поставщиков
+     * @param ObjUser сущность пользователя
      */
     @PostMapping("/registration")
     public ResponseEntity<?> registerFirm(@RequestBody User ObjUser)
@@ -112,7 +121,8 @@ public class UserController
                     ObjUser.getTelephone(),
                     ObjUser.getEmail());
 
-            return new ResponseEntity<>(new ApiResponse(true, "Вы успешно зарегестрировались, ожидайте аккредитации от сотрудника"), HttpStatus.CREATED);
+            return new ResponseEntity<>(new ApiResponse(true,
+                    "Вы успешно зарегестрировались, ожидайте аккредитации от сотрудника"), HttpStatus.CREATED);
         }
         catch (Exception e)
         {
@@ -121,7 +131,9 @@ public class UserController
     }
 
     /**
-     * Метод регистрации нового сотрудника
+     * Создание нового сотрудника другим сотрудником
+     * @param token токен авторизации
+     * @param ObjUser сущность пользователя
      */
     @PostMapping("/regemployee")
     @PreAuthorize("hasAuthority('employee')")
@@ -161,6 +173,12 @@ public class UserController
     }
 
 
+    /**
+     * Получение списков пользователей
+     * @param type тип пользователей по роли
+     * @param requestPage номер страницы
+     * @param numberOfElements колличество элементов на странице
+     */
     @GetMapping(value = "/users/{type}")
     @PreAuthorize("hasAuthority('employee')")
     public ResponseEntity<Object> getUsers(@PathVariable(name = "type") String type,
@@ -196,6 +214,11 @@ public class UserController
         return new ResponseEntity<>(searchResult, HttpStatus.OK);
     }
 
+    /**
+     * Получение информации по одному пользователю
+     * @param username имя пользователя
+     * @param token токен авторизации
+     */
     @GetMapping(value = "/user/{username}")
     @PreAuthorize("hasAuthority('employee') or hasAuthority('firm')")
     public ResponseEntity<Object> getUser(@PathVariable(name = "username") String username, @RequestHeader("Authorization") String token)
@@ -223,6 +246,11 @@ public class UserController
         return new ResponseEntity<>(new ApiResponse(false, "Пользователь не найден"), HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Изменение информации о пользователе
+     * @param objUser сущность пользователя
+     * @param token токен авторизации
+     */
     @PutMapping(value = "/user")
     @PreAuthorize("hasAuthority('employee')")
     public ResponseEntity<Object> editUser(@RequestBody User objUser, @RequestHeader("Authorization") String token)

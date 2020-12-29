@@ -9,13 +9,19 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
+/**
+ * Конфигурация стандартного пользователя Spring security
+ * Отключаем ненужные атрибуты такие как isAccountNonExpired (истек ли срок аккаунта) и тд
+ * authorities представлен ролью пользователя - firm, employee
+ * @author Василий Воробьев
+ */
 public class UserDetailsImpl implements UserDetails
 {
-    private String username;
-    private String email;
+    private final String username;
+    private final String email;
     @JsonIgnore
-    private String password;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final String password;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(String username, String email, String password,
                            Collection<? extends GrantedAuthority> authorities)

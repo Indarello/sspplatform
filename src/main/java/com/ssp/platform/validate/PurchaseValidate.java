@@ -6,12 +6,15 @@ import com.ssp.platform.response.ValidateResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Валидация при действиях с закупкой
+ * @author Василий Воробьев
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class PurchaseValidate extends Validator
 {
     public static final long ONE_HUNDRED_YEARS = 3155760000L;
-    //TODO на время тестирования изменили с ONE_HOUR = 3600L;
     public static final long ONE_HOUR = 3600L;
     public static final long THREE_THOUSAND_YEARS = 32503741200L;
     private Purchase purchase;
@@ -25,6 +28,9 @@ public class PurchaseValidate extends Validator
         this.foundInvalid = false;
     }
 
+    /**
+     * Валидация при создании закупки
+     */
     public ValidateResponse validatePurchaseCreate()
     {
         validateName();
@@ -54,6 +60,9 @@ public class PurchaseValidate extends Validator
         return new ValidateResponse(true, "", checkResult);
     }
 
+    /**
+     * Валидация при изменении закупки
+     */
     public ValidateResponse validatePurchaseEdit(Purchase newPurchase)
     {
         String newStringParam = newPurchase.getName();

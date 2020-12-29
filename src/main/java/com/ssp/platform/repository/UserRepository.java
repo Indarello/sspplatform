@@ -9,14 +9,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.ssp.platform.entity.User;
 
+/**
+ * Репозиторий для работы с сущностью пользователя
+ * @author Василий Воробьев
+ */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>
 {
     Optional<User> findByUsername(String username);
 
     boolean existsByUsername(String username);
-
-    boolean existsByRole(String role);
 
     boolean existsByEmail(String email);
 

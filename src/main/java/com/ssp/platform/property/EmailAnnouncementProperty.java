@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Настройки приложения связанные с оповещением по email
+ * @author Василий Воробьев
+ */
 @Component
 @Data
 @ConfigurationProperties(prefix = "email-announcement")

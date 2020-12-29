@@ -10,6 +10,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
 
+/**
+ * Валидация при действиях с пользователем
+ * @author Василий Воробьев
+ */
 //TODO:В будущем если будет время сделать так что бы название полей ValidateResponse совпадало с названием поля user
 @Getter
 @Component

@@ -9,6 +9,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * Сущность пользователя для сотрудника и поставщика
+ * @author Василий Воробьев
+ */
+//TODO: в будущем вынести данные которые есть только у поставщика в отдельную сущность, такие как ИНН и тд
 @Entity
 @Data
 @Table(name = "users",
@@ -77,12 +82,21 @@ public class User
     @NotNull
     private String technology;
 
+    /**
+     * ИНН или УНН
+     */
     @NotNull
     private String inn;
 
+    /**
+     * Контактный телефон
+     */
     @NotNull
     private String telephone;
 
+    /**
+     * почта @mail
+     */
     @NotNull
     @Email
     private String email;
@@ -104,10 +118,16 @@ public class User
     @Column(name = "tg_connected")
     private Boolean tgConnected;
 
+    /**
+     * Список закупок созданных пользователем
+     */
     @OneToMany(mappedBy="author", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Purchase> purchases;
 
+    /**
+     * Список предложений созданных пользователем к закупкам
+     */
     @OneToMany(mappedBy="author", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<SupplyEntity> supplies;

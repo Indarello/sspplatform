@@ -2,13 +2,14 @@ package com.ssp.platform.property;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Настройки приложения связанные с созданием пользователя сотрудника в системе
+ * @author Василий Воробьев
+ */
 @Component
 @Data
 @ConfigurationProperties(prefix = "user-create")
