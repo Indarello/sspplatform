@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+/**
+ * Контроллер для действий с вопросами и ответами
+ * @author Изначальный автор Рыжков Дмитрий, доработал Иван Медведев
+ */
 @RestController
 public class QAController {
 

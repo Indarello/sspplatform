@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Сервис для работы с вопросами
+ * @author Изначальный автор Рыжков Дмитрий, доработал Иван Медведев
+ */
 @Service
 public class AnswerServiceImpl implements AnswerService {
 

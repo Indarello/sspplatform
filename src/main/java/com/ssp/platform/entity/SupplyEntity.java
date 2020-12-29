@@ -11,6 +11,10 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.*;
 
+/**
+ * Сущность предложения к закупке
+ * @author Горбунов Александр
+ */
 @Data
 @Entity
 @Table(name = "supply")

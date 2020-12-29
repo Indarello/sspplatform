@@ -9,6 +9,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
+/**
+ * Сущность вопроса
+ * @author Изначальный автор Рыжков Дмитрий, доработал Иван Медведев
+ */
 @Data
 @Entity
 @Table(name = "questions")

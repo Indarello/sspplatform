@@ -19,6 +19,10 @@ import java.nio.file.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+/**
+ * Сервис для работы с вопросами
+ * @author Горбунов Александр
+ */
 @Service
 public class FileServiceImpl implements FileService {
     public static final int LOCATION_PURCHASE = 0;

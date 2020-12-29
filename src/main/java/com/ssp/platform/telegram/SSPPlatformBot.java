@@ -21,6 +21,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * @author Горбунов Александр
+ */
 @Component
 @RestController
 public class SSPPlatformBot extends TelegramLongPollingBot {

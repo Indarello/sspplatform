@@ -20,6 +20,10 @@ import java.util.*;
 
 import static com.ssp.platform.validate.ValidatorMessages.SupplyMessages.*;
 
+/**
+ * Сервис для работы с предложениями к закупке
+ * @author Горбунов Александр
+ */
 @Service
 public class SupplyServiceImpl implements SupplyService {
 

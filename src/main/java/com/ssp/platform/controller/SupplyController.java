@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+/**
+ * Контроллер для действий предложениями с закупками
+ * @author Горбунов Александр
+ */
 @RestController
 public class SupplyController {
 
@@ -45,7 +49,7 @@ public class SupplyController {
             throws IOException, NoSuchAlgorithmException, SupplyValidationException, FileValidationException, SupplyServiceException {
 
         User author = userDetailsService.loadUserByToken(token);
-        //if (author.getStatus().equals("NotApproved")) return new ResponseEntity<>(new ApiResponse(false, "Пользователь не аккредитован!"), HttpStatus.BAD_REQUEST);
+        if (author.getStatus().equals("NotApproved")) return new ResponseEntity<>(new ApiResponse(false, "Пользователь не аккредитован!"), HttpStatus.BAD_REQUEST);
 
         supplyService.create(purchaseId, description, author, budget, comment, files);
 

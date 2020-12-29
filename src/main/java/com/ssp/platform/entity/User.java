@@ -116,6 +116,7 @@ public class User
 
     @NotNull
     @Column(name = "tg_connected")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean tgConnected;
 
     /**

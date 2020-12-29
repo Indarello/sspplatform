@@ -18,6 +18,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
 
+/**
+ * Контроллер для действий с файлами
+ * @author Горбунов Александр
+ */
 @RestController
 public class FileController {
     private final UserDetailsServiceImpl userDetailsService;

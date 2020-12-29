@@ -14,6 +14,10 @@ import java.security.*;
 import java.sql.Timestamp;
 import java.util.*;
 
+/**
+ * Сущность файла
+ * @author Горбунов Александр
+ */
 @Data
 @Entity
 @Table(name = "files")
